@@ -3555,7 +3555,7 @@ clean: clean-generated clean-tex clean-graphics clean-deps clean-backups clean-a
 
 .PHONY: distclean
 distclean: clean
-	rm -rf auto woptic_userguide.tdo missfont.log
+	rm -rf auto woptic_userguide.{tdo,pdf} logo.tex missfont.log
 
 #
 # HELP TARGETS

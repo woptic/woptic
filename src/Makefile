@@ -53,7 +53,7 @@ clean:
 	rm -f *.mod *.o *__genmod.{f90,mod}
 
 distclean: clean
-	rm -f $(EXE)
+	rm -f $(EXE) logo.{ansi,txt}
 
 .PHONY: all clean distclean
 
