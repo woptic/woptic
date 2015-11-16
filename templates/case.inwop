@@ -1,0 +1,33 @@
+OPT   interp   F       # mode;      matelmode;    intra-uc hop? (Peierls)
+10 0.05 0.05   3 1e-5  # Emax, dE, delta (eV);    omega-div, tol-cutoff
+21 23  12 25           # inner window (= WFs);    [outer window]
+40.0   0.00            # inv. temp. (eV^-1);      chemical potential (eV)
+1.0    F               # Drude-sumrule sep. [eV]; compute orb.resolv.?
+T 0                    # read self-energy?        #bands 
+  21 22 23             # bands with self-energy   (if #b=0: inner window)
+F F 1.23 0             # rotate WFs?;       scissors?, shift (eV), #bands
+  24 25                # bands to shift
+
+###########################################################################
+# MODE:       DOS   … density of states only
+#             OPT   … optical conductivity and DOS
+#             JOINT … joint density of states
+#
+# MATELMODE:
+#  1 | Peierls … take dH/dk as matrix elements (Peierls approximation)
+#  2 | interp  … interpolate matrix elements in Wannier basis
+#  3 | optic   … take matrix elements from wien2k rotated in Wannier basis
+#  4 | Bloch   … take unchanged matrix elements from wien2k (non-int. only)
+#  5 | LDA     … wien2k only, no rotation or interpolation (non-int. only)
+
+## xx xy xz yy yz zz       # coordinate combinations
+
+
+##/---
+## Local Variables:
+## mode:                  text
+## comment-start:         "#"
+## End:
+##\---
+##
+## Time-stamp: <2015-05-23 19:58:48 elias>

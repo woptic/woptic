@@ -1,0 +1,420 @@
+#!/bin/bash
+
+### woptic/bin/woptic
+###
+###    Wrapper script for adaptive optics algorithm
+###
+### Copyright 2009-2012 Philipp Wissgott
+###           2014-2015 Elias Assmann
+###
+### $Id: woptic 447 2015-11-16 09:59:46Z assmann $
+
+set -e
+
+# default parameters
+start=1
+init=3
+theta=0.5
+maxiterations=5
+
+file=$(basename $PWD)
+home=$(dirname $0)
+name=$(basename $0)
+log=:log
+reftet=_refined
+wopmain=_new
+
+reftetfiles="tetra tetra_full klist klist_full voe map"
+wopmainfiles="kcontribw wdoskcontribw K1w"
+
+# copied from x_lapw
+[[ -e $file.struct ]] && \
+    c=$(cut -b -6 "$file.struct" |
+    awk 'BEGIN{c="c"};
+         {if ($0 == "-1 0 0") {
+            getline;
+            {if ($0 == " 0-1 0"){
+               getline;
+               {if ($0 == " 0 0-1")
+                  {c= ""}
+         }}}}};
+         END{print c}')
+
+usage () {
+    cat <<EOF
+WOPTIC:   adaptive algorithm to compute optical conductivity, dc conductivity,
+          and thermopower
+
+USAGE:    woptic [OPTIONS]
+
+OPTIONS:
+ --max-iterations N, -i N 
+                number of total iterations (default: $maxiterations)
+ --restart I    continue from iteration I
+ --restore I    restore iteration I without continuing
+ --theta Θ      change refinement “harshness”
+                (0 [uniform] … 1 [most adaptive]; default: $theta)
+ --inter        focus refinement on higher energies (usually inter-orbital)
+ --init         initial refinement steps (default: $init)
+ --nosym        do not use symmetry operations
+ --band         use ‘case.klist_band’
+  -p            use parallel lapw1, optic
+  -c            use complex  lapw1, optic
+ --so           use lapwso to compute energies
+ --up|--dn      use lapw1 -up/-dn to compute energies
+  -f            override  ‘case’
+  -V, --verbose increase verbiage level to maximum
+  -v, --version increase verbiage level to maximum
+  -q, --quiet
+  -h, --help    this message
+EOF
+}
+
+version () {
+    r=$(echo '$Rev: 394 $' | set 's/: *(\d+) *\$/\1/')
+    echo "woptic 0.98-r$r"
+}
+
+croak () {
+    echo >&2 "$0: $@"
+    exit 1
+}
+
+carp () {
+    [[ $q ]] && return
+    echo >&2 "$0: $@"
+}
+
+archive () {
+    local tozip
+
+    echo Archiving iteration $1 in ‘$vault’ …
+
+    for suf in $archfiles; do
+        ln -fs $file.$suf $file.$suf.$1 # create symlinks for names
+        tozip+=" $file.$suf.$1"
+    done
+
+    zip -qg $v $vault $tozip    # -g: grow archive in-place
+    rm $tozip                   # remove symlinks again
+}
+
+unarchive () {
+    local tounzip q
+
+    [[ $v ]] || q=-q
+
+    echo Restoring iteration $1 from ‘$vault’ …
+
+    for suf in $archfiles; do
+        tounzip+=" $file.$suf.$1"
+    done
+
+    unzip $q $vault $tounzip
+
+    for suf in $archfiles; do
+        mv $v $file.$suf.$1 $file.$suf
+    done
+}
+
+w () {
+    echo "`date`> (w) $@" >> $log
+    [[ $v ]] && echo
+    [[ $v ]] && echo $1 | perl -ple tr/a-z/A-Z/
+    $time $@
+}
+
+wq () {
+    local t
+
+    echo "`date`> (w) $@" >> $log
+
+    [[ $v ]] && t=$time
+    [[ $v ]] && echo
+    [[ $v ]] && echo $1 | perl -ple tr/a-z/A-Z/
+    $t $@
+}
+
+
+## Option handling ##
+shopt -s extglob
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -i|?(-)-max-iterations)
+                       maxiterations=$2; shift ;;
+        ?(-)-restart)        restart=$2; shift ;;
+        ?(-)-restore)        restore=$2; shift ;;
+        ?(-)-th|?(-)-theta)    theta=$2; shift ;;
+        ?(-)-inter)            inter=-inter    ;;
+        ?(-)-init)              init=$2; shift ;;
+        ?(-)-nosym)            nosym=1         ;;
+        ?(-)-band)              band=-band     ;; 
+        -p|?(-)-parallel?(-lapw1)) p=-p        ;;
+        -c|?(-)-complex?(-lapw1))  c=-c        ;;
+        ?(-)-so)                  so=-so       ;;
+        ?(-)-up)                updn=up        ;;
+        ?(-)-dn)                updn=dn        ;;
+        -f|?(-)-case)           file=$2; shift ;;
+        -V|?(-)-verbose)           v="-v"      ;;
+        -q|?(-)-quiet)             q="-q"      ;;
+
+        -v|?(-)-version)
+            version; exit 0;;
+        -[hH]|-help|--help)
+            usage;   exit 0;;
+
+        *) croak "argument “$1” not recognized (try --help)";;
+    esac
+
+    shift
+done
+shopt -u extglob
+
+## Output Banner (color on terminal)
+if tty <&1 -s; then
+    banner=ansi
+
+else
+    banner=txt
+fi
+banner=$(dirname $0)/../src/logo.$banner
+cat $banner
+echo
+
+echo ">   ($(basename $0)) options: $@" >>:log
+
+[[ $updn ]] && sp=-$updn
+#[[ $q    ]] || time="eval time" #/usr/bin/time
+
+vault=$file.wophist.zip
+klisttmp="mktemp $file.klist.XXX"
+
+[[ -s $file.inwop ]] || \
+    croak "‘$file.inwop’ required."
+
+# sets matelmode, runlapw1, runoptic, convert_vr, peierls, need_ham
+eval $(inwopcheck $file.inwop || echo exit $?) 
+
+[[ $runlapw1   ]] && oldnewfiles+=" energy"
+[[ $runoptic   ]] && oldnewfiles+=" mommat2"
+[[ $need_ham   ]] && oldnewfiles+=" hk"
+[[ $convert_vr ]] && oldnewfiles+=" vkx vky vkz"
+[[ $mixed_vr   ]] && oldnewfiles+=" vvkxx vvkxy vvkxz vvkyy vvkyz vvkzz"
+archfiles="$reftetfiles $wopmainfiles $oldnewfiles klist_add klist_refined
+           optcondw wdos outputref outputwop"
+
+
+## Special -restore mode ##
+if [[ $restore ]]; then
+    start=$restore
+    restore=$(( $restore - 1 ))
+    echo Restoring iteration $start …
+    unarchive $restore
+    exit
+fi    
+
+
+## Test file existence ##
+[[ -s $file.symop ]]                     || \
+    carp "‘$file.symop’ required.  Please run ‘x optic’."
+[[ $need_ham   && ! -s ${file}_hr.dat ]] && \
+    croak "‘${file}_hr.dat’ required.  Run Wannier90 with ‘hr_plot=T’."
+[[ $convert_vr && ! -s $file.vr ]]       && \
+    croak "‘$file.vr’ required.  Run ‘x optic’ and ‘compute_vr’."
+[[ $mixed_vr   && ! -s $file.vvr ]]      && \
+    croak "‘$file.vvr’ required.  Run ‘x optic’ and ‘compute_vr’."
+
+must="fermi$updn"
+[[ $runoptic ]] && must+=" inop"
+for suf in $must; do
+    f=$file.$suf
+    [[ -s $f ]] || croak "required file ‘$f’ not found"
+done
+
+
+## Header ##
+echo -n " MATELMODE     $matelmode"
+echo
+echo     " OPTIONS:"
+echo     "          case  = $file"
+echo -ne "    max. iter.  = $maxiterations\t\t"
+echo -e  "      parallel? : $p"
+echo -ne "       restart? : $restart\t\t"
+echo -e  "       complex? : $c"
+echo -ne "        -inter? : $inter\t\t"
+echo -e  "          band? : $band"
+echo -ne "         theta  = $theta\t\t"
+echo -e  "            so? : $so"
+echo -ne "         nosym? : $nosym\t\t"
+echo -e  "            sp  : $sp"
+echo -ne "          init  = $init\t\t"
+echo
+
+if [[ $restart ]]; then
+    start=$restart
+    restart=$(( $restart - 1 ))
+    echo Restart from iteration $start …
+    unarchive $restart
+else
+   ## Initialize history
+   ##
+   ## Some files have to contain “dummy zeros”, some just have to
+   ## exist.
+                             echo "0 0 0"   > $file.kcontribw
+                             true           > $file.K1w
+                             true           > $file.wdoskcontribw
+    [[     $need_ham   ]] && echo "0 0 0"   > $file.hk
+    [[     $runoptic   ]] && echo "0"       > $file.mommat2
+    [[     $runlapw1   ]] && true           > $file.energy
+    for i in x y z; do
+        [[ $convert_vr ]] && echo "0 0"     > $file.vk$i
+    done
+    for i in xx xy xz yy yz zz; do
+        [[ $mixed_vr   ]] && echo "0 0 0"   > $file.vvk$i
+    done
+    archive 0
+fi
+
+for iter in $(seq $start $maxiterations)
+do
+    echo
+    echo "+++ iteration $iter +++"
+
+    for suf in $oldnewfiles; do
+        mv $v $file.$suf $file.${suf}_old
+    done
+
+    if [[ $iter = 1 ]]; then
+        if [[ $nosym ]]; then
+            mv $v     $file.struct $file.struct_sym
+            ln -fs $v $file.ksym   $file.struct
+        fi
+        w refine_tetra -init $init $file
+        if [[ $nosym ]]; then
+            ln -sf $v $file.struct_sym $file.struct
+        fi
+        nk=$(perl -ne '/^END/ and print($.-1), exit' $file.klist_add)
+    else
+        # refine k-mesh
+        w refine_tetra -th $theta $inter $file
+        nk=$(perl -ne '/^END/ and print($.-1), exit' $file.klist_add)
+
+        fgrep "estimator =" $file.outputref
+    fi
+
+    # if there was no error, move updated files over old ones …
+    for suf in $reftetfiles; do
+        cp $v $file.$suf$reftet $file.$suf
+    done
+
+    # … then overwrite klist with klist_add
+    [[ $iter != 1 ]] && mv $v $file.klist_add $file.klist
+
+    [[ $band -eq 1 ]] && cp $v $file.klist_band $file.klist
+
+    echo "  new k-points: "$nk
+    if [[ $nk -ne 0 ]]; then  #special case where not much is to do here
+        if [[ $runlapw1 ]]; then
+            if [[ $so ]]; then
+                if [[ $sp ]]; then
+                    x lapw1  -f $file -up $p $c
+                    x lapw1  -f $file -dn $p $c
+                    x lapwso -f $file -up $p $c
+                else
+                    #FIXME: “this is not yet working” (???)
+                    x lapw1  -f $file $p $c
+                    x lapwso -f $file $p $c
+                fi
+            else
+                x lapw1 -f $file $sp $p $c #work with klist
+            fi
+            
+            [[ $p ]] && x joinvec -f $file $sp $so
+        fi
+
+        [[ $runoptic ]] && x optic -f $file $p $c $so $sp
+
+        if [[ $peierls ]]; then
+            ktmp=$(klisttmp)
+            mv $v $file.klist $ktmp
+            ln -fs $v $file.klist_full $file.klist
+        fi
+        x convham -f $file
+        if [[ $peierls ]]; then
+            rm $v $file.klist
+            mv $v $ktmp $file.klist
+        fi
+
+        [[ $runoptic || $need_ham ]] && wq joinham $file
+        [[ $runoptic ]] && mv $v $file.mommat2_joined $file.mommat2
+        [[ $need_ham ]] && mv $v $file.hk_joined $file.hk
+
+        if [[ $convert_vr ]]; then
+            wq convert_vr $file
+            for i in x y z; do
+                wq joinham $file.vk${i}_old $file.vk$i $file.vk${i}_joined
+                mv $v $file.vk${i}_joined $file.vk$i
+            done
+
+            if [[ $mixed_vr ]]; then
+                for i in xx xy xz yy yz zz; do
+                    wq joinham $file.vvk${i}_old $file.vvk$i \
+                        $file.vvk${i}_joined
+                    mv $v $file.vvk${i}_joined $file.vvk$i
+                done
+            fi
+        fi
+
+        if [[ $iter -ne 1 && $runlapw1 ]]; then
+            natoms=$(grep "elements:" $file.outputwop | cut -d: -f2)
+
+            tail -n +$(( 2*$natoms+1 )) $file.energy >>$file.energy_old
+            mv $v $file.energy_old $file.energy
+        fi
+    elif [[ $peierls ]]; then # Nk = 0
+        # for Peierls we have to Fourier transform the full
+        # Hamiltonian even if there is no new symmetrized k-point
+        ktmp=$(klisttmp)
+        mv $v $file.klist $ktmp
+        ln -fs $v $file.klist_full $file.klist
+
+        x convham -f $file
+
+        rm $file.klist
+        mv $v $ktmp $file.klist
+    else
+        carp "refine_tetra found no new k-points
+(maybe try re-running with smaller --theta or larger --init)"
+        for suf in $oldnewfiles; do
+            mv $v $file.${suf}_old $file.$suf
+        done
+    fi
+
+    # replace added k-points with full symmetrized list
+    [[ ! $band && $iter != 1 ]] && cp $v $file.klist$reftet $file.klist
+
+    [[ $nosym ]] && ln -sf $v $file.ksym $file.struct
+
+    # main run to compute optical conductivity on given mesh
+    w woptic_main $file $band
+
+    # if there was no error, move updated files over old ones
+    for suf in $wopmainfiles; do
+        mv $v $file.$suf$wopmain $file.$suf
+    done
+
+    [[ $nosym ]] && ln -sf $v $file.struct_sym $file.struct
+
+    fgrep $file.outputwop -e "sumrules" -e "dc cond" -e "thermopower"
+
+    # store history
+    archive $iter
+done
+
+if [[ ! $q ]]; then
+    echo
+    echo "+++ woptic done +++"
+fi
+
+
+## Time-stamp: <2015-11-13 11:40:58 assman@faepop36.tu-graz.ac.at>

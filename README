@@ -1,0 +1,50 @@
+                       //====================\\
+                      ||                      ||
+                      ||  The Woptic Package  ||
+                      ||                      ||
+                       \\====================//
+
+
+Woptic calculates the optical conductivity of interacting systems in a
+maximally-localized Wannier  basis.  It is  built on top  of Wannier90
+and Wien2k.  In  any published papers arising from  the use of Woptic,
+please cite:
+
+   J.Kunes, R.Arita, P.Wissgott, A.Toschi, H.Ikeda, K.Held,
+   Comp.Phys.Commun. 181, 1888 (2010)
+
+If you use additional codes  to process woptic output, such as Wien2k,
+wien2wannier,  or Wannier90,  do not  forget to  cite  the appropriate
+papers as well.
+
+For woptic updates and further information, see
+<http://www.ifp.tuwien.ac.at/forschung/arbeitsgruppen/cms/software-download/woptic/>
+
+Comments, patches and the like can be sent to <wien2wannier@ifp.tuwien.ac.at>.
+
+
+Installation
+************
+
+
+
+License
+*******
+
+Woptic  is free  software: you  can redistribute  it and/or  modify it
+under the terms of the GNU  General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.  See the file COPYING for details.
+
+Woptic is distributed in the hope  that it will be useful, but WITHOUT
+ANY WARRANTY; without even  the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.   See the GNU General Public License
+for more details.
+
+You  should have received  a copy  of the  GNU General  Public License
+along with Woptic.  If not, see <http://www.gnu.org/licenses/>.
+
+
+                          -----===:===-----
+                                   
+    No tetrahedra were harmed during the making of this software.

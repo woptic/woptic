@@ -1,0 +1,37 @@
+
+                             WOPTIC CHEAT SHEET
+                             ******************
+
+
+0) Wien2k run & Wannier projection
+   0.1) disentanglement works only for Wannier-only calculations
+   0.2) keep `vector´ file for next steps
+
+1) In the Wannierization directory,
+   1.1) cp $WIENROOT/SRC_templates/case.inop $(basename $PWD).inop     MME=ON
+
+2) Prepare woptic input file                                       case.inwop
+   2.1) cp /opt/woptic/case.inwop $(basename $PWD).inwop
+   2.2) select MATELMODE=2|3                                   (V(R) | optic)
+   2.3) adjust outer (``w2k´´) and inner (``w90´´) band windows
+        with disentanglement:  outer=inner  and  #bands=#WFs
+   2.4) set temperature, chemical potential
+
+3) If MATELMODE=2: compute V(R), VAV(R)           compute_vr $(basename $PWD)
+
+4) If interacting: self-energy on the real axis in `case.selfE´
+   Header: #frequencies, #orbitals.  Data: omega, (Re, Im) x #orbitals
+
+5) Run ‘woptic’
+   5.1) main output files:
+      - case.optcondw:    optical conductivity
+      - case.outputwop:   DC cond., thermopower;  diagnostic output
+      - case.wdos:        spectral function
+      - case.wophist.zip: saved iterations
+   5.2) `woptic -restart 2 -i 5´ will resume at it. 2 and stop after it. 5
+   5.3) useful for plotting history: `unzip -p *hist.zip '*condw.2'´
+
+
+                               ----===:===----
+
+                                  Good luck!

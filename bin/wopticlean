@@ -1,0 +1,160 @@
+#!/usr/bin/perl -w
+
+### woptic/bin/wopticlean
+###
+###    A script to remove leftover files from woptic runs
+###
+### Copyright 2015      Elias Assmann
+###
+### $Id: wopticlean 411 2015-06-09 08:00:21Z assmann $
+
+use strict;
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+use Pod::Usage;
+use File::Basename;
+use File::Find;
+use Cwd qw(realpath);
+
+## The following patterns define what will be removed ##
+
+# remove exactly these files, without prepending CASE
+my @sic = 
+  (
+   qr{^(?: |up|dn) (?: optic|lapw(?:1|so)) .* \. (?: def|error) }x,
+   qr{^\. (?: command | running | lapw (?:1|so) para | time | tmp | in\.tmp
+           | script | processes | mist )
+      .* }x,
+   qr{^ (?: :parallel | This_file) .*}x,
+   qw( \.symop symop )
+  );
+
+# remove files with this extension
+my @ext_only=
+  (
+   qr{\.
+      (?: output(?: ref|wop|op) | symmat | (?: output|scf) (?: 1|so) | storeHinv
+       | vector | energy | normso optcondw(?: | _orb(?: xx|xy|xz|yy|yz|zz))
+      ) .*
+     }x,
+   # we also remove ‘klist’ itself since it was automatically generated
+   qr{\. klist (?: |_[0-9]+)}x,
+   qw(\.klist_add \.opcondw \.wdos \.vec \.vect1)
+);
+
+# remove files with this extension, and with “_full” and/or “_refined”
+# added
+my @andfull = map { my $x=$_; map '\.'.$x.$_,
+                      '', qw(_full _refined _full_refined)
+                  }
+  qw( klist tetra );
+
+# remove files with this extension, and with “_new” added
+my @andnew = map { my $x=$_; map '\.'.$x.$_,
+                      qw(_new), ''
+                  }
+  qw( K1w kcontribw wdoskcontribw );
+
+# remove files with this extension, and with “_old” added
+my @andold = map { my $x=$_; map qr{\.$x$_}x,
+                      '', qw(_old)
+                  }
+  qw( energy mommat2 hk ), q{vk(?:x|y|z)}, q{vvk(?:xx|xy|xz|yy|yz|zz)};
+
+my @andrefined = map { my $x=$_; map '\.'.$x.$_,
+                      '', qw(_refined)
+                  }
+  qw( map voe );
+
+my @extensions = (@sic, @ext_only, @andfull, @andnew, @andold, @andrefined);
+
+sub help    { pod2usage(0) }
+sub man     { pod2usage(-verbose=>2, exitval=>0, -noperldoc=>1) }
+sub version { '$Rev: 394 $' =~ /: *(\d+) *\$/; print "wopticlean 0.98-r$1\n" }
+
+my ($verbose, $recursive, $mrproper, $recon, %dirs);
+
+GetOptions('help|h'      => \&help,
+           'man|H'       => \&man,
+           'verbose|V'   => \$verbose,
+           'version|v'   => \&version,#
+           'recursive|r' => \$recursive,
+           'mrproper|A'  => \$mrproper,
+           'recon|n'     => \$recon,
+          ) or pod2usage(2);
+
+
+@ARGV or @ARGV = ".";
+
+$dirs{realpath($_)}++ for @ARGV;
+
+## Real Work ##
+my $action = sub { unlink @_ };
+
+sub wanted {
+    -d $_ and return;
+
+    my ($b, $d, $e) = fileparse($_, @extensions);
+
+    $e and
+      $recursive || $dirs{substr $d, 0, -1} and
+      $mrproper || length($b)==0 || basename($d) eq $b
+        and $action->($_);
+}
+
+my %opts = ( wanted => \&wanted,
+             no_chdir => 1 );
+
+if ($recon) {
+    $action = sub { print @_, "\n" }
+} elsif ($verbose) {
+    $action = sub { print @_, "\n"; unlink @_; }
+}
+
+find(\%opts, keys %dirs);
+
+
+__END__
+
+if [[ $r ]]; then
+    dirs=( $(find "${dirs[@]}" -type d) )
+fi
+
+actions="-delete $v"
+
+[[ $n ]] && actions=$n
+
+
+=head1 NAME
+
+wopticlean - remove leftover files from woptic runs
+
+=head1 SYNOPSIS
+
+wopticlean [OPTIONS] [DIRECTORY ...]
+
+=head1 OPTIONS
+
+   -h, --help        brief help
+   -H, --man         full documentation
+   -v, --verbose     print file names as they are deleted
+   -r, --recursive   recursively operate on all (!) subdirectories
+   -A, --mrproper    clean more thoroughly
+   -n, --recon       only print filenames that would be deleted
+
+
+=head1 DESCRIPTION
+
+For each DIRECTORY, normally only files conforming to Wien2k naming
+conventions (DIRECTORY/DIRECTORY.EXT) are deleted [the usual caveats
+about symlinks apply]; with -A, delete DIRECTORY/*.EXT instead.
+
+If no directories are named, defaults to `.'
+
+You are  advised to do a  dry run (`-n') first,  especially when using
+`-r' or `-A'!
+
+=cut
+
+
+## Time-stamp: <2015-06-08 19:26:25 assman@faepop23.tu-graz.ac.at>
