@@ -13,9 +13,9 @@ please cite:
    E. Assmann, P. Wissgott, J. Kuneš, A. Toschi, P. Blaha, and K. Held,
    arXiv:1507.04881  (http://arxiv.org/abs/1507.04881)
 
-If you use additional codes  to process woptic output, such as Wien2k,
-wien2wannier,  or Wannier90,  do not  forget to  cite  the appropriate
-papers as well.
+If  you use  additional  codes  in conjunction  with  woptic, such  as
+Wien2k,  wien2wannier,  or  Wannier90,  do  not  forget  to  cite  the
+appropriate papers as well.
 
 For woptic updates and further information, see (https://github.com/woptic/woptic).
 
