@@ -1,3 +1,6 @@
+doc/auto
+doc/*.log
+
 # Compiled Object files
 *.slo
 *.lo

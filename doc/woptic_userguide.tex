@@ -123,12 +123,12 @@ It uses the Green function formalism, which yields
 \begin{equation}
   \label{eq:optcond}
   \tag{$*$}
-  σ_{αβ}(Ω) = \frac{2\pi e^2 \hbar}{V_\text{\uc}}
-  \sum_k \int\!\dd ω\mathop{} \frac{f(ω)-f(ω+Ω)}{Ω}
-  \tr\left[A(ω,k)\,V^α(k)\,A(ω,k)\,V^β(k)\right],
+  σ^{αβ}(Ω) = 2\pi e^2 \hbar
+  \int\!\dd^3 k \int\!\dd ω\mathop{} \frac{f(ω)-f(ω+Ω)}{Ω}
+  \tr\left[A(k,ω)\,V^α(k)\,A(k,ω+Ω)\,V^β(k)\right],
 \end{equation}
 %
-where $σ_{αβ}$ is the $(α,β)$ element of the optical conductivity
+where $σ^{αβ}$ is the $(α,β)$ element of the optical conductivity
 tensor ($α,β \in \{x,y,z\}$), $V_\text{uc}$ the unit cell volume, $f$
 the Fermi function, $A= \frac\ii{2 π}(G-G^\dagger)$ the generalized
 spectral function \cite{Wissgott2012,Tomczak2009a,Jan}, and $V^α$ the
@@ -147,8 +147,8 @@ underlying formalism and algorithm, see Refs.~\cite{Philipp, Elias,
   woptic}.
 
 \paragraph{Acknowledgement} Development of this software was supported
-by Vienna University of Technology and the European Research Council
-through grant agreement no. 306447.
+by Vienna University of Technology, Graz University of Technology, and
+the European Research Council through grant agreement no. 306447.
 
 \paragraph{Caution} Following the many recent changes in \wtow and
 \woptic, some parts of the older version of \woptic have not yet been
@@ -328,7 +328,7 @@ momentum matrix elements.  It is currently unsupported.
 description of \woptic in the \code{optic} and \code{Peierls} modes.
 See \cite{Elias} for a detailed description of \code{interp} mode and
 a numerical comparison to \code{optic} mode including an analysis of
-the errors commited in each of them.  Ref.~\cite{Peierls} tests the
+the errors commited in each of them.  Ref.~\cite{Wissgott2012} tests the
 Peierls approximation against the full momentum matrix elements.
 
 \paragraph{\lvir Disentanglement} is supported only in \code{interp}
@@ -1001,7 +1001,7 @@ procedure is analogous to \file{convham}, \file{\case.hk}, and
 \bibitem{Tomczak2009a}
   \name{J.M. Tomczak} and \name{S. Biermann.}
   \textit{Optical properties of correlated materials: Generalized
-    {P}eierls approach and its application to {${\text{VO}}_{2}$}.}
+    Peierls approach and its application to $\text{VO}_{2}$.}
   \href{http://prb.aps.org/abstract/PRB/v80/i8/e085117}{
     Phys. Rev. B {\bf 80}, 085117 (2009).
   }
@@ -1009,7 +1009,7 @@ procedure is analogous to \file{convham}, \file{\case.hk}, and
 \bibitem{Jan}
   \name{J.M. Tomczak.}
   \textit{Spectral and optical properties of correlated materials.}
-  \href{http://hal.archives-ouvertes.fr/docs/00/50/36/63/PDF/Tomczak.pdf}{
+  \href{https://pastel.archives-ouvertes.fr/pastel-00003163}{
     PhD Thesis, \'Ecole Polytechnique, Paris (2007).
   }
 
@@ -1017,22 +1017,26 @@ procedure is analogous to \file{convham}, \file{\case.hk}, and
   \name{P. Wissgott.}
   \textit{Transport properties of correlated materials from first
     principles.}
-  PhD Thesis, TU Wien, Vienna (2012).
+  \href{http://katalog.ub.tuwien.ac.at/AC07812647}{
+    PhD Thesis, TU Wien, Vienna (2012).
+  }
 
 \bibitem{Elias}
   \name{E. Assmann.}
   \textit{Spectral properties of strongly correlated materials.}
-  PhD Thesis, TU Wien, Vienna (2015).
+  \href{http://katalog.ub.tuwien.ac.at/AC12656725}{
+    PhD Thesis, TU Wien, Vienna (2015).
+  }
 
 \bibitem{woptic}
-  \name{P. Wissgott, E. Assmann, J. Kuneš, A. Toschi, P. Blaha,} and
+  \name{E. Assmann, P. Wissgott, J. Kuneš, A. Toschi, P. Blaha,} and
   \name{K. Held.}
   \textit{woptic: optical conductivity with Wannier functions and adaptive
     k-mesh refinement.}
   % \href{http://}{
   %   Comp. Phys. Commun. \textbf{XXX}, YYYY~(2015),
   % }
-  \href{http://arxiv.org/abs/}{arXiv:15UU.WWWW}.
+  \href{http://arxiv.org/abs/1507.04881}{arXiv:1507.04881}.
 
 \bibitem{wien2k}
   \name{P. Blaha, K. Schwarz, G.K.H. Madsen, D. Kvasnicka,} and
@@ -1060,14 +1064,8 @@ procedure is analogous to \file{convham}, \file{\case.hk}, and
   \href{http://www.sciencedirect.com/science/article/pii/S0010465507004936}{%
     Comput. Phys. Commun. \textbf{178}, 685~(2008).
   }
+  \href{http://arxiv.org/abs/0708.0650}{arXiv:0708.0650}
 
-\bibitem{Peierls} \name{P. Wissgott, J. Kuneš, A. Toschi,} and
-  \name{K. Held.} 
-  \textit{Dipole matrix element approach versus Peierls approximation
-    for optical conductivity.}
-  \href{http://journals.aps.org/prb/abstract/10.1103/PhysRevB.85.205133}{%
-    Phys. Rev. B 85, 205133 (2012).
-  }
 % Must have empty line to terminate bibitem!
 
 \end{thebibliography}
