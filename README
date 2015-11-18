@@ -1,3 +1,4 @@
+
                        //====================\\
                       ||                      ||
                       ||  The Woptic Package  ||
@@ -6,26 +7,35 @@
 
 
 Woptic calculates the optical conductivity of interacting systems in a
-maximally-localized Wannier  basis.  It is  built on top  of Wannier90
-and Wien2k.  In  any published papers arising from  the use of Woptic,
-please cite:
+maximally-localized  Wannier basis.   It is  built on  top of  Wien2k,
+wien2wannier, and Wannier90.  In any published papers arising from the
+use of Woptic, please cite:
 
    E. Assmann, P. Wissgott, J. Kuneš, A. Toschi, P. Blaha, and K. Held,
-   arXiv:1507.04881  (http://arxiv.org/abs/1507.04881)
+   arXiv:1507.04881  <http://arxiv.org/abs/1507.04881>
 
-If  you use  additional  codes  in conjunction  with  woptic, such  as
-Wien2k,  wien2wannier,  or  Wannier90,  do  not  forget  to  cite  the
-appropriate papers as well.
-
-For woptic updates and further information, see <https://github.com/woptic/woptic>.
-
-Comments, patches and the like can be sent to <wien2wannier@ifp.tuwien.ac.at>.
+When using additional codes in  conjunction with woptic, do not forget
+to cite their appropriate papers as well.
 
 
 Installation
 ************
 
+0. As a prerequisite,  install Wien2k <http://wien2k.at> and Wannier90
+   <http://wannier.org>.  Wien2k should  include wien2wannier (version
+   14.2 or newer).
 
+1. Get woptic  from  <https://github.com/woptic/woptic>  and  extract.
+   For  the newest  code, clone  the  ‘master’ branch;  for a  stabler
+   version, download the latest release.
+
+2. Configure and compile.   For configuration, copy ‘make.sys.example’
+   to ‘make.sys’ and edit; woptic uses some modules from wien2wannier,
+   so use the same compiler.  To compile, run ‘make’.
+
+3. Put  it in your  $PATH.  After compilation, the  woptic executables
+   are in the subdirectory bin/.  It is easiest to add this directory
+   to your $PATH.
 
 
 License
