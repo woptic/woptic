@@ -19,12 +19,14 @@ src/refine_tetra
 src/woptic_main 
 src/logo.ansi
 src/logo.txt
+src/*__genmod.f90
 
 doc/logo.tex
 doc/auto
 doc/*.log
 doc/*.aux
 doc/*.make
+doc/*.temp
 doc/woptic_userguide.d
 doc/woptic_userguide.pdf
 doc/woptic_userguide.fls
