@@ -37,6 +37,9 @@ Installation
    are in the subdirectory bin/.  It is easiest to add this directory
    to your $PATH.
 
+4. Optionally, compile the user's guide.  Run ‘make doc’, resulting in
+   the file ‘doc/woptic_userguide.pdf’.
+
 
 License
 *******
