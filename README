@@ -17,13 +17,14 @@ If  you use  additional  codes  in conjunction  with  woptic, such  as
 Wien2k,  wien2wannier,  or  Wannier90,  do  not  forget  to  cite  the
 appropriate papers as well.
 
-For woptic updates and further information, see (https://github.com/woptic/woptic).
+For woptic updates and further information, see <https://github.com/woptic/woptic>.
 
 Comments, patches and the like can be sent to <wien2wannier@ifp.tuwien.ac.at>.
 
 
 Installation
 ************
+
 
 
 
