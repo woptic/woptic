@@ -25,6 +25,8 @@ General:
    - quick fix: make joinvec work
    - long run: make woptic_main, convert_vr accept -p
 
+ * add note about GitHub to UG
+
 
 woptic:
 

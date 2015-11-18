@@ -3561,7 +3561,7 @@ clean: clean-generated clean-tex clean-graphics clean-deps clean-backups clean-a
 
 .PHONY: distclean
 distclean: clean
-	rm -rf woptic_userguide.pdf
+	rm -rf woptic_userguide.pdf auto
 
 #
 # HELP TARGETS
