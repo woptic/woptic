@@ -1,0 +1,45 @@
+### woptic/make.sys
+#
+#   Options for Makefiles in subdirectories
+#
+# The main purpose of this file is to allow compilation in a non-WIEN
+# environment (i.e., the placeholders in Makefile.orig have not been
+# replaced to create Makefile)
+#
+# Copyright 2014-2015 Elias Assmann
+#
+
+## woptic needs ‘util_w2w.o’ from wien2wannier.  ‘src/Makefile’ gets
+## it from $(WIENROOT)/SRC_w2w by default, override here if desired.
+## NB: if relative, the path must be from ‘src/’.
+#W2W_DIR  = $(HOME)/wien2wannier
+
+## overwrite make's outdated default FC (f77, WTF?)
+ifeq "$(origin FC)" "default"
+#	FC = gfortran
+	FC = ifort
+endif
+
+## ‘src/Makefile’ uses ‘-llapack -lblas’ by default, override here to
+## use e.g. MKL
+LDFLAGS ?= -L$(MKLROOT)/lib/intel64
+LDLIBS 	?= -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -openmp -lpthread
+
+ifneq "$(findstring gfortran,$(FC))" ""
+    FFLAGS += -Wall-form -g -pedantic
+    FFLAGS += -Wcharacter-truncation -Wextra -Wcharacter-truncation -Wconversion
+else ifneq "$(findstring ifort,$(FC))" ""
+    FFLAGS += -warn all -traceback -g -ipo
+#else
+#   unknown compiler, please specify variables manually
+endif
+
+
+
+##/---
+## Local Variables:
+## mode: makefile-gmake
+## End:
+##\---
+##
+## Time-stamp: <2015-09-23 15:48:54 assman@faepop06.tu-graz.ac.at>

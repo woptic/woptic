@@ -5,18 +5,19 @@
 ### Copyright 2013-2015 Elias Assmann
 ###
 
+## include ‘make.sys’, if present
+-include ../make.sys
+
 ####### Configuration variables #######
 
-## some defaults
-SHELL = /bin/sh
+LDLIBS  ?= -llapack -lblas
+W2W_DIR ?= $(WIENROOT)
+
+#######################################
+
+## Some defaults & derived variables
+SHELL = /bin/bash
 .SUFFIXES:
-
-LDLIBS  ?= $(R_LIBS)
-
-FFLAGS += $(FOPT)
-
-## W2W_DIR should be set in ../make.sys
--include ../make.sys
 
 W2W_SRCDIR  := $(W2W_DIR)/SRC_w2w
 W2W_LIBDIR  := $(W2W_SRCDIR)/lib
@@ -24,12 +25,8 @@ W2W_UTILOBJ := $(W2W_LIBDIR)/util_w2w.o
 W2W_UTARGET := lib/util_w2w.o
 UTILOBJ     := util_woptic.o
 
-## finally, overwrite make's outdated default FC (f77, WTF?)
-ifeq "$(origin FC)" "default"
-	FC = gfortran
-endif
 
-#######################################
+## Internal variables
 
 # all executables (= targets)
 EXE = $(EXE_W2WU) $(EXE_SIMPLE)
@@ -65,11 +62,11 @@ $(EXE_UTIL): %: %.o $(UTILOBJ)
 
 $(EXE_W2WU): %: %.o $(W2W_UTILOBJ)
 	$(FC) $(FFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
-	cp -v $@ ../bin
+	mv -v $@ ../bin
 
 $(EXE_SIMPLE): %: %.f90
 	$(FC) $(FFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
-	cp -v $@ ../bin
+	mv -v $@ ../bin
 
 W2WU_USERS := $(addsuffix .o,$(EXE_W2WU))
 UTIL_USERS := $(addsuffix .o,$(EXE_UTIL))

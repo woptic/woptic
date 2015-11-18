@@ -6,6 +6,8 @@
 ###    notice follows below.
 ###
 
+-include ../make.sys
+
 # Copyright 2004 Chris Monson (shiblon@gmail.com)
 # Latest version available at http://www.bouncingchairs.net/oss
 #
