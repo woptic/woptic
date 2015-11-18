@@ -6,7 +6,6 @@
 ###
 ### Copyright 2015      Elias Assmann
 ###
-### $Id: wopticlean 411 2015-06-09 08:00:21Z assmann $
 
 use strict;
 

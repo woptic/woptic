@@ -4,7 +4,6 @@
 ###
 ### Copyright 2013-2015 Elias Assmann
 ###
-### $Id: Makefile 445 2015-11-09 16:29:54Z assmann $
 
 ####### Configuration variables #######
 

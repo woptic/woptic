@@ -5,7 +5,6 @@
 ###    <https://github.com/shiblon/latex-makefile>, whose copyright
 ###    notice follows below.
 ###
-### $Id: Makefile 411 2015-06-09 08:00:21Z assmann $
 
 # Copyright 2004 Chris Monson (shiblon@gmail.com)
 # Latest version available at http://www.bouncingchairs.net/oss

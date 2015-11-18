@@ -6,7 +6,6 @@
 !!! Copyright 2012      Philipp Wissgott
 !!!           2013-2015 Elias Assmann
 !!!
-!!! $Id: convert_vr.f90 411 2015-06-09 08:00:21Z assmann $
 
 PROGRAM convert_vr
   use util,      only: ptime, string

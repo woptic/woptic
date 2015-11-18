@@ -10,7 +10,6 @@
 !!! Copyright 2009-2012 Philipp Wissgott
 !!!           2014-2015 Elias Assmann
 !!!
-!!! $Id: joinham.f90 447 2015-11-16 09:59:46Z assmann $
 
 program combine_hamfiles
   use const,     only: BUFSZ, DPk

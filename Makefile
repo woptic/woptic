@@ -4,7 +4,6 @@
 ###
 ### Copyright 2015 Elias Assmann
 ###
-### $Id: Makefile 399 2015-06-03 20:28:10Z assmann $
 
 SUBDIRS := src doc
 

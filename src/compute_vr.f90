@@ -7,7 +7,6 @@
 !!!
 !!! FIXME: This program follows the WET principle too much.
 !!!
-!!! $Id: compute_vr.f90 411 2015-06-09 08:00:21Z assmann $
 
 program compute_vr
   use util,      only: ptime, string

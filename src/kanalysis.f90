@@ -3,7 +3,6 @@
 !!! Copyright 2009-2012 Philipp Wissgott
 !!!           2014-2015 Elias Assmann
 !!!
-!!! $Id: kanalysis.f90 386 2015-06-01 13:11:11Z assmann $
 
 program kanalysis
   use util,      only:

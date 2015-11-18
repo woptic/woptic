@@ -6,7 +6,6 @@
 !!! Copyright 2009-2012 Philipp Wissgott
 !!!           2013-2015 Elias Assmann
 !!!
-!!! $Id: woptic_main.F90 446 2015-11-10 14:14:02Z assmann $
 
 program woptic_main
   use const,      only: DPk, PI, ERROR_UNIT

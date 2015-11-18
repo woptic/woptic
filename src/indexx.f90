@@ -2,7 +2,6 @@
 !!!
 !!!    Sort with heapsort (from Numerical Recipes, p.233)
 !!!
-!!! $Id: indexx.f90 386 2015-06-01 13:11:11Z assmann $
 
       subroutine indexx(arrin,indx,n)
       implicit none

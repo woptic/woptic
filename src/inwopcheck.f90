@@ -5,7 +5,6 @@
 !!!
 !!! Copyright 2014-2015 Elias Assmann
 !!!
-!!! $Id: inwopcheck.f90 386 2015-06-01 13:11:11Z assmann $
 
 program check_inwop
   use woptic, only: inwop_t, inwop_read

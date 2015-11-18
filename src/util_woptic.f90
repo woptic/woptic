@@ -5,7 +5,6 @@
 !!! Copyright 2010-2012 Philipp Wissgott
 !!!           2013-2015 Elias Assmann
 !!!
-!!! $Id: util_woptic.f90 394 2015-06-02 10:19:17Z assmann $
 
 !!/=== Things that are exported here =============
 !!

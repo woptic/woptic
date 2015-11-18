@@ -5,7 +5,6 @@
 !!! Copyright 2009-2012 Philipp Wissgott
 !!!           2014-2015 Elias Assmann
 !!!
-!!! $Id: refine_tetra.f90 445 2015-11-09 16:29:54Z assmann $
 
 PROGRAM refine_tmesh
   use util,      only: inverse3x3, string

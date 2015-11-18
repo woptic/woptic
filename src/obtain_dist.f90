@@ -2,7 +2,6 @@
 !!!
 !!! Copyright 2009-2012 Philipp Wissgott
 !!!
-!!! $Id: obtain_dist.f90 408 2015-06-05 12:07:46Z assmann $
 
 program obtain_dist
 
