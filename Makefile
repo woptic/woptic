@@ -6,8 +6,6 @@
 ###
 ### $Id: Makefile 399 2015-06-03 20:28:10Z assmann $
 
-VERSION := new
-
 SUBDIRS := src doc
 
 .PHONY: all clean $(SUBDIRS) dist
