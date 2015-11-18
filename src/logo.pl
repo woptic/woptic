@@ -17,7 +17,7 @@ my @ansire = map { my ($a, $b) = ($markup[$_], $ansi[$_]);
                    sub { $_[0] =~ s/$a/$b/g } }
   0..$#markup;
 
-open TEX,  q[>], q[logo.tex]         or die $!;
+open TEX,  q[>], q[../doc/logo.tex]         or die $!;
 open TXT,  q[>], q[../src/logo.txt]  or die $!;
 open ANSI, q[>], q[../src/logo.ansi] or die $!;
 

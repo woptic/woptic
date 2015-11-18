@@ -8,6 +8,11 @@
 
 -include ../make.sys
 
+woptic_userguide.pdf: logo.tex
+
+logo.tex: ../src/logo.pl
+	make -C ../src ../doc/logo.tex
+
 # Copyright 2004 Chris Monson (shiblon@gmail.com)
 # Latest version available at http://www.bouncingchairs.net/oss
 #
@@ -3556,7 +3561,7 @@ clean: clean-generated clean-tex clean-graphics clean-deps clean-backups clean-a
 
 .PHONY: distclean
 distclean: clean
-	rm -rf auto woptic_userguide.{tdo,pdf} logo.tex missfont.log
+	rm -rf woptic_userguide.pdf
 
 #
 # HELP TARGETS

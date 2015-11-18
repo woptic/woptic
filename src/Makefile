@@ -42,8 +42,7 @@ EXE_UTIL = compute_vr convert_vr refine_tetra woptic_main joinham	\
 EXE_SIMPLE = obtain_dist
 
 ### Phony targets
-
-all: $(EXE)
+all: $(EXE) logo.txt logo.ansi ../doc/logo.tex
 
 clean:
 	rm -f *.mod *.o *__genmod.{f90,mod}
@@ -54,7 +53,6 @@ distclean: clean
 .PHONY: all clean distclean
 
 ### Rules for executables
-
 $(W2W_UTILOBJ): $(W2W_SRCDIR)/util_w2w.F $(W2W_SRCDIR)/Makefile
 	make -C $(W2W_SRCDIR) $(W2W_UTARGET)
 
@@ -74,7 +72,6 @@ UTIL_USERS := $(addsuffix .o,$(EXE_UTIL))
 refine_tetra: indexx.o
 
 ### Rules for objects
-
 $(W2WU_USERS): $(W2W_UTILOBJ)
 $(W2WU_USERS): override FFLAGS += -I$(W2W_LIBDIR)
 
@@ -83,5 +80,8 @@ $(UTIL_USERS): $(UTILOBJ)
 %.o: %.[fF]90
 	$(FC) $(FFLAGS) -c $<
 
+### Rules for logo variants
+logo.txt logo.ansi ../doc/logo.tex: logo.pl
+	./logo.pl
 
 ## Time-stamp: <2015-11-09 14:24:50 assman@faepop36.tu-graz.ac.at>
