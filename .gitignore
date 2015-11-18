@@ -1,5 +1,31 @@
+bin/compute_vr
+bin/convert_vr
+bin/inwopcheck
+bin/joinham
+bin/kanalysis
+bin/obtain_dist
+bin/refine_tetra
+bin/woptic_main
+
+src/compute_vr  
+src/convert_vr  
+src/inwopcheck  
+src/joinham     
+src/kanalysis   
+src/obtain_dist 
+src/refine_tetra
+src/woptic_main 
+
 doc/auto
 doc/*.log
+doc/*.aux
+doc/*.make
+doc/woptic_userguide.d
+doc/woptic_userguide.pdf
+doc/woptic_userguide.fls
+doc/woptic_userguide.maf
+doc/woptic_userguide.mtc*
+doc/woptic_userguide.toc
 
 # Compiled Object files
 *.slo
