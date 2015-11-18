@@ -35,6 +35,8 @@ woptic:
  * make check for ‘case.symop’ compulsory when necessary
 
  * convergence tests
+
+ * color during iterations
    
 
 woptic_main:
