@@ -60,11 +60,11 @@ $(EXE_UTIL): %: %.o $(UTILOBJ)
 
 $(EXE_W2WU): %: %.o $(W2W_UTILOBJ)
 	$(FC) $(FFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
-	mv -v $@ ../bin
+	cp -v $@ ../bin
 
 $(EXE_SIMPLE): %: %.f90
 	$(FC) $(FFLAGS) $(LDFLAGS) $^ $(LDLIBS) -o $@
-	mv -v $@ ../bin
+	cp -v $@ ../bin
 
 W2WU_USERS := $(addsuffix .o,$(EXE_W2WU))
 UTIL_USERS := $(addsuffix .o,$(EXE_UTIL))
