@@ -1,3 +1,5 @@
+make.sys
+
 bin/compute_vr
 bin/convert_vr
 bin/inwopcheck
