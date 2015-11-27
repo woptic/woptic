@@ -28,7 +28,6 @@ doc/*.aux
 doc/*.make
 doc/*.temp
 doc/woptic_userguide.d
-doc/woptic_userguide.pdf
 doc/woptic_userguide.fls
 doc/woptic_userguide.maf
 doc/woptic_userguide.mtc*
