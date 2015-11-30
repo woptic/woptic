@@ -9,11 +9,6 @@
 # Copyright 2014-2015 Elias Assmann
 #
 
-## woptic needs ‘util_w2w.o’ from wien2wannier.  ‘src/Makefile’ gets
-## it from $(WIENROOT)/SRC_w2w by default, override here if desired.
-## NB: if relative, the path must be from ‘src/’.
-#W2W_DIR  = $(HOME)/wien2wannier
-
 ## overwrite make's outdated default FC (f77, WTF?)
 ifeq "$(origin FC)" "default"
 #	FC = gfortran

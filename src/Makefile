@@ -19,10 +19,7 @@ W2W_DIR ?= $(WIENROOT)
 SHELL = /bin/bash
 .SUFFIXES:
 
-W2W_SRCDIR  := $(W2W_DIR)/SRC_w2w
-W2W_LIBDIR  := $(W2W_SRCDIR)/lib
-W2W_UTILOBJ := $(W2W_LIBDIR)/util_w2w.o
-W2W_UTARGET := lib/util_w2w.o
+W2W_UTILOBJ := util_w2w.o
 UTILOBJ     := util_woptic.o
 
 
@@ -53,9 +50,6 @@ distclean: clean
 .PHONY: all clean distclean
 
 ### Rules for executables
-$(W2W_UTILOBJ): $(W2W_SRCDIR)/util_w2w.F $(W2W_SRCDIR)/Makefile
-	make -C $(W2W_SRCDIR) $(W2W_UTARGET)
-
 $(EXE_UTIL): %: %.o $(UTILOBJ)
 
 $(EXE_W2WU): %: %.o $(W2W_UTILOBJ)
@@ -73,7 +67,6 @@ refine_tetra: indexx.o
 
 ### Rules for objects
 $(W2WU_USERS): $(W2W_UTILOBJ)
-$(W2WU_USERS): override FFLAGS += -I$(W2W_LIBDIR)
 
 $(UTIL_USERS): $(UTILOBJ)
 

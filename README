@@ -30,8 +30,7 @@ Installation
    version, download the latest release.
 
 2. Configure and compile.   For configuration, copy ‘make.sys.example’
-   to ‘make.sys’ and edit; woptic uses some modules from wien2wannier,
-   so use the same compiler.  To compile, run ‘make’.
+   to ‘make.sys’ and edit.  To compile, run ‘make’.
 
 3. Put  it in your  $PATH.  After compilation, the  woptic executables
    are in the subdirectory bin/.  It is easiest to add this directory
