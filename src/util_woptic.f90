@@ -237,13 +237,16 @@ contains
     else                        ! matelmode given as string?
        read(buf, *) inw%mode, inw%matelname, inw%intrahop
 
-       if (all(uppercase(inw%matelname) /= uppercase(MATELNAMES))) &
-            call croak("unknown matelmode: "//trim(inw%matelname))
-
        do i = 1, size(MATELNAMES)
-          if (uppercase(inw%matelname) == uppercase(MATELNAMES(i))) &
-               inw%matelmode = MATELMODES(i)
+          if (uppercase(inw%matelname) == uppercase(MATELNAMES(i))) then
+             inw%matelmode = MATELMODES(i)
+             goto 1001
+          end if
        end do
+
+       call croak("unknown matelmode: "//trim(inw%matelname))
+
+1001   continue
     end if
 
     read(lun,*) inw%Emax, inw%dE, inw%delterl, inw%wint_dens, inw%wint_cutoff
