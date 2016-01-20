@@ -135,45 +135,45 @@ program woptic_main
   ! [hbar^3/emass^2*(m/ang)^5]
   real   (DPk), parameter :: factor1 = 1.413351709413265e+08_DPk
   character(*), parameter :: suf_new = '_new'
-  character(*), parameter :: usage = '(                                       &
-&"woptic_main: compute optical conductivity for a given k-mesh"              /&
-&/"USAGE",                                                                    &
-&T10,"woptic_main [--band] CASE",                                            /&
-&/"FILES",                                                                    &
-&T10,"(prefixed by CASE)",                                                   /&
-&"*  '//suf_inwop    //'",T22,"woptic main input file"                       /&
-&"*  '//suf_struct   //'",T22,"Wien2k master input file"                     /&
-&"*  '//suf_klist    //'",T22,"symmetrized k-points"                         /&
-&"*  '//suf_tet      //'",T22,"symmetrized tetrahedra"                       /&
-&"   '//suf_energy   //'",T22,"energies from lapw1"                          /&
-&"   '//suf_fermi    //'",T22,"Fermi energy"                                 /&
+  character(*), parameter :: usage = '(                                      &
+&"woptic_main: compute optical conductivity for a given k-mesh"             /&
+&/"USAGE",                                                                   &
+&T10,"woptic_main [--band] CASE",                                           /&
+&/"FILES",                                                                   &
+&T10,"(prefixed by CASE)",                                                  /&
+&"*  '//suf_inwop    //'",T22,"woptic main input file"                      /&
+&"*  '//suf_struct   //'",T22,"Wien2k master input file"                    /&
+&"*  '//suf_klist    //'",T22,"symmetrized k-points"                        /&
+&"*  '//suf_tet      //'",T22,"symmetrized tetrahedra"                      /&
+&"   '//suf_energy   //'",T22,"energies from lapw1"                         /&
+&"   '//suf_fermi    //'",T22,"Fermi energy"                                /&
 &"   '//suf_mommat   //'",T22,"matrix elements from optic"                  /&
-&"   '//suf_chk      //'",T22,"Wannier90 checkpoint file"                    /&
-&"   '//suf_vk(1)//','//suf_vk(2)//','//suf_vk(3)//' ",                       &
-&                         T22,"Wannier-interpolated matrix elements"         /&
-&"   '//suf_vvk(1)   //'",T22,"Wannier-interpolated mixed matrix elements"   /&
-&"   '//suf_ham      //'",T22,"Wannier Hamiltonian H(R)"                     /&
-&"   '//suf_selfe    //'",T22,"self-energy Σ(ω) (e.g. from DMFT)"            /&
-&"   '//suf_wfrot    //'",T22,"Wannier function rotation matrix"             /&
-&"P  '//suf_fklist   //'",T22,"unsymmetrized k-points"                       /&
-&"P  '//suf_ftet     //'",T22,"unsymmetrized tetrahedra"                     /&
-&"P  '//suf_map      //'",T22,"mapping of klist_full to klist"               /&
-&"P  '//suf_intrahop //'",T22,"distance matrix for intra-u.c. hopping "                    /&
-&"*U '//suf_contr    //'",T22,"function values for estimator"                /&
-&"*U '//suf_K1       //'",T22,""                                             /&
-&"*U '//suf_doscontr //'",T22,"stored DOS"                                   /&
-&"*W '//suf_outwop   //'",T22,"diagnostic output"                            /&
-&"*W '//suf_optcond  //'",T22,"optical conductivity"                         /&
-&" W '//suf_optorb(1)//'",T22,"orbitally resolved optical conductivity"      /&
-&"*W '//suf_wdos     //'",T22,"(joint) density of states"                    /&
-&/"Files marked ‘W’ are written, and ‘U’, read and updated.  The updated"    /&
-&"file ‘F’ is written to ‘F'//suf_new//'’.  Other files are read only.  "    /&
-&"Precisely which of these files are used depends on OPTIONS and settings in"/&
-&"‘CASE'//suf_inwop//'’ (*: always; P: Peierls mode)."                       /&
-&/"OPTIONS",                                                                  &
-&T10,"--help, -h"                                                            /&
-&T10,"--version, -v"                                                         /&
-&T10,"--band", T22, "use BZ path"                                             &
+&"   '//suf_chk      //'",T22,"Wannier90 checkpoint file"                   /&
+&"   '//suf_vk(1)//','//suf_vk(2)//','//suf_vk(3)//' ",                      &
+&                         T22,"Wannier-interpolated matrix elements"        /&
+&"   '//suf_vvk(1)   //'",T22,"Wannier-interpolated mixed matrix elements"  /&
+&"   '//suf_ham      //'",T22,"Wannier Hamiltonian H(R)"                    /&
+&"   '//suf_selfe    //'",T22,"self-energy Σ(ω) (e.g. from DMFT)"           /&
+&"   '//suf_wfrot    //'",T22,"Wannier function rotation matrix"            /&
+&"P  '//suf_fklist   //'",T22,"unsymmetrized k-points"                      /&
+&"P  '//suf_ftet     //'",T22,"unsymmetrized tetrahedra"                    /&
+&"P  '//suf_map      //'",T22,"mapping of klist_full to klist"              /&
+&"P  '//suf_intrahop //'",T22,"distance matrix for intra-u.c. hopping "     /&
+&"*U '//suf_contr    //'",T22,"function values for estimator"               /&
+&"*U '//suf_K1       //'",T22,""                                            /&
+&"*U '//suf_doscontr //'",T22,"stored DOS"                                  /&
+&"*W '//suf_outwop   //'",T22,"diagnostic output"                           /&
+&"*W '//suf_optcond  //'",T22,"optical conductivity"                        /&
+&" W '//suf_optorb(1)//'",T22,"orbitally resolved optical conductivity"     /&
+&"*W '//suf_wdos     //'",T22,"(joint) density of states"                   /&
+&/"Files marked ‘W’ are written, and ‘U’, read and updated.  The updated"   /&
+&"file ‘F’ is written to ‘F'//suf_new//'’.  Other files are read only.  "   /&
+&"Precisely which of these files are used depends on OPTIONS and settings"  /&
+&"in ‘CASE'//suf_inwop//'’ (*: always; P: Peierls mode)."                   /&
+&/"OPTIONS",                                                                 &
+&T10,"--help, -h"                                                           /&
+&T10,"--version, -v"                                                        /&
+&T10,"--band", T22, "use BZ path"                                            &
 &)'
 
 !!!------------- Argument handling              -----------------------------
