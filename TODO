@@ -43,6 +43,8 @@ woptic:
 
 woptic_main:
 
+ * clean up the conversion factors (possibly even explain them!)
+
  * fix scissors shift, chemical potential
 
  * apply chemical potential to interacting states or all states?
@@ -60,6 +62,11 @@ refine_tetra:
 compute_vr:
 
  * add “-p” switch
+
+
+woptic_chap.tex:
+
+ * errata
 
 
 ##/---
