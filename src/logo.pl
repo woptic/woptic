@@ -3,12 +3,19 @@
 use strict;
 use warnings;
 
-my @markup = qw[ ‘      √      “       «       »      ’   ];
-my @tex    = qw[!xL{}  !xW{}  !xF{}   !xC{}   !xA{}  !xB{}];
-my @ansi   = qw{[37m [32m  [1m   [33m [36m [0m};
+my $version = qx(git describe);
 
-my @txtre  = map { my $a = $markup[$_];
-                   sub { $_[0] =~ s/$a//g } }
+chomp $version;
+$version =~ s/([\d.]+-\d+).*/$1/;
+$version = sprintf '%10s', $version;
+
+my @markup = qw[€version      ‘      √      “     «      »      ’    ] ;
+my @txt    = (  $version,     '',    '',    '',   '',    '',    ''    );
+my @tex    = (  $version, qw[ !xL{}  !xW{}  !xF{} !xC{}  !xA{}  !xB{}]);
+my @ansi   = (  $version, qw{ [37m [32m [1m [33m [36m [0m});
+
+my @txtre  = map { my ($a, $b) = ($markup[$_], $txt[$_]);
+                   sub { $_[0] =~ s/$a/$b/g } }
   0..$#markup;
 my @texre  = map { my ($a, $b) = ($markup[$_], $tex[$_]);
                    sub { $_[0] =~ s/$a/$b/g } }
@@ -35,7 +42,7 @@ for (<DATA>) {
 
 __DATA__
 ‘          *    *-----------------------------*’
-‘         / \    \ “√WOPTIC’ ‘\’ 1.0-rXXX  ‘\’ GPLv2+ ‘\’
+‘         / \    \ “√WOPTIC’ ‘\’€version ‘\’ GPLv2+ ‘\’
 ‘       “√_’‘/’“√_’  ‘\’ “√\’  ‘\’ √transport with  Wien2k+DMFT’ ‘\’
 ‘      “√/’‘/’“√|| /|’‘\’“√/’   ‘*-----------------------------*’
 ‘      “√\ ||/||/’‘\    \’«[Assmann,  Wissgott,  Kuneš,’ ‘\’
