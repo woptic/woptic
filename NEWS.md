@@ -2,6 +2,34 @@
                              ***********
 
 
+Version 0.1.0
+=============
+
+This is the first release of woptic as a stand-alone package.  It
+introduces many changes, including:
+
+ * New matelmode `interp` (Wannier interpolated matrix elements), with
+   support for disentangled Wannier functions (limited to cases
+   without an outer window).
+
+ * The format of the main input file `case.inwop` has changed to
+   accomodate new parameters (`ω-diff`, `tol-cutoff`) and simplify the
+   format.
+
+ * A thoroughly revised user's guide.
+
+ * Some regressions occured in this version:
+ 
+   - `Peierls` mode and `obtain_dist` are broken.
+
+   - The `Bloch` and `LDA` matelmodes are untested.
+
+   - The orbitally-resolved mode is untested.
+
+   - `kanalysis` and the corresponding option `--band` to `woptic` and
+     `woptic_main` is untested.
+
+
 === Older version information follows ===============================
 ===                                                                 =
 === The following was imported from wien2wannier's version history. =
