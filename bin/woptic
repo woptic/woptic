@@ -63,7 +63,7 @@ OPTIONS:
  --up|--dn      use lapw1 -up/-dn to compute energies
   -f            override  ‘case’
   -V, --verbose increase verbiage level to maximum
-  -v, --version increase verbiage level to maximum
+  -v, --version
   -q, --quiet
   -h, --help    this message
 EOF
