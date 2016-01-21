@@ -64,6 +64,9 @@ module woptic
   character(LEN_MATEL), public, parameter :: MATELNAMES(6) = & 
        (/ "Peierls", "interp ", "optic  ", "OrigU  ", "Bloch  ", "LDA    " /)
 
+  integer, parameter :: UNSUPPORTED_MATELMODES(3) = &
+       (/ MODE_Peierls, MODE_Bloch, MODE_LDA /)
+
 !!! Type representing ‘inwop’ files
   type inwop_t
 !!!! Variables directly corresponding to entries in config file
@@ -248,6 +251,19 @@ contains
 
 1001   continue
     end if
+
+    unsupported: if (any(inw%matelmode == UNSUPPORTED_MATELMODES)) then
+       inw%matelname = "???"
+
+       do i = 1, size(MATELMODES)
+          if (inw%matelmode == MATELMODES(i)) then
+             inw%matelname = MATELNAMES(i)
+          end if
+       end do
+
+       call croak("FIXME: matelmode "//trim(string(inw%matelmode))// &
+            &     " ("//trim(inw%matelname)//") is currently unsupported")
+    end if unsupported
 
     read(lun,*) inw%Emax, inw%dE, inw%delterl, inw%wint_dens, inw%wint_cutoff
 
