@@ -1,6 +1,15 @@
                              Woptic News
                              ***********
 
+Version 1.0.0
+=============
+
+This release corresponds to the publication of the paper describing
+woptic, CPC ….
+
+* woptic_userguide.tex: corrected the prefactor of the optical
+  conductivity
+
 
 Version 0.1.0
 =============
@@ -8,26 +17,35 @@ Version 0.1.0
 This is the first release of woptic as a stand-alone package.  It
 introduces many changes, including:
 
- * New matelmode `interp` (Wannier interpolated matrix elements), with
+ * New matelmode ‘interp’ (Wannier interpolated matrix elements), with
    support for disentangled Wannier functions (limited to cases
    without an outer window).
 
- * The format of the main input file `case.inwop` has changed to
-   accomodate new parameters (`ω-diff`, `tol-cutoff`) and simplify the
-   format.
+   - New programs for ‘interp’ mode: ‘compute_vr’, ‘convert_vr’.
 
- * A thoroughly revised user's guide.
+ * Changed format of the main input file ‘case.inwop’ to accomodate
+   new parameters (‘ω-diff’, ‘tol-cutoff’) and simplify the format.
+
+ * Thoroughly revised user's guide.
+
+ * Woptic is now hosted on GitHub, see <http://woptic.github.io/> or
+   <https://github.com/woptic/woptic>.
+
+ * Renamed some files and programs.
+
+ * Removed the need for the file ‘symop’ (which had to be copied to
+   each working directory for ‘woptic’).
 
  * Some regressions occured in this version:
  
-   - `Peierls` mode and `obtain_dist` are broken.
+   - ‘Peierls’ mode and ‘obtain_dist’ are broken.
 
-   - The `Bloch` and `LDA` matelmodes are untested.
+   - The ‘Bloch’ and ‘LDA’ matelmodes are untested.
 
    - The orbitally-resolved mode is untested.
 
-   - `kanalysis` and the corresponding option `--band` to `woptic` and
-     `woptic_main` is untested.
+   - ‘kanalysis’ and the corresponding option ’--band’ to ‘woptic’ and
+     ‘woptic_main’ is untested.
 
 
 === Older version information follows ===============================
