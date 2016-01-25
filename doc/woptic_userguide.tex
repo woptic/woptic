@@ -68,7 +68,7 @@
 
 \newcommand*\hateq{\mathbin{\widehat=}}
 
-\date{for version 0.1.0-$α$}
+\date{for version 1.0.0-$α$}
 \author{\name{Elias Assmann} \and \name{Philipp Wissgott}}
 \newcommand*\tit{\Woptic User's Guide}
 \newcommand*\subtit{Optical conductivity with Wannier functions}
@@ -589,7 +589,9 @@ The main input file for \woptic is
 
   \begin{flin}[T]{Drudesep, orbresolv}{}
     Drudesep  & \U{\eV} & cutoff for Drude sumrule integration\\
+    \lvir
     orbresolv & logical & whether to compute observables per-orbital
+                          (currently deactivated)
   \end{flin}
 
   \begin{flin}[T]{selfE, Nself}{self-energy specification}
@@ -844,8 +846,8 @@ partially indicated below.
 \item[\case.outputwop] diagnostic output \usgrem{(always)}
 \item[\case.optcondw] optical conductivity \usgrem{(always)}
 \item[\case.wdos] (joint) density of states \usgrem{(always)}
-\item[\case.optcondw\_orb$αβ$] orbitally resolved optical conductivity
-  \codeit{(orbresolv)}
+\item[\lvir \case.optcondw\_orb$αβ$] orbitally resolved optical
+  conductivity \codeit{(orbresolv)} (currently deactivated)
 \end{options}
 
 \subsection{Files updated}
