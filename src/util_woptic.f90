@@ -281,6 +281,9 @@ contains
     if (inw%bmax     == 0) inw%bmax     = inw%bmax_w2k
     read(lun,*) inw%beta, inw%chempot
     read(lun,*) inw%drudesep, inw%orbresolv
+    if (inw%orbresolv) call croak('FIXME: orbresolv still has to be adapted&
+         & to VAV-related changes!')
+
 
     read(lun,*) inw%selfE, Nself
     if (inw%selfE) then

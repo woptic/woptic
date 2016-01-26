@@ -10,14 +10,14 @@ bin/obtain_dist
 bin/refine_tetra
 bin/woptic_main
 
-src/compute_vr  
-src/convert_vr  
-src/inwopcheck  
-src/joinham     
-src/kanalysis   
-src/obtain_dist 
+src/compute_vr
+src/convert_vr
+src/inwopcheck
+src/joinham
+src/kanalysis
+src/obtain_dist
 src/refine_tetra
-src/woptic_main 
+src/woptic_main
 src/logo.ansi
 src/logo.txt
 src/*__genmod.f90

@@ -311,7 +311,7 @@ program woptic_main
   write(unit_outwop, '("number of elements: ", I0)') stru%nneq
   write(unit_outwop, '("band windows: [",&
        &I0, "..", I0, "] ⊆ [", I0, "..", I0, "]")') WFmin,WFmax, KSmin,KSmax
-  write(unit_outwop, "('unit cell volume: ',G10.6E1,' bohr³')") stru%vol
+  write(unit_outwop, "('unit cell volume: ',G12.6E1,' bohr³')") stru%vol
 
   call read_tetra(unit_tet, tetra, wtetra); close(unit_tet)
 
@@ -736,8 +736,8 @@ program woptic_main
         end if compute_optcond
         call ptock(optcond_timer)
 
+        ! This is deactivated and produces an error in inwop_read()
         orbresolv: if (inw%orbresolv) then
-           call croak('FIXME: orbresolv still has to be adapted to VAV-related changes!')
            orb_optcond: if(inw%optcond) then
               orb_dc: do jw= wmin, wmax
                  df = -inw%beta * cosh(inw%beta*inw%w(jw)/2)**(-2)/4
@@ -1255,7 +1255,7 @@ subroutine read_energy(lun, ene, bmin, bmax, Nk)
 
   read (unit_fermi,*) EFermi
   close(unit_fermi)
-  write(unit_outwop, "('Wien2k Fermi energy: ',G10.6E1,' Ry')") EFermi
+  write(unit_outwop, "('Wien2k Fermi energy: ',G12.6E1,' Ry')") EFermi
 
   do ii=1,stru%nneq
      read(lun,*)
