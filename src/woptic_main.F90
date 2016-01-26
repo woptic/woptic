@@ -98,7 +98,7 @@ program woptic_main
   integer      :: jt, T, jb,jb1,jb2, jd, jk,jk1,jk2, js, jarg, ii
   real   (DPk) :: mxr, sumtetraweights, df, convfac, x,xd,xk !, y, z
   complex(DPk) :: derivative(3)
-  logical      :: have_file, band=.false. ! command line argument, --band option
+  logical      :: have_file=.false., have_band=.false.
   logical      :: vvk_binary              ! vvk files in binary (mixed trans.)
 
   character(*), parameter :: &
@@ -193,7 +193,11 @@ program woptic_main
         print '("woptic_main ", A)', WOPTIC_VERSION
         call exit(0)
      case ('-band', '--band')
-        band = .true.
+        have_band = .true.
+     case ('-up', '--up')
+        call croak('FIXME: spin-polarized mode is unimplemented')
+     case ('-dn', '--dn')
+        call croak('FIXME: spin-polarized mode is unimplemented')
      case default
         if (arg%s(1:1) == '-') &
              call croak('unknown option ' // trim(arg%s))
@@ -207,7 +211,7 @@ program woptic_main
   if (.not. have_file) &
        call croak('CASE argument must be given')
 
-  call set_casename(file, band)
+  call set_casename(file, have_band)
 
 !!!------------- Open files for reading         -----------------------------
   call inwop_read(fn_inwop, inw)
@@ -593,7 +597,7 @@ program woptic_main
 
 !!!------------- Read old k-resolved contributions --------------------------
   Nkold = 0; DCcond = 0; K1 = 0
-  if (.not. band) then
+  if (.not. have_band) then
      read(unit_contr,*) Nkold
   end if
   do jk=1,Nkold
@@ -823,7 +827,7 @@ program woptic_main
 
   call ptime("write contr")
 
-  if (band) then
+  if (have_band) then
      stop
   end if
   
