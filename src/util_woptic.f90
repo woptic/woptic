@@ -847,52 +847,54 @@ contains
     end if
   end subroutine print1or3
 
-  subroutine set_casename(file, band)
+  subroutine set_casename(file, have_band, have_so, updn)
     use clio,  only: argstr
 
     implicit none
 
     type(argstr), intent(in)           :: file
-    logical,      intent(in), optional :: band
+    logical,      intent(in), optional :: have_band, have_so
+    character(2), intent(in), optional :: updn
 
-    character(5) :: suf
+    character(5) :: band_
+    character(2) :: so, ud
     integer      :: i
-    suf=''
-    if (present(band)) then
-       if (band) suf='_band'
-    end if
+
+    band_ = merge('_band', '     ', present(have_band) .and. have_band)
+    so    = merge('so',    '  ',    present(have_so)   .and. have_so)
+    ud    = merge(updn,    '  ',    present(updn))
 
     fn_inwop    =trim(file%s)//trim(suf_inwop    )
-    fn_fermi    =trim(file%s)//trim(suf_fermi    )
-    fn_ham      =trim(file%s)//trim(suf_ham      )
-    fn_intrahop =trim(file%s)//trim(suf_intrahop )
-    fn_wfrot    =trim(file%s)//trim(suf_wfrot    )
-    fn_hr       =trim(file%s)//trim(suf_hr       )
-    fn_chk      =trim(file%s)//trim(suf_chk      )
-    fn_inwf     =trim(file%s)//trim(suf_inwf     )
+    fn_fermi    =trim(file%s)//trim(suf_fermi    )//ud
+    fn_ham      =trim(file%s)//trim(suf_ham      )//ud
+    fn_intrahop =trim(file%s)//trim(suf_intrahop )//ud !???
+    fn_wfrot    =trim(file%s)//trim(suf_wfrot    )//ud
+    fn_hr       =trim(file%s)//trim(suf_hr       )//ud
+    fn_chk      =trim(file%s)//trim(suf_chk      )//ud
+    fn_inwf     =trim(file%s)//trim(suf_inwf     )//ud
     fn_struct   =trim(file%s)//trim(suf_struct   )
     fn_symop    =trim(file%s)//trim(suf_symop    )
-    fn_energy   =trim(file%s)//trim(suf_energy   )
-    fn_mommat   =trim(file%s)//trim(suf_mommat   )
-    fn_klist    =trim(file%s)//trim(suf_klist    )//suf
-    fn_vr       =trim(file%s)//trim(suf_vr       )
-    fn_vvr      =trim(file%s)//trim(suf_vvr      )
-    fn_fklist   =trim(file%s)//trim(suf_fklist   )
-    fn_kadd     =trim(file%s)//trim(suf_kadd     )
-    fn_tet      =trim(file%s)//trim(suf_tet      )
-    fn_ftet     =trim(file%s)//trim(suf_ftet     )
-    fn_map      =trim(file%s)//trim(suf_map      )
-    fn_voe      =trim(file%s)//trim(suf_voe      )
-    fn_optcond  =trim(file%s)//trim(suf_optcond  )
-    fn_contr    =trim(file%s)//trim(suf_contr    )//suf
-    fn_wdos     =trim(file%s)//trim(suf_wdos     )//suf
-    fn_doscontr =trim(file%s)//trim(suf_doscontr )
-    fn_K1       =trim(file%s)//trim(suf_K1       )//suf
-    fn_selfE    =trim(file%s)//trim(suf_selfE    )//suf
-    fn_outwop   =trim(file%s)//trim(suf_outwop   )
-    fn_outref   =trim(file%s)//trim(suf_outref   )
-    fn_outvr    =trim(file%s)//trim(suf_outvr    )
-    fn_outvk    =trim(file%s)//trim(suf_outvk    )
+    fn_energy   =trim(file%s)//trim(suf_energy   )//trim(so)//ud
+    fn_mommat   =trim(file%s)//trim(suf_mommat   )//ud
+    fn_klist    =trim(file%s)//trim(suf_klist    )//band_
+    fn_vr       =trim(file%s)//trim(suf_vr       )//ud
+    fn_vvr      =trim(file%s)//trim(suf_vvr      )//ud
+    fn_fklist   =trim(file%s)//trim(suf_fklist   )//ud
+    fn_kadd     =trim(file%s)//trim(suf_kadd     )//ud
+    fn_tet      =trim(file%s)//trim(suf_tet      )//ud
+    fn_ftet     =trim(file%s)//trim(suf_ftet     )//ud
+    fn_map      =trim(file%s)//trim(suf_map      )//ud
+    fn_voe      =trim(file%s)//trim(suf_voe      )//ud
+    fn_optcond  =trim(file%s)//trim(suf_optcond  )//ud
+    fn_contr    =trim(file%s)//trim(suf_contr    )//trim(ud)//band_
+    fn_wdos     =trim(file%s)//trim(suf_wdos     )//trim(ud)//band_
+    fn_doscontr =trim(file%s)//trim(suf_doscontr )//ud
+    fn_K1       =trim(file%s)//trim(suf_K1       )//trim(ud)//band_
+    fn_selfE    =trim(file%s)//trim(suf_selfE    )//trim(ud)//band_
+    fn_outwop   =trim(file%s)//trim(suf_outwop   )//ud
+    fn_outref   =trim(file%s)//trim(suf_outref   )//ud
+    fn_outvr    =trim(file%s)//trim(suf_outvr    )//ud
+    fn_outvk    =trim(file%s)//trim(suf_outvk    )//ud
     do i=1,size(fn_optorb)
        fn_optorb(i)=trim(file%s)//trim(suf_optorb(i))
     end do

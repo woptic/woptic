@@ -88,7 +88,7 @@ program woptic_main
   integer      :: KSmin, KSmax   ! outer window
   integer      :: Nw             ! # internal frequencies
   integer      :: NE             ! # external frequencies
-  integer      :: wmin, wmax     ! (maximal) w-window
+  integer      :: wmin, wmax     ! (maximal) ω-window
   integer      :: Nk             ! # (new) k-points
   integer      :: Nt             ! # tetrahedra
   integer      :: Nsym           ! # symmetry operations
@@ -98,8 +98,9 @@ program woptic_main
   integer      :: jt, T, jb,jb1,jb2, jd, jk,jk1,jk2, js, jarg, ii
   real   (DPk) :: mxr, sumtetraweights, df, convfac, x,xd,xk !, y, z
   complex(DPk) :: derivative(3)
-  logical      :: have_file=.false., have_band=.false.
-  logical      :: vvk_binary              ! vvk files in binary (mixed trans.)
+  logical      :: have_file=.false., have_band=.false., have_so=.false.
+  character(2) :: updn=''
+  logical      :: vvk_binary     ! vvk files in binary (mixed trans.)
 
   character(*), parameter :: &
        fmt_subtime  = "('   of which ',A,T33, &
@@ -138,7 +139,7 @@ program woptic_main
   character(*), parameter :: usage = '(                                      &
 &"woptic_main: compute optical conductivity for a given k-mesh"            /&
 &/"USAGE",                                                                   &
-&T10,"woptic_main [--band] CASE",                                          /&
+&T10,"woptic_main [--band] [--up|--dn] [--so] CASE",                       /&
 &/"FILES",                                                                   &
 &T10,"(prefixed by CASE)",                                                 /&
 &"*  '//suf_inwop    //'",T22,"woptic main input file"                     /&
@@ -196,8 +197,12 @@ program woptic_main
         have_band = .true.
      case ('-up', '--up')
         call croak('FIXME: spin-polarized mode is unimplemented')
+        updn='up'
      case ('-dn', '--dn')
         call croak('FIXME: spin-polarized mode is unimplemented')
+        updn='dn'
+     case ('-so', '--so')
+        have_so = .true.
      case default
         if (arg%s(1:1) == '-') &
              call croak('unknown option ' // trim(arg%s))
@@ -211,7 +216,7 @@ program woptic_main
   if (.not. have_file) &
        call croak('CASE argument must be given')
 
-  call set_casename(file, have_band)
+  call set_casename(file, have_band, have_so, updn)
 
 !!!------------- Open files for reading         -----------------------------
   call inwop_read(fn_inwop, inw)
