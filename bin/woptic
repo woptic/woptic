@@ -153,7 +153,8 @@ while [[ $# -gt 0 ]]; do
         ?(-)-so)                  so=-so       ;;
         ?(-)-up)                updn=up        ;;
         ?(-)-dn)                updn=dn        ;;
-        -f|?(-)-case)           file=$2; shift ;;
+        -f|?(-)-case)           file=$2; shift
+                               ffile="-f $file";;
         -V|?(-)-verbose)           v="-v"      ;;
         -q|?(-)-quiet)             q="-q"      ;;
 
@@ -316,29 +317,29 @@ do
         if [[ $runlapw1 ]]; then
             if [[ $so ]]; then
                 if [[ $sp ]]; then
-                    x lapw1  -f $file -up $p $c
-                    x lapw1  -f $file -dn $p $c
-                    x lapwso -f $file -up $p $c
+                    x lapw1  $ffile -up $p $c
+                    x lapw1  $ffile -dn $p $c
+                    x lapwso $ffile -up $p $c
                 else
                     #FIXME: “this is not yet working” (???)
-                    x lapw1  -f $file $p $c
-                    x lapwso -f $file $p $c
+                    x lapw1  $ffile $p $c
+                    x lapwso $ffile $p $c
                 fi
             else
-                x lapw1 -f $file $sp $p $c #work with klist
+                x lapw1 $ffile $sp $p $c #work with klist
             fi
             
-            [[ $p ]] && x joinvec -f $file $sp $so
+            [[ $p ]] && x joinvec $ffile $sp $so
         fi
 
-        [[ $runoptic ]] && x optic -f $file $p $c $so $sp
+        [[ $runoptic ]] && x optic $ffile $p $c $so $sp
 
         if [[ $peierls ]]; then
             ktmp=$(klisttmp)
             mv $v $file.klist $ktmp
             ln -fs $v $file.klist_full $file.klist
         fi
-        x convham -f $file
+        x convham $ffile
         if [[ $peierls ]]; then
             rm $v $file.klist
             mv $v $ktmp $file.klist
@@ -377,7 +378,7 @@ do
         mv $v $file.klist $ktmp
         ln -fs $v $file.klist_full $file.klist
 
-        x convham -f $file
+        x convham $ffile
 
         rm $file.klist
         mv $v $ktmp $file.klist
@@ -395,7 +396,7 @@ do
     [[ $nosym ]] && ln -sf $v $file.ksym $file.struct
 
     # main run to compute optical conductivity on given mesh
-    w woptic_main $file $band
+    w woptic_main $file $band $so $sp
 
     # if there was no error, move updated files over old ones
     for suf in $wopmainfiles; do
