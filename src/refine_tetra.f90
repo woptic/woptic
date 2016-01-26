@@ -50,31 +50,31 @@ PROGRAM refine_tmesh
 
   character(*), parameter :: suf_new='_refined'
   character(*), parameter :: usage = '(                                      &
-&"refine_tetra: adaptive refinement of tetrahedral k-mesh"                  /&
+&"refine_tetra: adaptive refinement of tetrahedral k-mesh"                 /&
 &/"USAGE",                                                                   &
-&T10,"refine_tetra [OPTIONS] CASE",                                         /&
-&/"FILES",                                                                   &
-&T10,"(prefixed by CASE)",                                                  /&
-&"   '//suf_inwop //'",T20,"woptic main input file (for dE)"                /&
-&"   '//suf_struct//'",T20,"Wien2k master input file"                       /&
-&"   '//suf_contr //'",T20,"function values for estimator (w.r.t klist)"    /&
-&"   '//suf_outref//'",T20,"log file"                                       /&
-&" * '//suf_klist //'",T20,"symmetrized k-points"                           /&
-&" * '//suf_fklist//'",T20,"unsymmetrized k-points"                         /&
-&" * '//suf_tet   //'",T20,"symmetrized tetrahedra"                         /&
-&" * '//suf_ftet  //'",T20,"unsymmetrized tetrahedra"                       /&
-&" * '//suf_voe   //'",T20,"list of k-points on tetrahedral edges"          /&
-&" * '//suf_map   //'",T20,"internal mapping of klist_full to klist"        /&
-&/"Files marked ‘*’ are read and updated unless -init is given.  The"       /&
-&"updated file ‘F’ is written to ‘F'//suf_new//'’.  The list of added"      /&
-&"k-points is written to ‘CASE'//suf_kadd//'’."                             /&
-&/"OPTIONS",                                                                 &
-&T10,"--theta Θ", T21,"(0≤Θ≤1) defines the ‘harshness’ of refinement"       /&
-&                 T20,"Θ=0: uniform;   Θ=1: most adaptive refinement"       /&
-&T10,"--init N",                                                             &
-&T20,"initial refinement with N steps (in general, 2 … 4)"                  /&
-&T10,"--inter",                                                              &
-&T20,"give larger weight to higher-energy contributions"                     &
+&T10,"refine_tetra [OPTIONS] CASE",                                        /&
+&/"FILES",                                                                  &
+&T10,"(prefixed by CASE)",                                                 /&
+&"   '//suf_inwop //'",T20,"woptic main input file (for dE)"               /&
+&"   '//suf_struct//'",T20,"Wien2k master input file"                      /&
+&"   '//suf_contr //'",T20,"function values for estimator (w.r.t klist)"   /&
+&"   '//suf_outref//'",T20,"log file"                                      /&
+&" * '//suf_klist //'",T20,"symmetrized k-points"                          /&
+&" * '//suf_fklist//'",T20,"unsymmetrized k-points"                        /&
+&" * '//suf_tet   //'",T20,"symmetrized tetrahedra"                        /&
+&" * '//suf_ftet  //'",T20,"unsymmetrized tetrahedra"                      /&
+&" * '//suf_voe   //'",T20,"list of k-points on tetrahedral edges"         /&
+&" * '//suf_map   //'",T20,"internal mapping of klist_full to klist"       /&
+&/"Files marked ‘*’ are read and updated unless -init is given.  The"      /&
+&"updated file ‘F’ is written to ‘F'//suf_new//'’.  The list of added"     /&
+&"k-points is written to ‘CASE'//suf_kadd//'’."                            /&
+&/"OPTIONS",                                                                &
+&T10,"--theta Θ", T21,"(0≤Θ≤1) defines the ‘harshness’ of refinement"      /&
+&                 T20,"Θ=0: uniform;   Θ=1: most adaptive refinement"      /&
+&T10,"--init N",                                                            &
+&T20,"initial refinement with N steps (in general, 2 … 4)"                 /&
+&T10,"--inter",                                                             &
+&T20,"give larger weight to higher-energy contributions"                    &
 &)'
 
 
