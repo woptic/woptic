@@ -7,8 +7,10 @@ Version 1.0.0
 This release corresponds to the publication of the paper describing
 woptic, CPC ….
 
-* woptic_userguide.tex: corrected the prefactor of the optical
-  conductivity
+ * corrected the prefactor of the optical conductivity in the user's
+   guide
+
+ * woptic_main: fail on currently unsupported matelmodes
 
 
 Version 0.1.0
@@ -46,6 +48,9 @@ introduces many changes, including:
 
    - ‘kanalysis’ and the corresponding option ’--band’ to ‘woptic’ and
      ‘woptic_main’ is untested.
+
+Thanks to Sushil Auluck for spotting an incompatibility with older
+ifort and gfortran versions.
 
 
 === Older version information follows ===============================
