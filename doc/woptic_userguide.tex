@@ -57,6 +57,7 @@
 \ProgName               {inwopcheck}
 
 \newcommand*\lapwi   {\file{lapw1}\xspace}
+\newcommand*\lapwso  {\file{lapwso}\xspace}
 \newcommand*\optic   {\file{optic}\xspace}
 \newcommand*\prepwiiw{\file{prepare\_w2wdir}\xspace}
 \newcommand*\wiiw    {\file{w2w}\xspace}
@@ -92,18 +93,18 @@
     #1%
   }}
 
-% \tikz[overlay, remember picture]
-%   \node[anchor=center] at (current page.center) {
-%     \begin{minipage}{10.7cm}
-%       \newcommand*\xL{\color{darkgray}}
-%       \newcommand*\xW{\color{green!80!black}}
-%       \newcommand*\xF{\bfseries}
-%       \newcommand*\xC{\color{brown}}
-%       \newcommand*\xA{\color{cyan!90!black}}
-%       \newcommand*\xB{\normalfont\ttfamily}
-%       \VerbatimInput[commandchars=\!\{\}]{logo.tex}
-%     \end{minipage}
-%   };
+\tikz[overlay, remember picture]
+\node[anchor=center] at (current page.center) {
+  \begin{minipage}{10.7cm}
+    \newcommand*\xL{\color{darkgray}}
+    \newcommand*\xW{\color{green!80!black}}
+    \newcommand*\xF{\bfseries}
+    \newcommand*\xC{\color{brown}}
+    \newcommand*\xA{\color{cyan!90!black}}
+    \newcommand*\xB{\normalfont\ttfamily}
+    \VerbatimInput[commandchars=\!\{\}]{logo.tex}
+  \end{minipage}
+};
 
 \chapter*{Introduction}
 \label{chap:intro}
@@ -489,6 +490,9 @@ e.g., to remove extraneous states at the band edges.
 
 \item [\lvir\td{}band] compute optical conductivity contributions along
   \file{\case.klist\_band} to be processed by \kanalysis
+
+\item[-p] call the parallelized versions of \lapwi, \lapwso, \optic
+  (\woptic itself is not parallelized)
 \end{options}
 %
 The iterations in \code{-i}, \code{\td{}restart}, and
