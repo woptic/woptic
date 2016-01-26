@@ -21,16 +21,16 @@ program compute_vr
   use Wannier90, only: chk_t, chk_read
   use woptic_io, only: set_casename, &
        ! input:
-                    unit_mommat,          unit_hr, unit_wfrot,                &
-        suf_inwop,   suf_mommat, suf_chk,  suf_hr,                            &
-         fn_inwop,    fn_mommat,  fn_chk,   fn_hr,   fn_wfrot,                &
+                    unit_mommat,          unit_hr, unit_wfrot,              &
+        suf_inwop,   suf_mommat, suf_chk,  suf_hr,                          &
+         fn_inwop,    fn_mommat,  fn_chk,   fn_hr,   fn_wfrot,              &
        ! input for mixed transitions / disentanglement:
-       unit_energy, unit_fermi,                                               &
-        suf_energy,  suf_fermi, suf_struct, suf_inwf,                         &
-         fn_energy,   fn_fermi,  fn_struct,  fn_inwf,                         &
+       unit_energy, unit_fermi,                                             &
+        suf_energy,  suf_fermi, suf_struct, suf_inwf,                       &
+         fn_energy,   fn_fermi,  fn_struct,  fn_inwf,                       &
        ! output:
-       unit_outvr,  unit_vr,    unit_vvr,                                     &
-        suf_outvr,   suf_vr,     suf_vvr,                                     &
+       unit_outvr,  unit_vr,    unit_vvr,                                   &
+        suf_outvr,   suf_vr,     suf_vvr,                                   &
          fn_outvr,    fn_vr,      fn_vvr
 
   implicit none
