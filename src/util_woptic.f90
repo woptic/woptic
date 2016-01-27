@@ -11,7 +11,7 @@
 !! woptic: Things specific to woptic
 !!
 !!    get_mommat(), get_mommat_1k(), type(inwop_t), inwop_read(),
-!!    MODE_*, fmt_*, woptic_version
+!!    MODE_*, fmt_*
 !!
 !!
 !! maybebin: Read/write files that may be binary or plain text
@@ -125,10 +125,6 @@ module woptic
 ! “ridiculously large” number for the number of bands …
 !       fmt_vk          = "(*(E20.12))",                                    &
        fmt_vvk         = fmt_vk
-
-  character(*),         parameter :: svn_rev_str  = '$Rev: 394 $'
-  character(*), public, parameter :: woptic_version = &
-       "0.98-r" // svn_rev_str(7:len(svn_rev_str)-2)
 
 contains
 

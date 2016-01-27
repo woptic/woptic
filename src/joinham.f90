@@ -16,10 +16,13 @@ program combine_hamfiles
   use clio,      only: fetcharg, croak
   use util,      only: lowercase
   use woptic_io, only: suf_ham, suf_mommat
-  use woptic,    only: fmt_vk_head, WOPTIC_VERSION
+  use woptic,    only: fmt_vk_head
   use maybebin,  only: maybin_open, maybin_read, maybin_write, formatted
 
   implicit none
+
+  character(*), parameter :: rev_str = "$version: v0.1.0-27-ga77d9d3$"
+  character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer,          parameter :: unit_ham1=11, unit_ham2=12, unit_mom1=13
   integer,          parameter :: unit_mom2=14, unit_ham3=15, unit_mom3=16

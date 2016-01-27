@@ -16,7 +16,7 @@ program compute_vr
   use inwfmod,   only: inwf_t, inwf_read
   use maybebin,  only: maybin_open, maybin_read, maybin_write, &
        maybin_set, maybin_get
-  use woptic,    only: get_mommat_1k, inwop_t, inwop_read, WOPTIC_VERSION, &
+  use woptic,    only: get_mommat_1k, inwop_t, inwop_read, &
        fmt_rweights, fmt_vr_head, fmt_vvr_head, fmt_vr, fmt_vvr
   use Wannier90, only: chk_t, chk_read
   use woptic_io, only: set_casename, &
@@ -34,6 +34,9 @@ program compute_vr
          fn_outvr,    fn_vr,      fn_vvr
 
   implicit none
+
+  character(*), parameter :: rev_str = "$version: v0.1.0-27-ga77d9d3$"
+  character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
 !!! Formats for log file
   character(*), parameter ::            &

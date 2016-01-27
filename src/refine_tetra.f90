@@ -12,7 +12,6 @@ PROGRAM refine_tmesh
   use structmod, only: struct_t, struct_read
   use kpoints,   only: count_kmesh_klist
   use clio,      only: fetcharg, argstr, croak
-  use woptic,    only: WOPTIC_VERSION
   use woptic_io, only: set_casename, &
        unit_klist,  unit_fklist, unit_tet,   unit_ftet, unit_contr, unit_voe,&
        unit_struct, unit_map,    unit_inwop, unit_kadd, unit_outref,         &
@@ -22,6 +21,9 @@ PROGRAM refine_tmesh
        fn_struct,   fn_map,      fn_inwop,   fn_kadd,   fn_outref
 
   implicit none
+
+  character(*), parameter :: rev_str = "$version: v0.1.0-27-ga77d9d3$"
+  character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
   integer   :: iarg, iv, iE, ik, jk, ir, it, jd1, tcount, kdiv, jsig

@@ -16,7 +16,7 @@ program woptic_main
   use clio,       only: argstr, fetcharg, croak, carp
   use maybebin,   only: maybin_open, maybin_read
   use Wannier90,  only: chk_t, chk_read
-  use woptic,     only: inwop_t, inwop_read, get_mommat, WOPTIC_VERSION, &
+  use woptic,     only: inwop_t, inwop_read, get_mommat, &
        MODE_Peierls, MODE_interp, MODE_optic, MODE_Bloch, MODE_LDA
   use woptic_io,  only: print1or3, set_casename, &
        & unit_intrahop, unit_outwop, unit_struct, unit_wfrot, unit_tet,     &
@@ -36,6 +36,9 @@ program woptic_main
        &   fn_optorb,     fn_selfE,    fn_vk,       fn_vvk,     fn_chk
 
   implicit none
+
+  character(*), parameter :: rev_str = "$version: v0.1.0-27-ga77d9d3$"
+  character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
 

@@ -13,7 +13,7 @@ PROGRAM convert_vr
   use clio,      only: croak, argstr, fetcharg
   use structmod, only: struct_t, struct_read
   use maybebin,  only: maybin_open, maybin_read, maybin_write
-  use woptic,    only: inwop_t, inwop_read, WOPTIC_VERSION, &
+  use woptic,    only: inwop_t, inwop_read, &
        fmt_rweights, fmt_vr_read, fmt_vvr_read, fmt_vk_head, fmt_vk_kp, &
        fmt_vk, fmt_vvk_head, fmt_vvk_kp, fmt_vvk
   use kpoints,   only: get_kmesh_klist
@@ -28,6 +28,9 @@ PROGRAM convert_vr
          fn_outvk,   fn_vk,    fn_vvk
 
   implicit none
+
+  character(*), parameter :: rev_str = "$version: v0.1.0-27-ga77d9d3$"
+  character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer       :: v, w, k, r, o, i, id, omin, omax
   integer       :: Nb, Nr, Nk, Nw, iarg, check(3)
