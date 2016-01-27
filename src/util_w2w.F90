@@ -1,11 +1,9 @@
-!!! wien2wannier/SRC_w2w/util_w2w.F
+!!! woptic/src/util_w2w.F
 !!!
-!!!    Collection of routines for wien2wannier
+!!!    Collection of routines for wien2wannier (copied for woptic)
 !!!
 !!! Copyright 2010-2012 Philipp Wissgott
-!!!           2013-2015 Elias Assmann
-!!!
-!!! $Id: util_w2w.F 424 2015-07-14 11:17:35Z assmann $
+!!!           2013-2016 Elias Assmann
 
 
 !!/=== Things that are exported here =============

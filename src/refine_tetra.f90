@@ -43,6 +43,7 @@ PROGRAM refine_tmesh
 
   logical        :: have_file=.false.
   logical        :: inter=.false., init=.false.
+  character(2)   :: updn=''
   real(DPk)      :: theta=0.5_DPk
   type(argstr)   :: arg, file
   integer        :: init_steps
@@ -65,7 +66,7 @@ PROGRAM refine_tmesh
 &" * '//suf_ftet  //'",T20,"unsymmetrized tetrahedra"                      /&
 &" * '//suf_voe   //'",T20,"list of k-points on tetrahedral edges"         /&
 &" * '//suf_map   //'",T20,"internal mapping of klist_full to klist"       /&
-&/"Files marked ‘*’ are read and updated unless -init is given.  The"      /&
+&/"Files marked ‘*’ are read and updated (except with --init).  The"       /&
 &"updated file ‘F’ is written to ‘F'//suf_new//'’.  The list of added"     /&
 &"k-points is written to ‘CASE'//suf_kadd//'’."                            /&
 &/"OPTIONS",                                                                &
@@ -74,7 +75,10 @@ PROGRAM refine_tmesh
 &T10,"--init N",                                                            &
 &T20,"initial refinement with N steps (in general, 2 … 4)"                 /&
 &T10,"--inter",                                                             &
-&T20,"give larger weight to higher-energy contributions"                    &
+&T20,"give larger weight to higher-energy contributions"                   /&
+&T10,"--up|--dn",                                                           &
+&T20,"spin-polarized calculation"                                          /&
+&T10,"--help, --version"                                                    &
 &)'
 
 
@@ -103,8 +107,12 @@ PROGRAM refine_tmesh
         init=.true.
         call fetcharg(iarg, init_steps)
      case ('-v', '-V', '-version', '--version')
-        print '("refine_tetra ", A)', woptic_version
+        print '("refine_tetra ", A)', WOPTIC_VERSION
         call exit(0)
+     case ('-up', '--up')
+        updn='up'
+     case ('-dn', '--dn')
+        updn='dn'
      case default
         if (arg%s(1:1) == '-') &
              call croak('unknown option ' // trim(arg%s))
@@ -118,7 +126,7 @@ PROGRAM refine_tmesh
   if (.not. have_file) &
        call croak('CASE argument must be given')
 
-  call set_casename(file)
+  call set_casename(file, UPDN=updn)
 
 
 !!!------------- Open files for reading         -----------------------------

@@ -53,7 +53,8 @@ program compute_vr
   type(inwf_t)   :: inwf        ! we need bmin,bmax for disentanglement
 
 !!! Options
-  logical :: no_umat=.false.
+  logical      :: no_umat=.false., have_so=.false.
+  character(2) :: updn=''
 
 !!! Loop variables
   integer :: i, v,w, k, R, f, ii, iarg
@@ -117,7 +118,8 @@ program compute_vr
         write(*,'(A)') &
              "compute_vr: compute dipole matrix elements in direct space"
         write(*,*) 
-        write(*,fmt_hlp2) "USAGE:", "compute_vr [--text] CASE"
+        write(*,fmt_hlp2)"USAGE:", "compute_vr [--text] [--up|--dn] [--so]&
+             & CASE"
         write(*,*) 
         write(*,fmt_help)"INPUT:", suf_inwop, "input file"
         write(*,fmt_help)" (W90)", suf_chk,   "Wannier90 checkpoint file"
@@ -138,9 +140,8 @@ program compute_vr
         write(*,*) 
         write(*,fmt_hlp2)"OPTIONS:", "--help, -h"
         write(*,fmt_hlp2)"",         "--version, -v"
-        write(*,fmt_hlp2)"",         "--text, -t", "output plain text"
-        write(*,fmt_hlp2)"",         "--noU", "do not apply U-matrices",   &
-             "[for debugging, currently broken]"
+        write(*,fmt_hlp2)"",         "--text, -t", "plain-text case.vvr"
+        write(*,fmt_hlp2)"",         "--up|--dn",  "spin-polarized mode"
         stop
 
      case ('-v', '-V', '-version', '--version')
@@ -154,6 +155,13 @@ program compute_vr
      case('-t', '--text')
         call maybin_set(.false.)
 
+     case ('-up', '--up')
+        updn='up'
+     case ('-dn', '--dn')
+        updn='dn'
+     case ('-so', '--so')
+        have_so = .true.
+
      case default
         if (arg%s(1:1) == '-') &
              call croak('unknown option: '//trim(arg%s))
@@ -162,7 +170,7 @@ program compute_vr
      end select
   end do
 
-  call set_casename(case)
+  call set_casename(case, HAVE_SO=have_so, UPDN=updn)
 
   call ptime(UNIT=unit_outvr)
 

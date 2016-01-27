@@ -856,13 +856,22 @@ contains
     logical,      intent(in), optional :: have_band, have_so
     character(2), intent(in), optional :: updn
 
+    ! Curse Fortran for disallowing leading underscores !
     character(5) :: band_
     character(2) :: so, ud
     integer      :: i
 
-    band_ = merge('_band', '     ', present(have_band) .and. have_band)
-    so    = merge('so',    '  ',    present(have_so)   .and. have_so)
-    ud    = merge(updn,    '  ',    present(updn))
+    ! Curse Fortran for not providing short-circuit Boolean operators !
+    band_=''; so=''; ud=''
+    if(present(have_band)) then
+       if (have_band) band_='_band'
+    end if
+    if(present(have_so)) then
+       if (have_so) so = 'so'
+    end if
+    if(present(updn)) then
+       ud = updn
+    end if
 
     fn_inwop    =trim(file%s)//trim(suf_inwop    )
     fn_fermi    =trim(file%s)//trim(suf_fermi    )//ud
@@ -879,12 +888,12 @@ contains
     fn_klist    =trim(file%s)//trim(suf_klist    )//band_
     fn_vr       =trim(file%s)//trim(suf_vr       )//ud
     fn_vvr      =trim(file%s)//trim(suf_vvr      )//ud
-    fn_fklist   =trim(file%s)//trim(suf_fklist   )//ud
-    fn_kadd     =trim(file%s)//trim(suf_kadd     )//ud
-    fn_tet      =trim(file%s)//trim(suf_tet      )//ud
-    fn_ftet     =trim(file%s)//trim(suf_ftet     )//ud
-    fn_map      =trim(file%s)//trim(suf_map      )//ud
-    fn_voe      =trim(file%s)//trim(suf_voe      )//ud
+    fn_fklist   =trim(file%s)//trim(suf_fklist   )
+    fn_kadd     =trim(file%s)//trim(suf_kadd     )
+    fn_tet      =trim(file%s)//trim(suf_tet      )
+    fn_ftet     =trim(file%s)//trim(suf_ftet     )
+    fn_map      =trim(file%s)//trim(suf_map      )
+    fn_voe      =trim(file%s)//trim(suf_voe      )
     fn_optcond  =trim(file%s)//trim(suf_optcond  )//ud
     fn_contr    =trim(file%s)//trim(suf_contr    )//trim(ud)//band_
     fn_wdos     =trim(file%s)//trim(suf_wdos     )//trim(ud)//band_
@@ -896,15 +905,15 @@ contains
     fn_outvr    =trim(file%s)//trim(suf_outvr    )//ud
     fn_outvk    =trim(file%s)//trim(suf_outvk    )//ud
     do i=1,size(fn_optorb)
-       fn_optorb(i)=trim(file%s)//trim(suf_optorb(i))
+       fn_optorb(i)=trim(file%s)//trim(suf_optorb(i))//ud
     end do
     do i=1,size(fn_vk)
-       fn_vk(i)    =trim(file%s)//trim(suf_vk(i)    )
+       fn_vk(i)    =trim(file%s)//trim(suf_vk(i)    )//ud
     end do
     do i=1,size(fn_vvk)
-       fn_vvk(i)   =trim(file%s)//trim(suf_vvk(i)   )
+       fn_vvk(i)   =trim(file%s)//trim(suf_vvk(i)   )//ud
     end do
-  end subroutine set_casename
+end subroutine set_casename
 end module woptic_io
 
 

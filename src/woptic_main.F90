@@ -136,11 +136,11 @@ program woptic_main
   ! [hbar^3/emass^2*(m/ang)^5]
   real   (DPk), parameter :: factor1 = 1.413351709413265e+08_DPk
   character(*), parameter :: suf_new = '_new'
-  character(*), parameter :: usage = '(                                      &
+  character(*), parameter :: usage = '(                                     &
 &"woptic_main: compute optical conductivity for a given k-mesh"            /&
-&/"USAGE",                                                                   &
+&/"USAGE",                                                                  &
 &T10,"woptic_main [--band] [--up|--dn] [--so] CASE",                       /&
-&/"FILES",                                                                   &
+&/"FILES",                                                                  &
 &T10,"(prefixed by CASE)",                                                 /&
 &"*  '//suf_inwop    //'",T22,"woptic main input file"                     /&
 &"*  '//suf_struct   //'",T22,"Wien2k master input file"                   /&
@@ -196,10 +196,8 @@ program woptic_main
      case ('-band', '--band')
         have_band = .true.
      case ('-up', '--up')
-        call croak('FIXME: spin-polarized mode is unimplemented')
         updn='up'
      case ('-dn', '--dn')
-        call croak('FIXME: spin-polarized mode is unimplemented')
         updn='dn'
      case ('-so', '--so')
         have_so = .true.
