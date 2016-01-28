@@ -3,3 +3,5 @@ src/convert_vr.f90    filter=version
 src/joinham.f90       filter=version
 src/refine_tetra.f90  filter=version
 src/woptic_main.F90   filter=version
+bin/woptic            filter=version
+bin/wopticlean        filter=version

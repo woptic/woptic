@@ -69,7 +69,8 @@ my @extensions = (@sic, @ext_only, @andfull, @andnew, @andold, @andrefined);
 
 sub help    { pod2usage(0) }
 sub man     { pod2usage(-verbose=>2, exitval=>0, -noperldoc=>1) }
-sub version { '$Rev: 394 $' =~ /: *(\d+) *\$/; print "wopticlean 0.98-r$1\n" }
+sub version { '$version: v0.1.0-29-gfc0247a$/;
+              print "wopticlean $1\n"' }
 
 my ($verbose, $recursive, $mrproper, $recon, %dirs);
 
@@ -156,4 +157,4 @@ You are  advised to do a  dry run (`-n') first,  especially when using
 =cut
 
 
-## Time-stamp: <2015-06-08 19:26:25 assman@faepop23.tu-graz.ac.at>
+## Time-stamp: <2016-01-29 14:44:26 assman@faepop36.tu-graz.ac.at>

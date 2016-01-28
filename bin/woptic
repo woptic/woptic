@@ -70,8 +70,9 @@ EOF
 }
 
 version () {
-    r=$(echo '$Rev: 394 $' | set 's/: *(\d+) *\$/\1/')
-    echo "woptic 0.98-r$r"
+    r=$(echo '$version: v0.1.0-29-g47a7471$' | 
+               perl -pe 's/.*: *(\S+) *\$/$1/')
+    echo "woptic $r"
 }
 
 croak () {
