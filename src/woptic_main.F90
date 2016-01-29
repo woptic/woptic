@@ -4,7 +4,7 @@
 !!!    kmesh refinement
 !!!
 !!! Copyright 2009-2012 Philipp Wissgott
-!!!           2013-2015 Elias Assmann
+!!!           2013-2016 Elias Assmann
 !!!
 
 program woptic_main
@@ -37,7 +37,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-29-g47a7471$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk

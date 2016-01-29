@@ -3,7 +3,7 @@
 !!!    Collection of routines for woptic
 !!!
 !!! Copyright 2010-2012 Philipp Wissgott
-!!!           2013-2015 Elias Assmann
+!!!           2013-2016 Elias Assmann
 !!!
 
 !!/=== Things that are exported here =============

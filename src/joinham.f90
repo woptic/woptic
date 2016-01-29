@@ -8,7 +8,7 @@
 !!!     case.mommat_old + case.mommat = case.mommat_joined
 !!!
 !!! Copyright 2009-2012 Philipp Wissgott
-!!!           2014-2015 Elias Assmann
+!!!           2014-2016 Elias Assmann
 !!!
 
 program combine_hamfiles
@@ -21,7 +21,7 @@ program combine_hamfiles
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-29-g47a7471$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer,          parameter :: unit_ham1=11, unit_ham2=12, unit_mom1=13
@@ -178,4 +178,4 @@ contains
 end program combine_hamfiles
 
 
-!! Time-stamp: <2015-11-10 16:16:44 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-01-29 15:00:44 assman@faepop36.tu-graz.ac.at>

@@ -3,7 +3,7 @@
 !!!    Computes V(r), the dipole matrix-elements in real space.
 !!!
 !!! Copyright 2012      Philipp Wissgott
-!!!           2013-2015 Elias Assmann
+!!!           2013-2016 Elias Assmann
 !!!
 !!! FIXME: This program follows the WET principle too much.
 !!!
@@ -35,7 +35,7 @@ program compute_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-29-g47a7471$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
 !!! Formats for log file
@@ -558,4 +558,4 @@ contains
   end function hemul
 end program compute_vr
 
-!! Time-stamp: <2015-06-08 19:17:45 assman@faepop23.tu-graz.ac.at>
+!! Time-stamp: <2016-01-29 14:59:56 assman@faepop36.tu-graz.ac.at>

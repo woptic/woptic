@@ -4,7 +4,7 @@
 !!!    V(k)
 !!!
 !!! Copyright 2012      Philipp Wissgott
-!!!           2013-2015 Elias Assmann
+!!!           2013-2016 Elias Assmann
 !!!
 
 PROGRAM convert_vr
@@ -29,7 +29,7 @@ PROGRAM convert_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-29-g47a7471$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer       :: v, w, k, r, o, i, id, omin, omax
@@ -270,4 +270,4 @@ PROGRAM convert_vr
 end program convert_vr
 
 
-!! Time-stamp: <2015-06-08 19:17:04 assman@faepop23.tu-graz.ac.at>
+!! Time-stamp: <2016-01-29 15:00:34 assman@faepop36.tu-graz.ac.at>

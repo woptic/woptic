@@ -3,7 +3,7 @@
 !!!    Adaptive refinement of tetrahedral k-mesh 
 !!!
 !!! Copyright 2009-2012 Philipp Wissgott
-!!!           2014-2015 Elias Assmann
+!!!           2014-2016 Elias Assmann
 !!!
 
 PROGRAM refine_tmesh
@@ -13,16 +13,16 @@ PROGRAM refine_tmesh
   use kpoints,   only: count_kmesh_klist
   use clio,      only: fetcharg, argstr, croak
   use woptic_io, only: set_casename, &
-       unit_klist,  unit_fklist, unit_tet,   unit_ftet, unit_contr, unit_voe,&
-       unit_struct, unit_map,    unit_inwop, unit_kadd, unit_outref,         &
-       suf_klist,   suf_fklist,  suf_tet,    suf_ftet,  suf_contr,  suf_voe, &
-       suf_struct,  suf_map,     suf_inwop,  suf_kadd,  suf_outref,          &
-       fn_klist,    fn_fklist,   fn_tet,     fn_ftet,   fn_contr,   fn_voe,  &
-       fn_struct,   fn_map,      fn_inwop,   fn_kadd,   fn_outref
+       unit_klist, unit_fklist, unit_tet,   unit_ftet, unit_contr, unit_voe,&
+       unit_struct,unit_map,    unit_inwop, unit_kadd, unit_outref,         &
+       suf_klist,  suf_fklist,  suf_tet,    suf_ftet,  suf_contr,  suf_voe, &
+       suf_struct, suf_map,     suf_inwop,  suf_kadd,  suf_outref,          &
+       fn_klist,   fn_fklist,   fn_tet,     fn_ftet,   fn_contr,   fn_voe,  &
+       fn_struct,  fn_map,      fn_inwop,   fn_kadd,   fn_outref
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-29-g47a7471$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
