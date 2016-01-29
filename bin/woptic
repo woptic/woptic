@@ -70,7 +70,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-30-gf31ce8c$' | 
+    r=$(echo '$version: v0.1.0-30-ga313269$' | 
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -330,7 +330,7 @@ do
                 x lapw1 $ffile $sp $p $c #work with klist
             fi
             
-            [[ $p ]] && x joinvec $ffile $sp $so
+            [[ $p ]] && x joinvec -enefile $ffile $sp $so
         fi
 
         [[ $runoptic ]] && x optic $ffile $p $c $so $sp
