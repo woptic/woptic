@@ -69,7 +69,7 @@ my @extensions = (@sic, @ext_only, @andfull, @andnew, @andold, @andrefined);
 
 sub help    { pod2usage(0) }
 sub man     { pod2usage(-verbose=>2, exitval=>0, -noperldoc=>1) }
-sub version { '$version: v0.1.0-30-gf31ce8c$/;
+sub version { '$version: v0.1.0-32-gd1cc3f5$/;
               print "wopticlean $1\n"' }
 
 my ($verbose, $recursive, $mrproper, $recon, %dirs);

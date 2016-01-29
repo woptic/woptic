@@ -12,6 +12,9 @@ woptic, CPC ….
 
  * woptic_main: fail on currently unsupported matelmodes
 
+ * joinham: fixed a bug where the second argument in the two-argument
+   case (‘joinham HK MOMMAT’) was ignored
+
 
 Version 0.1.0
 =============

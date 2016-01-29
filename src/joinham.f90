@@ -21,7 +21,7 @@ program combine_hamfiles
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-32-gd1cc3f5$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer,          parameter :: unit_ham1=11, unit_ham2=12, unit_mom1=13
@@ -31,6 +31,7 @@ program combine_hamfiles
   integer          :: Nkb1(2), Nkb2(2), i,j
   logical          :: info, mation, mommat=.false.
   character(BUFSZ) :: case, ham1, ham2, ham3, mom1, mom2, mom3, buf
+  character(2)     :: updn=''
 
   ! The “HK” file may be binary (vvk!).  During the first woptic
   ! iteration, HK1 will be plain text even if HK2 is binary.
@@ -47,17 +48,19 @@ program combine_hamfiles
      call fetcharg(1, case)
      option: select case (case)
      case ('-h','-H','-help','--help')
-        print '(A)', 'USAGE: joinham CASE'
+        print '(A)', 'USAGE: joinham [--up|--dn] CASE'
         print '(A)', '   or  joinham HK MOMMAT'
         print '(A)', '   or  joinham HK1 HK2 HKOUT'
         print '(A)', '   or  joinham HK1 HK2 HKOUT MOM1 MOM2 MOMOUT'
-        print '(A)', '   or  joinham { OPTION }'
+        print '(A)', '   or  joinham { --help | --version }'
         print '(A)'
-        print '(A)', 'Splice two ‘hk’ files together, and possibly two ‘mommat2’ files.'
+        print '(A)', 'Splice two ‘hk’ files together, and possibly two &
+             &‘mommat2’ files.'
         print '(A)'
         print '(A)', 'OPTIONS:'
-        print '(A)', '  --help, -h'
-        print '(A)', '  --version, -v'
+        print '(A)', '  --help, -h     output this message and exit'
+        print '(A)', '  --version, -v  output version information and exit'
+        print '(A)', '  --up|--dn      spin-polarized mode'
         call exit(0)
 
      case ('-v', '-V', '-version', '--version')
@@ -65,19 +68,38 @@ program combine_hamfiles
         call exit(0)
 
      case default
-        if (case(1:1) == '-') &
-             call croak('unknown option ‘'//trim(case)//'’ (try ‘-h’)')
+        ! -up, -dn will bring us back here via GOTO
+437     if (case(1:1) == '-') &
+             call croak('bad option ‘'//trim(case)//'’ (try ‘-h’)')
 
-        ham1 = trim(case)//suf_ham//old; mom1 = trim(case)//suf_mommat//old
-        ham2 = trim(case)//suf_ham//cur; mom2 = trim(case)//suf_mommat//cur
-        ham3 = trim(case)//suf_ham//jnd; mom3 = trim(case)//suf_mommat//jnd
+        ham1 = trim(case)//suf_ham   //trim(updn)//old
+        ham2 = trim(case)//suf_ham   //trim(updn)//cur
+        ham3 = trim(case)//suf_ham   //trim(updn)//jnd
+
+        mom1 = trim(case)//suf_mommat//trim(updn)//old
+        mom2 = trim(case)//suf_mommat//trim(updn)//cur
+        mom3 = trim(case)//suf_mommat//trim(updn)//jnd
 
         inquire(FILE=mom1, EXIST=info); inquire(FILE=mom2, exist=mation)
         mommat = info .and. mation
      end select option
   case (2)
-     call fetcharg(1,ham2); ham1 = trim(ham2)//old; ham3 = trim(ham2)//jnd
-     call fetcharg(1,mom2); mom1 = trim(mom2)//old; mom3 = trim(mom2)//jnd
+     call fetcharg(1,ham2)
+     call fetcharg(2,mom2)
+
+     spmode: select case(ham2)
+     case ('-up', '--up')
+        updn='up'
+        case=mom2
+        goto 437
+     case ('-dn', '--dn')
+        updn='dn'
+        case=mom2
+        goto 437
+     end select spmode
+
+     ham1 = trim(ham2)//old; ham3 = trim(ham2)//jnd
+     mom1 = trim(mom2)//old; mom3 = trim(mom2)//jnd
      mommat = .true.
   case (3)
      call fetcharg(1,ham1); call fetcharg(2,ham2); call fetcharg(3,ham3)
@@ -178,4 +200,4 @@ contains
 end program combine_hamfiles
 
 
-!! Time-stamp: <2016-01-29 15:00:44 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-01-29 15:36:19 assman@faepop36.tu-graz.ac.at>
