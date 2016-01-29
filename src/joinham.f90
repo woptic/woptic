@@ -200,4 +200,4 @@ contains
 end program combine_hamfiles
 
 
-!! Time-stamp: <2016-02-01 17:10:17 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-01 17:34:19 assman@faepop36.tu-graz.ac.at>
