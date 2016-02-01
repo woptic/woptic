@@ -29,13 +29,14 @@ PROGRAM convert_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-32-gd1cc3f5$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-33-g51bf2a1$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
-  integer       :: v, w, k, r, o, i, id, omin, omax
-  integer       :: Nb, Nr, Nk, Nw, iarg, check(3)
-  real(DPk)     :: imre(12), rdotk
-  logical       :: binout=.true., binin
+  integer        :: v, w, k, r, o, i, id, omin, omax
+  integer        :: Nb, Nr, Nk, Nw, iarg, check(3)
+  real(DPk)      :: imre(12), rdotk
+  logical        :: binout=.true., binin
+  character(2)   :: updn=''
 
   type(struct_t) :: stru
   type(argstr)   :: arg, case
@@ -54,8 +55,8 @@ PROGRAM convert_vr
 
   !! formats for output
   character(*), parameter ::                                      &
-       fmt_help = '(A, T10, "case", A, T24, A, T50, A)',          &
-       fmt_hlp2 = '(A, T10,         A, T24, A, T50, A)'
+       fmt_help = '(A, T10, "case", A, T25, A, T50, A)',          &
+       fmt_hlp2 = '(A, T10,         A, T25, A, T50, A)'
 
   !! just a string ...
   character(*), parameter :: A = "(A)"
@@ -72,7 +73,7 @@ PROGRAM convert_vr
         write(*,A) "convert_vr: convert direct-space dipole &
              &matrix elements back to k-space"
         write(*,*) 
-        write(*,fmt_hlp2) "USAGE:", "convert_vr [--text] CASE"
+        write(*,fmt_hlp2) "USAGE:", "convert_vr [--text] [--up|--dn] CASE"
         write(*,*) 
         write(*,fmt_help) "INPUT:", suf_struct, "Wien2k master input file"
         write(*,fmt_help) "", suf_klist, "target k-points"
@@ -88,14 +89,19 @@ PROGRAM convert_vr
         write(*,fmt_hlp2) "OPTIONS:", "-h, --help"
         write(*,fmt_hlp2) "", "-v, --version"
         write(*,fmt_hlp2) "", "-t, --text", "read/write VAV in plain text"
+        write(*,fmt_hlp2) "", "--up|--dn", "spin-polarized mode"
         call exit(0)
-
-     case('-t', '--text')
-        binout = .false.
 
      case ('-v', '-V', '-version', '--version')
         print '("convert_vr ", A)', WOPTIC_VERSION
         call exit(0)
+
+     case('-t', '--text')
+        binout = .false.
+     case ('-up', '--up')
+        updn='up'
+     case ('-dn', '--dn')
+        updn='dn'
 
      case default
         if (arg%s(1:1) == '-') &
@@ -105,7 +111,7 @@ PROGRAM convert_vr
      end select
   end do
 
-  call set_casename(case)
+  call set_casename(case, UPDN=updn)
 
 !!! Read inwop, struct
   call struct_read(fn_struct, stru)
@@ -270,4 +276,4 @@ PROGRAM convert_vr
 end program convert_vr
 
 
-!! Time-stamp: <2016-01-29 15:00:34 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-01-29 17:02:44 assman@faepop36.tu-graz.ac.at>

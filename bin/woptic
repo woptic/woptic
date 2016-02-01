@@ -70,7 +70,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-32-g52c5620$' | 
+    r=$(echo '$version: v0.1.0-33-g51bf2a1$' | 
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -187,7 +187,7 @@ echo ">   ($(basename $0)) options: $@" >>:log
 [[ $updn ]] && sp=-$updn
 #[[ $q    ]] || time="eval time" #/usr/bin/time
 
-vault=$file.wophist.zip
+vault=$file.wophist$updn.zip
 klisttmp="mktemp $file.klist.XXX"
 
 [[ -s $file.inwop ]] || \
@@ -196,13 +196,14 @@ klisttmp="mktemp $file.klist.XXX"
 # sets matelmode, runlapw1, runoptic, convert_vr, peierls, need_ham
 eval $(inwopcheck $file.inwop || echo exit $?) 
 
-[[ $runlapw1   ]] && oldnewfiles+=" energy"
-[[ $runoptic   ]] && oldnewfiles+=" mommat2"
-[[ $need_ham   ]] && oldnewfiles+=" hk"
-[[ $convert_vr ]] && oldnewfiles+=" vkx vky vkz"
-[[ $mixed_vr   ]] && oldnewfiles+=" vvkxx vvkxy vvkxz vvkyy vvkyz vvkzz"
+[[ $runlapw1   ]] && oldnewfiles+=" energy$updn"
+[[ $runoptic   ]] && oldnewfiles+=" mommat2$updn"
+[[ $need_ham   ]] && oldnewfiles+=" hk$updn"
+[[ $convert_vr ]] && oldnewfiles+=" vkx$updn vky$updn vkz$updn"
+[[ $mixed_vr   ]] && oldnewfiles+=" vvkxx$updn vvkxy$updn vvkxz$updn
+                                    vvkyy$updn vvkyz$updn vvkzz$updn"
 archfiles="$reftetfiles $wopmainfiles $oldnewfiles klist_add klist_refined
-           optcondw wdos outputref outputwop"
+           optcondw$updn wdos$updn outputref$updn outputwop$updn"
 
 
 ## Special -restore mode ##
@@ -218,12 +219,12 @@ fi
 ## Test file existence ##
 [[ -s $file.symop ]]                     || \
     carp "‘$file.symop’ required.  Please run ‘x optic’."
-[[ $need_ham   && ! -s ${file}_hr.dat ]] && \
-    croak "‘${file}_hr.dat’ required.  Run Wannier90 with ‘hr_plot=T’."
-[[ $convert_vr && ! -s $file.vr ]]       && \
-    croak "‘$file.vr’ required.  Run ‘x optic’ and ‘compute_vr’."
-[[ $mixed_vr   && ! -s $file.vvr ]]      && \
-    croak "‘$file.vvr’ required.  Run ‘x optic’ and ‘compute_vr’."
+[[ $need_ham   && ! -s ${file}_hr$updn.dat ]] && \
+    croak "‘${file}_hr$updn.dat’ required.  Run Wannier90 with ‘hr_plot=T’."
+[[ $convert_vr && ! -s $file.vr$updn ]]       && \
+    croak "‘$file.vr$updn’ required.  Run ‘x optic’ and ‘compute_vr’."
+[[ $mixed_vr   && ! -s $file.vvr$updn ]]      && \
+    croak "‘$file.vvr$updn’ required.  Run ‘x optic’ and ‘compute_vr’."
 
 must="fermi$updn"
 [[ $runoptic ]] && must+=" inop"
@@ -261,17 +262,17 @@ else
    ##
    ## Some files have to contain “dummy zeros”, some just have to
    ## exist.
-                             echo "0 0 0"   > $file.kcontribw
-                             true           > $file.K1w
-                             true           > $file.wdoskcontribw
-    [[     $need_ham   ]] && echo "0 0 0"   > $file.hk
-    [[     $runoptic   ]] && echo "0"       > $file.mommat2
-    [[     $runlapw1   ]] && true           > $file.energy
+                             echo "0 0 0"   > $file.kcontribw$updn
+                             true           > $file.K1w$updn
+                             true           > $file.wdoskcontribw$updn
+    [[     $need_ham   ]] && echo "0 0 0"   > $file.hk$updn
+    [[     $runoptic   ]] && echo "0"       > $file.mommat2$updn
+    [[     $runlapw1   ]] && true           > $file.energy$updn
     for i in x y z; do
-        [[ $convert_vr ]] && echo "0 0"     > $file.vk$i
+        [[ $convert_vr ]] && echo "0 0"     > $file.vk$i$updn
     done
     for i in xx xy xz yy yz zz; do
-        [[ $mixed_vr   ]] && echo "0 0 0"   > $file.vvk$i
+        [[ $mixed_vr   ]] && echo "0 0 0"   > $file.vvk$i$updn
     done
     archive 0
 fi
@@ -347,21 +348,22 @@ do
         fi
 
         [[ $runoptic || $need_ham ]] && wq joinham $file
-        [[ $runoptic ]] && mv $v $file.mommat2_joined $file.mommat2
-        [[ $need_ham ]] && mv $v $file.hk_joined $file.hk
+        [[ $runoptic ]]&& mv $v $file.mommat2${updn}_joined $file.mommat2$updn
+        [[ $need_ham ]]&& mv $v $file.hk${updn}_joined      $file.hk$updn
 
         if [[ $convert_vr ]]; then
             wq convert_vr $file
             for i in x y z; do
-                wq joinham $file.vk${i}_old $file.vk$i $file.vk${i}_joined
-                mv $v $file.vk${i}_joined $file.vk$i
+                vk=$file.vk${i}$updn
+                wq joinham ${vk}_old $vk ${vk}_joined
+                mv $v ${vk}_joined $vk
             done
 
             if [[ $mixed_vr ]]; then
                 for i in xx xy xz yy yz zz; do
-                    wq joinham $file.vvk${i}_old $file.vvk$i \
-                        $file.vvk${i}_joined
-                    mv $v $file.vvk${i}_joined $file.vvk$i
+                    vvk=$file.vvk$updn
+                    wq joinham ${vvk}_old $vvk ${vvk}_joined
+                    mv $v ${vvk}_joined $vvk
                 done
             fi
         fi

@@ -35,7 +35,7 @@ program compute_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-32-gd1cc3f5$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-33-g51bf2a1$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
 !!! Formats for log file
@@ -45,8 +45,8 @@ program compute_vr
 
 !!! Formats for output
   character(*), parameter ::                                          &
-       fmt_help   = '(A, T10, "case", A, T24, A, T50, A)',            &
-       fmt_hlp2   = '(A, T10,         A, T24, A, T50, A)'
+       fmt_help   = '(A, T10, "case", A, T25, A, T50, A)',            &
+       fmt_hlp2   = '(A, T10,         A, T25, A, T50, A)'
 
 !!! Command line arguments and input files
   type(argstr)   :: arg, case
@@ -558,4 +558,4 @@ contains
   end function hemul
 end program compute_vr
 
-!! Time-stamp: <2016-01-29 14:59:56 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-01-29 17:02:57 assman@faepop36.tu-graz.ac.at>

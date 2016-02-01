@@ -38,7 +38,7 @@ my @ext_only=
      }x,
    # we also remove ‘klist’ itself since it was automatically generated
    qr{\. klist (?: |_[0-9]+)}x,
-   qw(\.klist_add \.opcondw \.wdos \.vec \.vect1)
+   qw(\.klist_add \.wdos \.vec \.vect1)
 );
 
 # remove files with this extension, and with “_full” and/or “_refined”
@@ -55,12 +55,12 @@ my @andnew = map { my $x=$_; map '\.'.$x.$_,
   qw( K1w kcontribw wdoskcontribw );
 
 # remove files with this extension, and with “_old” added
-my @andold = map { my $x=$_; map qr{\.$x$_}x,
+my @andold = map { my $x=$_; map qr{\.$x (?:up|dn)? $_}x,
                       '', qw(_old)
                   }
   qw( energy mommat2 hk ), q{vk(?:x|y|z)}, q{vvk(?:xx|xy|xz|yy|yz|zz)};
 
-my @andrefined = map { my $x=$_; map '\.'.$x.$_,
+my @andrefined = map { my $x=$_; map qr{\.$x (?:up|dn)? $_}x,
                       '', qw(_refined)
                   }
   qw( map voe );
@@ -69,7 +69,7 @@ my @extensions = (@sic, @ext_only, @andfull, @andnew, @andold, @andrefined);
 
 sub help    { pod2usage(0) }
 sub man     { pod2usage(-verbose=>2, exitval=>0, -noperldoc=>1) }
-sub version { '$version: v0.1.0-32-gd1cc3f5$/;
+sub version { '$version: v0.1.0-33-g51bf2a1$/;
               print "wopticlean $1\n"' }
 
 my ($verbose, $recursive, $mrproper, $recon, %dirs);
@@ -157,4 +157,4 @@ You are  advised to do a  dry run (`-n') first,  especially when using
 =cut
 
 
-## Time-stamp: <2016-01-29 15:00:27 assman@faepop36.tu-graz.ac.at>
+## Time-stamp: <2016-01-29 16:56:31 assman@faepop36.tu-graz.ac.at>
