@@ -15,6 +15,9 @@ woptic, CPC ….
  * joinham: fixed a bug where the second argument in the two-argument
    case (‘joinham HK MOMMAT’) was ignored
 
+ * woptic: fixed a bug that caused -restore N to fail (thanks to
+   U. Wedig)
+
 
 Version 0.1.0
 =============

@@ -70,7 +70,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-33-g51bf2a1$' | 
+    r=$(echo '$version: v0.1.0-32-g40fa349$' | 
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -196,14 +196,13 @@ klisttmp="mktemp $file.klist.XXX"
 # sets matelmode, runlapw1, runoptic, convert_vr, peierls, need_ham
 eval $(inwopcheck $file.inwop || echo exit $?) 
 
-[[ $runlapw1   ]] && oldnewfiles+=" energy$updn"
-[[ $runoptic   ]] && oldnewfiles+=" mommat2$updn"
-[[ $need_ham   ]] && oldnewfiles+=" hk$updn"
-[[ $convert_vr ]] && oldnewfiles+=" vkx$updn vky$updn vkz$updn"
-[[ $mixed_vr   ]] && oldnewfiles+=" vvkxx$updn vvkxy$updn vvkxz$updn
-                                    vvkyy$updn vvkyz$updn vvkzz$updn"
-archfiles="$reftetfiles $wopmainfiles $oldnewfiles klist_add klist_refined
-           optcondw$updn wdos$updn outputref$updn outputwop$updn"
+[[ $runlapw1   ]] && oldnewfiles+=" energy"
+[[ $runoptic   ]] && oldnewfiles+=" mommat2"
+[[ $need_ham   ]] && oldnewfiles+=" hk"
+[[ $convert_vr ]] && oldnewfiles+=" vkx vky vkz"
+[[ $mixed_vr   ]] && oldnewfiles+=" vvkxx vvkxy vvkxz vvkyy vvkyz vvkzz"
+archfiles="$reftetfiles $wopmainfiles $oldnewfiles klist_refined
+           optcondw wdos outputref outputwop"
 
 
 ## Special -restore mode ##
