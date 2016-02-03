@@ -273,7 +273,7 @@ contains
   subroutine realloc_r_d1(tf, nd)
     integer,               intent(in)    :: nd
     real(r8), allocatable, intent(inout) :: tf(:)
-                         
+
     real(r8), allocatable :: hilfsfeld(:)
     integer               :: min1
 
@@ -287,7 +287,7 @@ contains
   subroutine realloc_r_d2(tf, nd1, nd2)
     integer,               intent(in)    :: nd1, nd2
     real(r8), allocatable, intent(inout) :: tf(:,:)
-                         
+
     real(r8), allocatable :: hilfsfeld(:,:)
     integer               :: min1, min2
 
@@ -303,7 +303,7 @@ contains
   subroutine realloc_r_d3(tf, nd1, nd2, nd3)
     integer,               intent(in)    :: nd1, nd2, nd3
     real(r8), allocatable, intent(inout) :: tf(:,:,:)
-                         
+
     real(r8), allocatable :: hilfsfeld(:,:,:)
     integer               :: min1, min2, min3
 
@@ -320,7 +320,7 @@ contains
   subroutine realloc_c_d1(tf, nd)
     integer,                   intent(in)    :: nd
     complex(c16), allocatable, intent(inout) :: tf(:)
-                             
+
     complex(c16), allocatable :: hilfsfeld(:)
     integer                   :: min1
 
@@ -335,7 +335,7 @@ contains
   subroutine realloc_c_d2(tf, nd1, nd2)
     integer,                   intent(in)    :: nd1, nd2
     complex(c16), allocatable, intent(inout) :: tf(:,:)
-                             
+
     complex(c16), allocatable :: hilfsfeld(:,:)
     integer                  :: min1, min2
 
@@ -351,7 +351,7 @@ contains
   subroutine realloc_c_d3(tf, nd1, nd2, nd3)
     integer,                   intent(in)    :: nd1, nd2, nd3
     complex(c16), allocatable, intent(inout) :: tf(:,:,:)
-                             
+
     complex(c16), allocatable :: hilfsfeld(:,:,:)
     integer                   :: min1, min2, min3
 
@@ -368,7 +368,7 @@ contains
   subroutine realloc_i_d1(tf, nd)
     integer,              intent(in)    :: nd
     integer, allocatable, intent(inout) :: tf(:)
-                        
+
     integer, allocatable :: hilfsfeld(:)
     integer              :: min1
 
@@ -383,7 +383,7 @@ contains
   subroutine realloc_i_d2(tf, nd1, nd2)
     integer,              intent(in)    :: nd1, nd2
     integer, allocatable, intent(inout) :: tf(:,:)
-                        
+
     integer, allocatable  :: hilfsfeld(:,:)
     integer               :: min1, min2
 
@@ -530,13 +530,13 @@ contains
 
        t%flush = ios==0 ! ios>0 signals error, ios<0 means flush not supported
     end if
-       
+
     call ptick(t)
   end subroutine ptime_setunit
 
   subroutine ptick(timer)
     type(ptimer), target, intent(inout), optional :: timer
-    
+
     type(ptimer), pointer :: t
     t                      => default_timer
     if (present(timer)) t  => timer
@@ -547,7 +547,7 @@ contains
 
   subroutine ptock(timer)
     type(ptimer), target, intent(inout), optional :: timer
-    
+
     real(DPk)             :: cpu2
     integer               :: wall2
     type(ptimer), pointer :: t
@@ -642,7 +642,7 @@ contains
   end function lowercase
 
 
-  integer function line_count(fid)  
+  integer function line_count(fid)
     !>Returns the number of lines in a file.
     !>\param fname Name of the file
     !>\return Number of lines in the file.
@@ -651,7 +651,7 @@ contains
 
     !input parameters
     !character(len=*) fname   !filename of the file to count
-    integer, intent(in) :: fid 
+    integer, intent(in) :: fid
 
     !local parameters
     character(20) dummy
@@ -664,7 +664,7 @@ contains
     do while (.not. ioEndFlag )
        read(fid,"(A20)", iostat=ioStat ) dummy
        if( iostat .eq. 0) line_count = line_count + 1
-       if( iostat < 0 ) ioEndFlag = .TRUE. 
+       if( iostat < 0 ) ioEndFlag = .TRUE.
     end do
     rewind(fid)
   END FUNCTION line_count
@@ -701,7 +701,7 @@ contains
 !!! We would like to use the NEWUNIT keyword to open(), but many
 !!! compilers do not support that yet.  Workaround from
 !!! <http://fortranwiki.org/fortran/show/newunit>:
-!!! 
+!!!
   ! This is a simple function to search for an available unit.
   ! LUN_MIN and LUN_MAX define the range of possible LUNs to check.
   ! The UNIT value is returned by the function, and also by the optional
@@ -733,7 +733,7 @@ module clio
   use iso_fortran_env, only: ERROR_UNIT, OUTPUT_UNIT
   use util,            only: string
   use const,           only: BUFSZ, DPk
-  
+
   implicit none
   private
 
@@ -999,12 +999,15 @@ module structmod
      real(DPk)         :: brlat(3,3)   ! Bravais lattice (row is a vector)
      real(DPk)         :: lat2car(3,3) ! lattice to cartesian transformation
                                        ! (different from brlat in some cases)
-     real(DPk)         :: stru2frac(3,3)!‘struct’ to “fractional” coords. 
-     logical           :: ortho        ! orthogonal axes?
+     real(DPk)         :: stru2frac(3,3)!‘struct’ to “fractional” coords.
+     logical           :: ortho, prim  ! orthogonal axes?  primitive latt.?
      real(DPk)         :: vol          ! u.c. volume
      integer, allocatable, dimension(:,:,:) &
-                       :: rsym, ksym   ! symmetry operations from struct
-                                       ! (as ‘outputkgen’)
+          &            :: rsym, ksym   ! symmetry operations (3×3×N — can be
+                                       ! different!) as ‘outputkgen’
+     real(DPk), allocatable, dimension(:,:) &
+          &            :: rtrans       ! translational part of symmetries
+                                       ! (3×N)
 
      ! positions (3 × nat); local rotation matrices (3 × 3 × nneq)
      real(DPk),         allocatable :: pos(:,:), locrot(:,:,:)
@@ -1115,7 +1118,9 @@ contains
        br2_rec = br1_rec
 
        rvfac = 2/SQ3
+
        stru%ortho = .false.
+       stru%prim  = .true.
 
     case ('S', 'P')             ! what's ‘S’??
        wurzel = sqrt(sinbc**2 - cosac**2 - cosab**2 + 2*cosbc*cosac*cosab)
@@ -1132,6 +1137,7 @@ contains
        rvfac = 1/wurzel
 
        stru%ortho = all(abs(alpha - PI/2) <= ortho_test)
+       stru%prim  = .true.
 
     case ('F')
        br1_rec(1,1) = pia(1)
@@ -1144,6 +1150,8 @@ contains
 
        rvfac = 4
        stru%ortho = .true.
+       stru%prim  = .false.
+
     case ('B')
        br1_rec(1,1) = pia(1)
        br1_rec(2,2) = pia(2)
@@ -1154,7 +1162,9 @@ contains
        br2_rec(3,:) = pia(3) * (/ 1, 1, 0 /)
 
        rvfac = 2
+
        stru%ortho = .true.
+       stru%prim  = .false.
 
     case ('R')
        br1_rec(1, :) = pia(1) * (/  1, 1, -2 /)/SQ3
@@ -1164,7 +1174,9 @@ contains
        br2_rec = br1_rec
 
        rvfac = 6/SQ3
+
        stru%ortho = .false.
+       stru%prim  = .true.
 
     case ('C')
        ! “defaults”, to be changed in nonorthogonal XZ-case
@@ -1173,7 +1185,8 @@ contains
        br1_rec(3,3) = pia(3)
 
        rvfac = 2
-       stru%ortho = .true.
+       stru%ortho = .true.      ! may be overridden for CXZ
+       stru%prim  = .false.
 
        C: select case (stru%lattic(2:3))
        case ('XY')
@@ -1226,12 +1239,14 @@ contains
   contains
     subroutine read_rsym()
 !!! This is from SRC_kgen (main.f, addinv.f)
-      integer :: nsym, i, i1, i2
+      integer :: Nrsym, i, id
 
-      read(lun, '(I4)') nsym
-      allocate(stru%rsym(3,3,nsym))
-      do i=1,nsym
-         read(lun, '(3(3I2,/), I8)') ((stru%rsym(i1,i2,i), i1=1,3), i2=1,3)
+      read(lun, '(I4)') Nrsym
+      allocate(stru%rsym  (3,3,Nrsym), &
+           &   stru%rtrans(3,  Nrsym))
+      do i=1,Nrsym
+         read(lun, '(3(3I2,F11.8/), I8)') &
+              (stru%rsym(:,id,i), stru%rtrans(id, i), id=1,3)
       end do
     end subroutine read_rsym
 
@@ -1240,14 +1255,14 @@ contains
 
       real(DPk), dimension(3,3) :: a
       logical                   :: addinv
-      integer                   :: i, nrsym, nksym
+      integer                   :: i, Nrsym, Nksym
 
       addinv = .true.
-      nrsym  = size(stru%rsym, 3)
+      Nrsym  = size(stru%rsym, 3)
 !!! Redefine symmetry operations from struct with
 !!! unitary transformation  u(-1) * S * u
 
-      do i=1,nrsym
+      do i=1,Nrsym
          ! if inversion is already present, we do not need to add it
          ! later
          if (all(stru%rsym(:,:,i) == reshape( (/ -1, 0, 0,    &
@@ -1259,24 +1274,24 @@ contains
          end if
       end do
 
-      if (nrsym>24 .and. addinv) &
-           call croak('nsym > 24 without inversion')
+      if (Nrsym>24 .and. addinv) &
+           call croak('Nsym > 24 without inversion')
 
       if (addinv) then
          ! add inversion
          ! FIXME: check if we should actually do this (non-sp non-so)
-         nksym = 2*nrsym
+         Nksym = 2*Nrsym
       else
-         nksym =   nrsym
+         Nksym =   Nrsym
       end if
-      allocate(stru%ksym(3,3,nksym))
+      allocate(stru%ksym(3,3,Nksym))
 
-                  stru%ksym(:,:,       1:nrsym) =  stru%rsym(:,:, 1:nrsym)
-      if (addinv) stru%ksym(:,:, nrsym+1:nksym) = -stru%rsym(:,:, 1:nrsym)
+                  stru%ksym(:,:,       1:Nrsym) =  stru%rsym(:,:, 1:Nrsym)
+      if (addinv) stru%ksym(:,:, Nrsym+1:Nksym) = -stru%rsym(:,:, 1:Nrsym)
 
       if (stru%ortho .or. stru%lattic=='CXZ') then
          ! FIXME: why the check for CXZ??  sdefl.f has it …
-         do i=1,nksym
+         do i=1,Nksym
             a = matmul(matmul(stru%brlat, stru%ksym(:,:,i)), &
                  &     stru%gbas)/2/PI
             stru%ksym(:,:,i) = nint(a)
@@ -1352,7 +1367,7 @@ contains
     case default
        call croak('unknown MODE in inwf, '//inwf%mode)
     end select
-       
+
     read(lun, *) inwf%bmin, inwf%bmax
     if (inwf%bmax < inwf%bmin) &
          call croak('bmin > bmax in inwf')
@@ -1683,10 +1698,10 @@ module Wannier90
      complex(DPk), pointer      :: u_matrix    (:,:,:)
      ! overlaps M_mn are stored in ‘chk’ for restart (#WF × #WF × #nn × #k)
      complex(DPk), allocatable  :: m_matrix(:,:,:,:)
-     !                            [Å] (3 × #WF),        [Å²] (#WF) 
+     !                            [Å] (3 × #WF),        [Å²] (#WF)
      real(DPk),    allocatable :: wannier_centres(:,:), wannier_spreads(:)
      ! kpoints in lattice vecs (3 × #k)
-     real(DPk),    allocatable :: kpt_latt(:,:) 
+     real(DPk),    allocatable :: kpt_latt(:,:)
 
      ! disentanglement parameters
      logical                    :: have_disentangled
@@ -1893,7 +1908,7 @@ module wien2k
 !
     END SUBROUTINE ERRFLG
 
-    
+
     SUBROUTINE ERRCLR(FNAME)
       CHARACTER*(*)      FNAME
 
@@ -1914,7 +1929,7 @@ module wien2k
 !           FORTRAN 77 SUBROUTINE
 !
 ! 2.     PURPOSE
-!           Read the commandline-argument 
+!           Read the commandline-argument
 !           specifying the name of the definition file ('lapw1.def')
 !           and generate the name of the error file by replacing the
 !           extension of the definition filename with '.error'. If no
@@ -1972,7 +1987,7 @@ module wien2k
 !           - if found replace all characters after that '.' with
 !             'error' giving the error filename
 !           - otherwise append '.error' giving the error filename
-!           
+!
 ! 6.     DATE
 !           25. August 1993                                 Version 1.01
 !
@@ -2049,4 +2064,4 @@ END MODULE wien2k
 !! End:
 !!\---
 !!
-!! Time-stamp: <2015-11-30 17:57:18 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-03 15:58:17 assman@faepop36.tu-graz.ac.at>
