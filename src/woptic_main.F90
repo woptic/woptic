@@ -37,7 +37,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-38-gf121bfb$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -315,8 +315,14 @@ program woptic_main
        "      This is woptic_main " // woptic_version
   write(unit_outwop,*)
   write(unit_outwop, '(I0," k points, ",I0," Wannier functions ")') Nk, NWF
-  write(unit_outwop, '(I0," external frequencies up to ",F7.2)') NE, inw%E(NE)
-  write(unit_outwop, '(I0," internal frequencies from ",SP,F7.3," to ",F7.3)')&
+  if (NE > 0) then
+     write(unit_outwop, '(I0," external frequencies up to ",F7.2)') &
+          NE, inw%E(NE)
+  else
+     write(unit_outwop, '("dc quantities only")')
+  end if
+  write(unit_outwop, &
+       '(I0," internal frequencies from ",SP,F7.3," to ",F7.3)') &
        Nw, inw%w(wmin), inw%w(wmax)
   write(unit_outwop, '("number of elements: ", I0)') stru%nneq
   write(unit_outwop, '("band windows: [",&
@@ -1013,20 +1019,22 @@ program woptic_main
   write(unit_outwop,*) "conversion factor:", convfac
 
 !!! Sumrules
-  ii = ceiling(inw%drudesep/inw%dE)
-  do jj=1,size(ij,1)
-     sumruledrude(jj) = sum(optcond_tot(ij(jj,1), ij(jj,2),    1:ii))*inw%dE
-     sumrule     (jj) = sum(optcond_tot(ij(jj,1), ij(jj,2), ii+1:  ))*inw%dE
-  end do
+  if (NE>0) then
+     ii = ceiling(inw%drudesep/inw%dE)
+     do jj=1,size(ij,1)
+        sumruledrude(jj)=sum(optcond_tot(ij(jj,1), ij(jj,2),    1:ii))*inw%dE
+        sumrule     (jj)=sum(optcond_tot(ij(jj,1), ij(jj,2), ii+1:  ))*inw%dE
+     end do
 
-  write(unit_outwop,*) "sumrules [Drude,interband]:", &
-       sumruledrude(1), sumrule(1)
-
-  do jj=1,size(ij,1)
-     sumruledrude(jj) = sumruledrude(jj) + &
-          DCcond_tot(ij(jj,1), ij(jj,2)) / sumtetraweights*inw%dE
-  end do
-  write(unit_outwop,*) "sumrule +dc [Drude]       :", sumruledrude(1)
+     write(unit_outwop,*) "sumrules [Drude,interband]:", &
+          sumruledrude(1), sumrule(1)
+     
+     do jj=1,size(ij,1)
+        sumruledrude(jj) = sumruledrude(jj) + &
+             DCcond_tot(ij(jj,1), ij(jj,2)) / sumtetraweights*inw%dE
+     end do
+     write(unit_outwop,*) "sumrule +dc [Drude]       :", sumruledrude(1)
+  end if
 
 !!! Optical conductivity
   write(unit_optcond,*)"# Optical conductivity in Ω-1 cm-1"
@@ -1660,4 +1668,4 @@ end subroutine init_random_seed
 !! End:
 !!\---
 !!
-!! Time-stamp: <2015-11-10 15:12:52 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-09 12:32:53 assman@faepop36.tu-graz.ac.at>

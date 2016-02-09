@@ -553,7 +553,7 @@ The main input file for \woptic is
                              \code{Peierls} mode \cite{Tomczak2009a,Jan}
                              (needs \file{\case.intrahop})
   \end{flin}
-  \vskip-.5\baselineskip
+  \vskip-.9\baselineskip
   \lvir[anchor=center]{}Only \code{mode}s \code{interp} and \code{optic} are
   thoroughly tested; \code{Peierls}, \code{Bloch}, and \code{LDA} must
   be considered experimental.
@@ -572,6 +572,9 @@ The main input file for \woptic is
     $ε$   & real    & tolerance for $ω$-integration limits 
                       ($-\Emax \lesssim ω \lesssim 0$)
   \end{flin}
+  \vskip-.9\baselineskip
+  \textbf{Note:}\hspace{1em} Set $\Emax=0$ to compute only the dc
+  quantities.
 
   \begin{flin}[T]{Wlo, Whi, [Blo, Bhi]}{band windows}
     Wlo, Whi & int & band indices corresponding to \wfs\\
