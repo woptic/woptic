@@ -18,7 +18,7 @@
 
 2) Wien2k optic: input file [& preparatory run]                    case.inwop
    2.1) cp $WIENROOT/SRC_templates/case.inop $(basename $PWD).inop     MME=ON
-   2.2) ‘interp’ mode: run optic for ‘case.mommat2’, ‘case.symop’     x optic
+   2.2) ‘interp’ mode: run optic for ‘case.mommat2’                   x optic
 
 3) If MATELMODE=2: compute V(R), VAV(R)           compute_vr $(basename $PWD)
 
