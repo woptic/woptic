@@ -741,9 +741,6 @@ module woptic_io
   integer,          parameter   :: unit_struct=20
   character(*),     parameter   ::  suf_struct='.struct'
   character(BUFSZ)              ::   fn_struct
-  integer,          parameter   :: unit_symop=21
-  character(*),     parameter   ::  suf_symop='.symop'
-  character(BUFSZ)              ::   fn_symop
   integer,          parameter   :: unit_energy=22
   character(*),     parameter   ::  suf_energy='.energy'
   character(BUFSZ)              ::   fn_energy
@@ -878,7 +875,6 @@ contains
     fn_chk      =trim(file%s)//trim(suf_chk      )//ud
     fn_inwf     =trim(file%s)//trim(suf_inwf     )//ud
     fn_struct   =trim(file%s)//trim(suf_struct   )
-    fn_symop    =trim(file%s)//trim(suf_symop    )
     fn_energy   =trim(file%s)//trim(suf_energy   )//trim(so)//ud
     fn_mommat   =trim(file%s)//trim(suf_mommat   )//ud
     fn_klist    =trim(file%s)//trim(suf_klist    )//band_
@@ -913,4 +909,4 @@ end subroutine set_casename
 end module woptic_io
 
 
-!! Time-stamp: <2015-06-02 12:09:35 assman@faepop23.tu-graz.ac.at>
+!! Time-stamp: <2016-02-09 13:12:36 assman@faepop36.tu-graz.ac.at>

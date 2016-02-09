@@ -70,7 +70,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-32-g40fa349$' | 
+    r=$(echo '$version: v0.1.0-39-g4071e29$' | 
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -216,8 +216,6 @@ fi
 
 
 ## Test file existence ##
-[[ -s $file.symop ]]                     || \
-    carp "‘$file.symop’ required.  Please run ‘x optic’."
 [[ $need_ham   && ! -s ${file}_hr$updn.dat ]] && \
     croak "‘${file}_hr$updn.dat’ required.  Run Wannier90 with ‘hr_plot=T’."
 [[ $convert_vr && ! -s $file.vr$updn ]]       && \
