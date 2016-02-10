@@ -710,9 +710,16 @@ end module maybebin
 module woptic_io
   use const, only: BUFSZ
   implicit none
-  public
 
-  integer :: i
+  interface set_casename
+     module procedure set_case_argstr, set_case_buf
+  end interface set_casename
+
+  private :: set_case_argstr, set_case_buf
+
+  integer, private :: i
+
+  public
 
   integer,          parameter   :: unit_inwop=10
   character(*),     parameter   ::  suf_inwop='.inwop'
@@ -786,8 +793,8 @@ module woptic_io
   character(BUFSZ)              ::   fn_optcond
   integer,          parameter   :: unit_optorb(6)=(/511,512,513,514,515,516/)
   character(*),     parameter   ::  suf_optorb(6)= &
-       (/ suf_optcond//'_orbxx', suf_optcond//'_orbxy', suf_optcond//'_orbxz',&
-       &  suf_optcond//'_orbyy', suf_optcond//'_orbyz', suf_optcond//'_orbzz'/)
+       (/ suf_optcond//'_orbxx',suf_optcond//'_orbxy',suf_optcond//'_orbxz',&
+       &  suf_optcond//'_orbyy',suf_optcond//'_orbyz',suf_optcond//'_orbzz'/)
   character(BUFSZ)              ::   fn_optorb(6)
   integer,          parameter   :: unit_contr=52
   character(*),     parameter   ::  suf_contr='.kcontribw'
@@ -840,12 +847,8 @@ contains
     end if
   end subroutine print1or3
 
-  subroutine set_casename(file, have_band, have_so, updn)
-    use clio,  only: argstr
-
-    implicit none
-
-    type(argstr), intent(in)           :: file
+  subroutine set_case_buf(file, have_band, have_so, updn)
+    character(*), intent(in)           :: file
     logical,      intent(in), optional :: have_band, have_so
     character(2), intent(in), optional :: updn
 
@@ -866,47 +869,75 @@ contains
        ud = updn
     end if
 
-    fn_inwop    =trim(file%s)//trim(suf_inwop    )
-    fn_fermi    =trim(file%s)//trim(suf_fermi    )//ud
-    fn_ham      =trim(file%s)//trim(suf_ham      )//ud
-    fn_intrahop =trim(file%s)//trim(suf_intrahop )//ud !???
-    fn_wfrot    =trim(file%s)//trim(suf_wfrot    )//ud
-    fn_hr       =trim(file%s)//trim(suf_hr       )//ud
-    fn_chk      =trim(file%s)//trim(suf_chk      )//ud
-    fn_inwf     =trim(file%s)//trim(suf_inwf     )//ud
-    fn_struct   =trim(file%s)//trim(suf_struct   )
-    fn_energy   =trim(file%s)//trim(suf_energy   )//trim(so)//ud
-    fn_mommat   =trim(file%s)//trim(suf_mommat   )//ud
-    fn_klist    =trim(file%s)//trim(suf_klist    )//band_
-    fn_vr       =trim(file%s)//trim(suf_vr       )//ud
-    fn_vvr      =trim(file%s)//trim(suf_vvr      )//ud
-    fn_fklist   =trim(file%s)//trim(suf_fklist   )
-    fn_kadd     =trim(file%s)//trim(suf_kadd     )
-    fn_tet      =trim(file%s)//trim(suf_tet      )
-    fn_ftet     =trim(file%s)//trim(suf_ftet     )
-    fn_map      =trim(file%s)//trim(suf_map      )
-    fn_voe      =trim(file%s)//trim(suf_voe      )
-    fn_optcond  =trim(file%s)//trim(suf_optcond  )//ud
-    fn_contr    =trim(file%s)//trim(suf_contr    )//trim(ud)//band_
-    fn_wdos     =trim(file%s)//trim(suf_wdos     )//trim(ud)//band_
-    fn_doscontr =trim(file%s)//trim(suf_doscontr )//ud
-    fn_K1       =trim(file%s)//trim(suf_K1       )//trim(ud)//band_
-    fn_selfE    =trim(file%s)//trim(suf_selfE    )//trim(ud)//band_
-    fn_outwop   =trim(file%s)//trim(suf_outwop   )//ud
-    fn_outref   =trim(file%s)//trim(suf_outref   )//ud
-    fn_outvr    =trim(file%s)//trim(suf_outvr    )//ud
-    fn_outvk    =trim(file%s)//trim(suf_outvk    )//ud
+        fn_inwop    =trim(file)//trim(suf_inwop    )
+    fn_fermi    =trim(file)//trim(suf_fermi    )//ud
+    fn_ham      =trim(file)//trim(suf_ham      )//ud
+    fn_intrahop =trim(file)//trim(suf_intrahop )//ud ! FIXME: ud or not?
+    fn_wfrot    =trim(file)//trim(suf_wfrot    )//ud
+    fn_hr       =trim(file)//trim(suf_hr       )//ud
+    fn_chk      =trim(file)//trim(suf_chk      )//ud
+    fn_inwf     =trim(file)//trim(suf_inwf     )//ud
+    fn_struct   =trim(file)//trim(suf_struct   )
+    fn_energy   =trim(file)//trim(suf_energy   )//trim(so)//ud
+    fn_mommat   =trim(file)//trim(suf_mommat   )//ud
+    fn_klist    =trim(file)//trim(suf_klist    )//band_
+    fn_vr       =trim(file)//trim(suf_vr       )//ud
+    fn_vvr      =trim(file)//trim(suf_vvr      )//ud
+    fn_fklist   =trim(file)//trim(suf_fklist   )
+    fn_kadd     =trim(file)//trim(suf_kadd     )
+    fn_tet      =trim(file)//trim(suf_tet      )
+    fn_ftet     =trim(file)//trim(suf_ftet     )
+    fn_map      =trim(file)//trim(suf_map      )
+    fn_voe      =trim(file)//trim(suf_voe      )
+    fn_optcond  =trim(file)//trim(suf_optcond  )//ud
+    fn_contr    =trim(file)//trim(suf_contr    )//trim(ud)//band_
+    fn_wdos     =trim(file)//trim(suf_wdos     )//trim(ud)//band_
+    fn_doscontr =trim(file)//trim(suf_doscontr )//ud
+    fn_K1       =trim(file)//trim(suf_K1       )//trim(ud)//band_
+    fn_selfE    =trim(file)//trim(suf_selfE    )//trim(ud)//band_
+    fn_outwop   =trim(file)//trim(suf_outwop   )//ud
+    fn_outref   =trim(file)//trim(suf_outref   )//ud
+    fn_outvr    =trim(file)//trim(suf_outvr    )//ud
+    fn_outvk    =trim(file)//trim(suf_outvk    )//ud
     do i=1,size(fn_optorb)
-       fn_optorb(i)=trim(file%s)//trim(suf_optorb(i))//ud
+       fn_optorb(i)=trim(file)//trim(suf_optorb(i))//ud
     end do
     do i=1,size(fn_vk)
-       fn_vk(i)    =trim(file%s)//trim(suf_vk(i)    )//ud
+       fn_vk(i)    =trim(file)//trim(suf_vk(i)    )//ud
     end do
     do i=1,size(fn_vvk)
-       fn_vvk(i)   =trim(file%s)//trim(suf_vvk(i)   )//ud
+       fn_vvk(i)   =trim(file)//trim(suf_vvk(i)   )//ud
     end do
-end subroutine set_casename
+  end subroutine set_case_buf
+
+  subroutine set_case_argstr(file, have_band, have_so, updn)
+    use clio,  only: argstr
+
+    implicit none
+
+    type(argstr), intent(in)           :: file
+    logical,      intent(in), optional :: have_band, have_so
+    character(2), intent(in), optional :: updn
+
+    ! Curse Fortran for disallowing leading underscores !
+    logical      :: band, so
+    character(2) :: ud
+
+    ! Curse Fortran for not providing short-circuit Boolean operators !
+    band=.false.; so=.false.; ud=''
+    if(present(have_band)) then
+       band = have_band
+    end if
+    if(present(have_so)) then
+       so   = have_so
+    end if
+    if(present(updn)) then
+       ud = updn
+    end if
+
+    call set_case_buf(file%s, band, so, ud)
+  end subroutine set_case_argstr
 end module woptic_io
 
 
-!! Time-stamp: <2016-02-09 13:12:36 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-10 09:21:19 assman@faepop36.tu-graz.ac.at>

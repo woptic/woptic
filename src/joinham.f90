@@ -15,27 +15,29 @@ program combine_hamfiles
   use const,     only: BUFSZ, DPk
   use clio,      only: fetcharg, croak
   use util,      only: lowercase
-  use woptic_io, only: suf_ham, suf_mommat
+  use woptic_io, only: fn_ham,    unit_hamcur => unit_ham,                 &
+       &               fn_mommat, unit_momcur => unit_mommat, set_casename
   use woptic,    only: fmt_vk_head
   use maybebin,  only: maybin_open, maybin_read, maybin_write, formatted
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-38-gf121bfb$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-41-gc1ce1a0$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
-  integer,          parameter :: unit_ham1=11, unit_ham2=12, unit_mom1=13
-  integer,          parameter :: unit_mom2=14, unit_ham3=15, unit_mom3=16
+  integer,          parameter :: unit_hamold=121, unit_momold=13
+  integer,          parameter :: unit_hamnew=123, unit_momnew=16
   character(len=*), parameter :: old='_old', cur='', jnd='_joined'
 
   integer          :: Nkb1(2), Nkb2(2), i,j
   logical          :: info, mation, mommat=.false.
-  character(BUFSZ) :: case, ham1, ham2, ham3, mom1, mom2, mom3, buf
+  character(BUFSZ) :: hamold, hamcur, hamnew, momold, momcur, momnew, buf
+  character(BUFSZ) :: file
   character(2)     :: updn=''
 
   ! The “HK” file may be binary (vvk!).  During the first woptic
   ! iteration, HK1 will be plain text even if HK2 is binary.
-  logical :: binham1, binham2
+  logical :: binhamold, binhamcur
 
   ! These will be used to copy binary ‘vvk’ files.  Caveat: size(kw)=4
   ! assumes that only vvk, not hk or vk, files will ever be binary (3
@@ -43,10 +45,11 @@ program combine_hamfiles
   real(DPk)                 :: kw(4)
   complex(DPk), allocatable :: vv(:)
 
-  select case (command_argument_count())
-  case (1)
-     call fetcharg(1, case)
-     option: select case (case)
+  args: select case (command_argument_count())
+  case (1)                    ! joinham -h | joinham -v | joinham CASE
+     call fetcharg(1, file)
+
+     option: select case (file)
      case ('-h','-H','-help','--help')
         print '(A)', 'USAGE: joinham [--up|--dn] CASE'
         print '(A)', '   or  joinham HK MOMMAT'
@@ -68,92 +71,98 @@ program combine_hamfiles
         call exit(0)
 
      case default
-        ! -up, -dn will bring us back here via GOTO
-437     if (case(1:1) == '-') &
-             call croak('bad option ‘'//trim(case)//'’ (try ‘-h’)')
+        if (file(1:1) == '-') &
+             call croak('bad option ‘'//trim(file)//'’ (try ‘-h’)')
 
-        ham1 = trim(case)//suf_ham   //trim(updn)//old
-        ham2 = trim(case)//suf_ham   //trim(updn)//cur
-        ham3 = trim(case)//suf_ham   //trim(updn)//jnd
-
-        mom1 = trim(case)//suf_mommat//trim(updn)//old
-        mom2 = trim(case)//suf_mommat//trim(updn)//cur
-        mom3 = trim(case)//suf_mommat//trim(updn)//jnd
-
-        inquire(FILE=mom1, EXIST=info); inquire(FILE=mom2, exist=mation)
-        mommat = info .and. mation
+        call from_casename(file, updn)
      end select option
-  case (2)
-     call fetcharg(1,ham2)
-     call fetcharg(2,mom2)
 
-     spmode: select case(ham2)
-     case ('-up', '--up')
-        updn='up'
-        case=mom2
-        goto 437
-     case ('-dn', '--dn')
-        updn='dn'
-        case=mom2
-        goto 437
+  case (2)                ! joinham HK MOMMAT | joinham [-up|-dn] CASE
+     call fetcharg(1, hamcur)
+     call fetcharg(2, momcur)
+
+     spmode: select case(hamcur)
+     case ('-up', '--up', '-dn', '--dn')
+        updn = hamcur(len_trim(hamcur)-1 : )
+
+        call from_casename(momcur, updn)
+
+     case default
+        hamold = trim(hamcur)//old; hamnew = trim(hamcur)//jnd
+        momold = trim(momcur)//old; momnew = trim(momcur)//jnd
+        mommat = .true.
      end select spmode
 
-     ham1 = trim(ham2)//old; ham3 = trim(ham2)//jnd
-     mom1 = trim(mom2)//old; mom3 = trim(mom2)//jnd
-     mommat = .true.
-  case (3)
-     call fetcharg(1,ham1); call fetcharg(2,ham2); call fetcharg(3,ham3)
+  case (3)                      ! joinham HK1 HK2 HK3
+     call fetcharg(1,hamold);call fetcharg(2,hamcur);call fetcharg(3,hamnew)
      mommat = .false.
-  case (6)
-     call fetcharg(1,ham1); call fetcharg(2,ham2); call fetcharg(3,ham3)
-     call fetcharg(4,mom1); call fetcharg(5,mom2); call fetcharg(6,mom3)
+
+  case (6)                      ! joinham MOM1 MOM2 MOM3
+     call fetcharg(1,hamold);call fetcharg(2,hamcur);call fetcharg(3,hamnew)
+     call fetcharg(4,momold);call fetcharg(5,momcur);call fetcharg(6,momnew)
      mommat = .true.
+
   case default
      call croak ('must have 1, 2, 3, or 6 arguments (see ‘-h’)')
-  end select
+  end select args
 
-  call maybin_open(unit_ham1, FILE=ham1, get=binham1, STATUS='old')
-  call maybin_open(unit_ham2, FILE=ham2, get=binham2, STATUS='old')
-  call maybin_open(unit_ham3, FILE=ham3, set=binham2, STATUS='replace')
+  call maybin_open(unit_hamold, FILE=hamold, get=binhamold, STATUS='old')
+  call maybin_open(unit_hamcur, FILE=hamcur, get=binhamcur, STATUS='old')
+  call maybin_open(unit_hamnew, FILE=hamnew, set=binhamcur, STATUS='replace')
 
   if (mommat) then
-     open(unit_mom1, FILE=mom1, STATUS='old')
-     open(unit_mom2, FILE=mom2, STATUS='old')
-     open(unit_mom3, FILE=mom3, STATUS='replace')
+     open(unit_momold, FILE=momold, STATUS='old')
+     open(unit_momcur, FILE=momcur, STATUS='old')
+     open(unit_momnew, FILE=momnew, STATUS='replace')
   end if
 
 !!! Splice ‘hk’
-  call maybin_read(unit_ham1, Nkb1)
-  call maybin_read(unit_ham2, Nkb2)
+  call maybin_read(unit_hamold, Nkb1)
+  call maybin_read(unit_hamcur, Nkb2)
 
   if (Nkb1(2)/=Nkb2(2) .and. Nkb1(1)/=0) &
        call croak("Error: number of bands not consistent")
 
-  if (binham2) allocate(vv(Nkb2(2)))
+  if (binhamcur) allocate(vv(Nkb2(2)))
 
-  call maybin_write(unit_ham3, (/ Nkb1(1)+Nkb2(1), Nkb2(2) /), fmt=fmt_vk_head)
+  call maybin_write(unit_hamnew, (/ Nkb1(1)+Nkb2(1), Nkb2(2) /), &
+       &            fmt=fmt_vk_head)
   do i=1,Nkb1(1)
-     call cpk_ham(unit_ham1, unit_ham3, Nkb2(2))
+     call cpk_ham(unit_hamold, unit_hamnew, Nkb2(2))
   enddo
 
   do i=1,Nkb2(1)
-     call cpk_ham(unit_ham2, unit_ham3, Nkb2(2))
+     call cpk_ham(unit_hamcur, unit_hamnew, Nkb2(2))
   enddo
 
   if (mommat) then
 !!! Splice ‘mommat2’
-     call copy(unit_mom1, unit_mom3, buf)
+     call copy(unit_momold, unit_momnew, buf)
      do j=1,Nkb1(1)
-        call cpk_mom(unit_mom1, unit_mom3)
+        call cpk_mom(unit_momold, unit_momnew)
      enddo
 
-     read(unit_mom2,*)
+     read(unit_momcur,*)
      do j=1,Nkb2(1)
-        call cpk_mom(unit_mom2, unit_mom3)
+        call cpk_mom(unit_momcur, unit_momnew)
      enddo
   endif
 
 contains
+  subroutine from_casename(file, updn)
+    character(*) :: file
+    character(2) :: updn
+
+    call set_casename(file, UPDN=updn)
+
+    hamold = trim(fn_ham)//old; momold = trim(fn_mommat)//old
+    hamcur = trim(fn_ham)//cur; momcur = trim(fn_mommat)//cur
+    hamnew = trim(fn_ham)//jnd; momnew = trim(fn_mommat)//jnd
+
+    inquire(FILE=momold, EXIST=info); inquire(FILE=momcur, EXIST=mation)
+    mommat = info .and. mation
+  end subroutine from_casename
+
   subroutine copy(src, dst, buf)
     integer,          intent(in)  :: src, dst
     character(len=*), intent(out) :: buf
@@ -200,4 +209,4 @@ contains
 end program combine_hamfiles
 
 
-!! Time-stamp: <2016-02-01 17:35:08 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-10 09:30:38 assman@faepop36.tu-graz.ac.at>
