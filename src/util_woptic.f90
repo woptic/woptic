@@ -726,6 +726,19 @@ module woptic_io
   ! this will be allocated() when SCRATCH has been fetched
   type(argstr), allocatable :: scratch
 
+  character(*), parameter :: suf_jnd = '_joined'
+  character(*), parameter :: suf_rfd = '_refined'
+  character(*), parameter :: suf_old = '_old'
+  character(*), parameter :: suf_new = '_new'
+  character(*), parameter :: suf_sym = '_sym'
+
+  character(*),     parameter   ::  suf_inop='.inop'
+  character(BUFSZ)              ::   fn_inop
+  character(*),     parameter   ::  suf_hist='.wophist'
+  character(BUFSZ)              ::   fn_hist
+  character(*),     parameter   ::  suf_ksym='.ksym'
+  character(BUFSZ)              ::   fn_ksym
+
   integer,          parameter   :: unit_inwop=10
   character(*),     parameter   ::  suf_inwop='.inwop'
   character(BUFSZ)              ::   fn_inwop
@@ -896,46 +909,47 @@ contains
 
     call get_scratch()
 
-    fn_inwop    =trim(file)//trim(suf_inwop   )
-    fn_fermi    =trim(file)//trim(suf_fermi   )//ud
-    fn_ham      =trim(file)//trim(suf_ham     )//ud
-    fn_intrahop =trim(file)//trim(suf_intrahop)//ud ! FIXME: ud or not?
-    fn_wfrot    =trim(file)//trim(suf_wfrot   )//ud
-    fn_hr       =trim(file)//trim(suf_hr      )//ud
-    fn_chk      =trim(file)//trim(suf_chk     )//ud
-    fn_inwf     =trim(file)//trim(suf_inwf    )//ud
-    fn_struct   =trim(file)//trim(suf_struct  )
-    fn_energy   =trim(file)//trim(suf_energy  )//trim(so)//ud
-    fn_klist    =trim(file)//trim(suf_klist   )//band_
-    fn_vr       =trim(file)//trim(suf_vr      )//ud
-    fn_vvr      =trim(file)//trim(suf_vvr     )//ud
-    fn_fklist   =trim(file)//trim(suf_fklist  )
-    fn_kadd     =trim(file)//trim(suf_kadd    )
-    fn_optcond  =trim(file)//trim(suf_optcond )//ud
-    fn_wdos     =trim(file)//trim(suf_wdos    )//trim(ud)//band_
-    fn_selfE    =trim(file)//trim(suf_selfE   )//trim(ud)//band_
-    fn_outwop   =trim(file)//trim(suf_outwop  )//ud
-    fn_outref   =trim(file)//trim(suf_outref  )//ud
-    fn_outvr    =trim(file)//trim(suf_outvr   )//ud
-    fn_outvk    =trim(file)//trim(suf_outvk   )//ud
-    fn_mommat   =trim(scratch%s)//trim(file)//trim(suf_mommat  )//ud
-    fn_tet      =trim(scratch%s)//trim(file)//trim(suf_tet     )
-    fn_ftet     =trim(scratch%s)//trim(file)//trim(suf_ftet    )
-    fn_map      =trim(scratch%s)//trim(file)//trim(suf_map     )
-    fn_voe      =trim(scratch%s)//trim(file)//trim(suf_voe     )
-    fn_doscontr =trim(scratch%s)//trim(file)//trim(suf_doscontr)//ud
-    fn_contr    =trim(scratch%s)//trim(file)//trim(suf_contr   )&
-         //trim(ud)//band_
-    fn_K1       =trim(scratch%s)//trim(file)//trim(suf_K1      )&
-         //trim(ud)//band_
+    fn_inop     =                  trim(file)//suf_inop
+    fn_hist     =                  trim(file)//suf_hist    //trim(ud)//'.zip'
+    fn_inwop    =                  trim(file)//suf_inwop
+    fn_ksym     =                  trim(file)//suf_ksym
+    fn_fermi    =                  trim(file)//suf_fermi             //ud
+    fn_ham      =                  trim(file)//suf_ham               //ud
+    fn_intrahop =                  trim(file)//suf_intrahop          //ud
+    fn_wfrot    =                  trim(file)//suf_wfrot             //ud
+    fn_hr       =                  trim(file)//suf_hr                //ud
+    fn_chk      =                  trim(file)//suf_chk               //ud
+    fn_inwf     =                  trim(file)//suf_inwf              //ud
+    fn_struct   =                  trim(file)//suf_struct
+    fn_energy   =                  trim(file)//suf_energy  //trim(so)//ud
+    fn_klist    =                  trim(file)//suf_klist             //band_
+    fn_vr       =                  trim(file)//suf_vr                //ud
+    fn_vvr      =                  trim(file)//suf_vvr               //ud
+    fn_fklist   =                  trim(file)//suf_fklist
+    fn_kadd     =                  trim(file)//suf_kadd
+    fn_optcond  =                  trim(file)//suf_optcond           //ud
+    fn_wdos     =                  trim(file)//suf_wdos    //trim(ud)//band_
+    fn_selfE    =                  trim(file)//suf_selfE   //trim(ud)//band_
+    fn_outwop   =                  trim(file)//suf_outwop            //ud
+    fn_outref   =                  trim(file)//suf_outref            //ud
+    fn_outvr    =                  trim(file)//suf_outvr             //ud
+    fn_outvk    =                  trim(file)//suf_outvk             //ud
+    fn_mommat   = trim(scratch%s)//trim(file)//suf_mommat            //ud
+    fn_tet      = trim(scratch%s)//trim(file)//suf_tet
+    fn_ftet     = trim(scratch%s)//trim(file)//suf_ftet
+    fn_map      = trim(scratch%s)//trim(file)//suf_map
+    fn_voe      = trim(scratch%s)//trim(file)//suf_voe
+    fn_doscontr = trim(scratch%s)//trim(file)//suf_doscontr//ud
+    fn_contr    = trim(scratch%s)//trim(file)//suf_contr   //trim(ud)//band_
+    fn_K1       = trim(scratch%s)//trim(file)//suf_K1      //trim(ud)//band_
     do i=1,size(fn_optorb)
-       fn_optorb(i)=trim(file)//trim(suf_optorb(i))//ud
+       fn_optorb(i) =                  trim(file)//suf_optorb(i)     //ud
     end do
     do i=1,size(fn_vk)
-       fn_vk(i)    =trim(file)//trim(suf_vk(i)    )//ud
+       fn_vk(i)     =                  trim(file)//suf_vk(i)         //ud
     end do
     do i=1,size(fn_vvk)
-       fn_vvk(i)   =trim(scratch%s)//trim(file)//trim(suf_vvk(i))//ud
+       fn_vvk(i)    = trim(scratch%s)//trim(file)//suf_vvk(i)        //ud
     end do
   end subroutine set_case_buf
 
@@ -969,4 +983,4 @@ contains
 end module woptic_io
 
 
-!! Time-stamp: <2016-02-14 23:01:22 elias@hupuntu>
+!! Time-stamp: <2016-02-15 18:51:51 assman@faepop36.tu-graz.ac.at>

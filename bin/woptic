@@ -8,6 +8,7 @@
 ###           2014-2016 Elias Assmann
 ###
 
+# exit on error
 set -e
 
 # default parameters
@@ -22,9 +23,6 @@ name=$(basename $0)
 log=:log
 reftet=_refined
 wopmain=_new
-
-reftetfiles="tetra tetra_full klist klist_full voe map"
-wopmainfiles="kcontribw wdoskcontribw K1w"
 
 # copied from x_lapw
 [[ -e $file.struct ]] && \
@@ -70,7 +68,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-41-gc1ce1a0$' | 
+    r=$(echo '$version: v0.1.0-45-gf5b26c6$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -88,14 +86,14 @@ carp () {
 archive () {
     local tozip
 
-    echo Archiving iteration $1 in ‘$vault’ …
+    echo Archiving iteration $1 in ‘$fn_hist’ …
 
-    for suf in $archfiles; do
-        ln -fs $file.$suf $file.$suf.$1 # create symlinks for names
-        tozip+=" $file.$suf.$1"
+    for f in $archfiles; do
+        ln -fs $f $f.$1 # create symlinks for names
+        tozip+=" $f.$1"
     done
 
-    zip -qg $v $vault $tozip    # -g: grow archive in-place
+    zip -qg $v $fn_hist $tozip    # -g: grow archive in-place
     rm $tozip                   # remove symlinks again
 }
 
@@ -104,16 +102,16 @@ unarchive () {
 
     [[ $v ]] || q=-q
 
-    echo Restoring iteration $1 from ‘$vault’ …
+    echo Restoring iteration $1 from ‘$fn_hist’ …
 
     for suf in $archfiles; do
-        tounzip+=" $file.$suf.$1"
+        tounzip+=" $f.$1"
     done
 
-    unzip $q $vault $tounzip
+    unzip $q $fn_hist $tounzip
 
-    for suf in $archfiles; do
-        mv $v $file.$suf.$1 $file.$suf
+    for f in $archfiles; do
+        mv $v $f.$1 $f
     done
 }
 
@@ -121,7 +119,7 @@ w () {
     echo "`date`> (w) $@" >> $log
     [[ $v ]] && echo
     [[ $v ]] && echo $1 | perl -ple tr/a-z/A-Z/
-    $time $@
+    $@
 }
 
 wq () {
@@ -129,10 +127,9 @@ wq () {
 
     echo "`date`> (w) $@" >> $log
 
-    [[ $v ]] && t=$time
     [[ $v ]] && echo
     [[ $v ]] && echo $1 | perl -ple tr/a-z/A-Z/
-    $t $@
+    $@
 }
 
 
@@ -147,7 +144,7 @@ while [[ $# -gt 0 ]]; do
         ?(-)-th|?(-)-theta)    theta=$2; shift ;;
         ?(-)-inter)            inter=-inter    ;;
         ?(-)-init)              init=$2; shift ;;
-        ?(-)-nosym)            nosym=1         ;;
+        ?(-)-nosym)            nosym=yes       ;;
         ?(-)-band)              band=-band     ;; 
         -p|?(-)-parallel?(-lapw1)) p=-p        ;;
         -c|?(-)-complex?(-lapw1))  c=-c        ;;
@@ -185,24 +182,28 @@ echo
 echo ">   ($(basename $0)) options: $@" >>:log
 
 [[ $updn ]] && sp=-$updn
-#[[ $q    ]] || time="eval time" #/usr/bin/time
 
-vault=$file.wophist$updn.zip
-klisttmp="mktemp $file.klist.XXX"
+inwop=$file.inwop
 
-[[ -s $file.inwop ]] || \
-    croak "‘$file.inwop’ required."
+[[ -s $inwop ]] || \
+    croak "‘$inwop’ required."
 
-# sets matelmode, runlapw1, runoptic, convert_vr, peierls, need_ham
-eval $(inwopcheck $file.inwop || echo exit $?) 
+# sets matelmode, runlapw1, runoptic, convert_vr, peierls, need_ham,
+# file names
+eval $(inwopcheck $inwop $file || echo exit $?)
 
-[[ $runlapw1   ]] && oldnewfiles+=" energy"
-[[ $runoptic   ]] && oldnewfiles+=" mommat2"
-[[ $need_ham   ]] && oldnewfiles+=" hk"
-[[ $convert_vr ]] && oldnewfiles+=" vkx vky vkz"
-[[ $mixed_vr   ]] && oldnewfiles+=" vvkxx vvkxy vvkxz vvkyy vvkyz vvkzz"
-archfiles="$reftetfiles $wopmainfiles $oldnewfiles klist_refined
-           optcondw wdos outputref outputwop"
+klisttmp="mktemp $fn_klist.XXX"
+
+reftetfiles="$fn_tet $fn_ftet $fn_klist $fn_fklist $fn_voe $fn_map"
+wopmainfiles="$fn_contr $fn_doscontr $fn_K1"
+
+[[ $runlapw1   ]] && oldnewfiles+=" $fn_energy"
+[[ $runoptic   ]] && oldnewfiles+=" $fn_mommat"
+[[ $need_ham   ]] && oldnewfiles+=" $fn_ham"
+[[ $convert_vr ]] && oldnewfiles+=" $fn_vk"
+[[ $mixed_vr   ]] && oldnewfiles+=" $fn_vvk"
+archfiles="$reftetfiles $wopmainfiles $oldnewfiles $fn_klist$suf_new
+           $fn_optcond $fn_wdos $fn_outref $fn_outwop"
 
 
 ## Special -restore mode ##
@@ -216,17 +217,16 @@ fi
 
 
 ## Test file existence ##
-[[ $need_ham   && ! -s ${file}_hr$updn.dat ]] && \
-    croak "‘${file}_hr$updn.dat’ required.  Run Wannier90 with ‘hr_plot=T’."
-[[ $convert_vr && ! -s $file.vr$updn ]]       && \
-    croak "‘$file.vr$updn’ required.  Run ‘x optic’ and ‘compute_vr’."
-[[ $mixed_vr   && ! -s $file.vvr$updn ]]      && \
-    croak "‘$file.vvr$updn’ required.  Run ‘x optic’ and ‘compute_vr’."
+[[ $need_ham   && ! -s $fn_hr  ]] && \
+    croak "‘$fn_hr’ required.  Run Wannier90 with ‘hr_plot=T’."
+[[ $convert_vr && ! -s $fn_vr  ]] && \
+    croak "‘$fn_vr’ required.  Run ‘x optic’ and ‘compute_vr’."
+[[ $mixed_vr   && ! -s $fn_vvr ]] && \
+    croak "‘$fn_vvr’ required.  Run ‘x optic’ and ‘compute_vr’."
 
-must="fermi$updn"
-[[ $runoptic ]] && must+=" inop"
-for suf in $must; do
-    f=$file.$suf
+must="$fn_fermi"
+[[ $runoptic ]] && must+=" $fn_inop"
+for f in $must; do
     [[ -s $f ]] || croak "required file ‘$f’ not found"
 done
 
@@ -247,6 +247,7 @@ echo -e  "            so? : $so"
 echo -ne "         nosym? : $nosym\t\t"
 echo -e  "            sp  : $sp"
 echo -ne "          init  = $init\t\t"
+echo -e  "       SCRATCH  = $SCRATCH"
 echo
 
 if [[ $restart ]]; then
@@ -259,17 +260,17 @@ else
    ##
    ## Some files have to contain “dummy zeros”, some just have to
    ## exist.
-                             echo "0 0 0"   > $file.kcontribw$updn
-                             true           > $file.K1w$updn
-                             true           > $file.wdoskcontribw$updn
-    [[     $need_ham   ]] && echo "0 0 0"   > $file.hk$updn
-    [[     $runoptic   ]] && echo "0"       > $file.mommat2$updn
-    [[     $runlapw1   ]] && true           > $file.energy$updn
-    for i in x y z; do
-        [[ $convert_vr ]] && echo "0 0"     > $file.vk$i$updn
+                             echo "0 0 0"   > $fn_contr
+                             true           > $fn_K1
+                             true           > $fn_doscontr
+    [[     $need_ham   ]] && echo "0 0 0"   > $fn_ham
+    [[     $runoptic   ]] && echo "0"       > $fn_mommat
+    [[     $runlapw1   ]] && true           > $fn_energy
+    for f in $fn_vk; do
+        [[ $convert_vr ]] && echo "0 0"     > $f
     done
-    for i in xx xy xz yy yz zz; do
-        [[ $mixed_vr   ]] && echo "0 0 0"   > $file.vvk$i$updn
+    for f in $fn_vvk; do
+        [[ $mixed_vr   ]] && echo "0 0 0"   > $f
     done
     archive 0
 fi
@@ -279,37 +280,35 @@ do
     echo
     echo "+++ iteration $iter +++"
 
-    for suf in $oldnewfiles; do
-        mv $v $file.$suf $file.${suf}_old
+    for f in $oldnewfiles; do
+        mv $v $f $f$suf_old
     done
 
     if [[ $iter = 1 ]]; then
         if [[ $nosym ]]; then
-            mv $v     $file.struct $file.struct_sym
-            ln -fs $v $file.ksym   $file.struct
+            mv $v     $fn_struct $fn_struct$suf_sym
+            ln -fs $v $fn_ksym   $fn_struct
         fi
         w refine_tetra -init $init $file
         if [[ $nosym ]]; then
-            ln -sf $v $file.struct_sym $file.struct
+            ln -sf $v $fn_struct$suf_sym $fn_struct
         fi
-        nk=$(perl -ne '/^END/ and print($.-1), exit' $file.klist_add)
+        nk=$(perl -ne '/^END/ and print($.-1), exit' $fn_kadd)
     else
         # refine k-mesh
         w refine_tetra -th $theta $inter $file
-        nk=$(perl -ne '/^END/ and print($.-1), exit' $file.klist_add)
+        nk=$(perl -ne '/^END/ and print($.-1), exit' $fn_kadd)
 
-        fgrep "estimator =" $file.outputref
+        fgrep "estimator =" $fn_outref
     fi
 
     # if there was no error, move updated files over old ones …
-    for suf in $reftetfiles; do
-        cp $v $file.$suf$reftet $file.$suf
+    for f in $reftetfiles; do
+        cp $v $f$suf_rfd $f
     done
 
     # … then overwrite klist with klist_add
-    [[ $iter != 1 ]] && mv $v $file.klist_add $file.klist
-
-    [[ $band -eq 1 ]] && cp $v $file.klist_band $file.klist
+    [[ $iter != 1 ]] && mv $v $fn_kadd $fn_klist
 
     echo "  new k-points: "$nk
     if [[ $nk -ne 0 ]]; then  #special case where not much is to do here
@@ -335,77 +334,75 @@ do
 
         if [[ $peierls ]]; then
             ktmp=$(klisttmp)
-            mv $v $file.klist $ktmp
-            ln -fs $v $file.klist_full $file.klist
+            mv $v $fn_klist $ktmp
+            ln -fs $v $fn_fklist $fn_klist
         fi
         x convham $ffile
         if [[ $peierls ]]; then
-            rm $v $file.klist
-            mv $v $ktmp $file.klist
+            rm $v $fn_klist
+            mv $v $ktmp $fn_klist
         fi
 
         [[ $runoptic || $need_ham ]] && wq joinham $file
-        [[ $runoptic ]]&& mv $v $file.mommat2${updn}_joined $file.mommat2$updn
-        [[ $need_ham ]]&& mv $v $file.hk${updn}_joined      $file.hk$updn
+        [[ $runoptic ]]&& mv $v $fn_mommat$suf_jnd $fn_mommat
+        [[ $need_ham ]]&& mv $v $fn_ham$suf_jnd    $fn_ham
 
         if [[ $convert_vr ]]; then
             wq convert_vr $file
-            for i in x y z; do
-                vk=$file.vk${i}$updn
-                wq joinham ${vk}_old $vk ${vk}_joined
-                mv $v ${vk}_joined $vk
+            for f in $fn_vk; do
+                wq joinham $f$suf_old $f $f$suf_jnd
+                mv $v $f$suf_jnd $f
             done
 
             if [[ $mixed_vr ]]; then
-                for i in xx xy xz yy yz zz; do
-                    vvk=$file.vvk$updn
-                    wq joinham ${vvk}_old $vvk ${vvk}_joined
-                    mv $v ${vvk}_joined $vvk
+                for f in xx xy xz yy yz zz; do
+                    wq joinham $f$suf_old $f $f$suf_jnd
+                    mv $v $f$suf_jnd $f
                 done
             fi
         fi
 
         if [[ $iter -ne 1 && $runlapw1 ]]; then
-            natoms=$(grep "elements:" $file.outputwop | cut -d: -f2)
+            natoms=$(grep "elements:" $fn_outwop | cut -d: -f2)
 
-            tail -n +$(( 2*$natoms+1 )) $file.energy >>$file.energy_old
-            mv $v $file.energy_old $file.energy
+            tail -n +$(( 2*$natoms+1 )) $fn_energy >>$fn_energy$suf_old
+            mv $v $fn_energy$suf_old $fn_energy
         fi
     elif [[ $peierls ]]; then # Nk = 0
         # for Peierls we have to Fourier transform the full
         # Hamiltonian even if there is no new symmetrized k-point
         ktmp=$(klisttmp)
-        mv $v $file.klist $ktmp
-        ln -fs $v $file.klist_full $file.klist
+        mv $v $fn_klist $ktmp
+        ln -fs $v $fn_fklist $fn_klist
 
         x convham $ffile
 
-        rm $file.klist
-        mv $v $ktmp $file.klist
+        rm $fn_klist
+        mv $v $ktmp $fn_klist
     else
         carp "refine_tetra found no new k-points
 (maybe try re-running with smaller --theta or larger --init)"
-        for suf in $oldnewfiles; do
-            mv $v $file.${suf}_old $file.$suf
+        for f in $oldnewfiles; do
+            mv $v $f$suf_old $f
         done
     fi
 
     # replace added k-points with full symmetrized list
-    [[ ! $band && $iter != 1 ]] && cp $v $file.klist$reftet $file.klist
+    [[ ! $band && $iter != 1 ]] && cp $v $fn_klist$reftet $fn_klist
 
-    [[ $nosym ]] && ln -sf $v $file.ksym $file.struct
+    [[ $nosym ]] && ln -sf $v $fn_ksym $fn_struct
 
     # main run to compute optical conductivity on given mesh
     w woptic_main $file $band $so $sp
 
     # if there was no error, move updated files over old ones
-    for suf in $wopmainfiles; do
-        mv $v $file.$suf$wopmain $file.$suf
+    for f in $wopmainfiles; do
+        mv $v $f$suf_new $f
     done
 
-    [[ $nosym ]] && ln -sf $v $file.struct_sym $file.struct
+    [[ $nosym ]] && ln -sf $v $fn_struct$suf_sym $fn_struct
 
-    fgrep $file.outputwop -e "sumrules" -e "dc cond" -e "thermopower"
+    fgrep $fn_outwop -e "sumrules" -e "dc cond" -e "thermopower"
 
     # store history
     archive $iter

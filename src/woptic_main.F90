@@ -33,11 +33,12 @@ program woptic_main
        &   fn_doscontr,   fn_mommat,   fn_fklist,   fn_klist,   fn_map,     &
        &   fn_struct,     fn_fermi,    fn_ham,     fn_K1,      &
        &   fn_energy,     fn_contr,    fn_ftet,     fn_wdos,    fn_optcond, &
-       &   fn_optorb,     fn_selfE,    fn_vk,       fn_vvk,     fn_chk
+       &   fn_optorb,     fn_selfE,    fn_vk,       fn_vvk,     fn_chk,     &
+       &  suf_new
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-38-gf121bfb$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-45-gf5b26c6$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -138,7 +139,6 @@ program woptic_main
   real   (DPk), parameter :: hbar    = 1.05457148e-34_DPk    ! [J·s]
   ! [hbar^3/emass^2*(m/ang)^5]
   real   (DPk), parameter :: factor1 = 1.413351709413265e+08_DPk
-  character(*), parameter :: suf_new = '_new'
   character(*), parameter :: usage = '(                                     &
 &"woptic_main: compute optical conductivity for a given k-mesh"            /&
 &/"USAGE",                                                                  &
@@ -187,7 +187,10 @@ program woptic_main
 
      select case (arg%s)
      case ('--')
-        call fetcharg(command_argument_count(), file)
+        if (command_argument_count() /= jarg+1) &
+             call croak('too many arguments')
+
+        call fetcharg(jarg+1, file)
         have_file=.true.
         exit arguments
      case ('-h','-H','-help','--help')
@@ -207,6 +210,9 @@ program woptic_main
      case default
         if (arg%s(1:1) == '-') &
              call croak('unknown option ' // trim(arg%s))
+        if (have_file) &
+             call croak('too many arguments')
+
         call fetcharg(jarg, file)
         have_file=.true.
      end select
@@ -1668,4 +1674,4 @@ end subroutine init_random_seed
 !! End:
 !!\---
 !!
-!! Time-stamp: <2016-02-09 12:32:53 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-15 18:34:47 assman@faepop36.tu-graz.ac.at>

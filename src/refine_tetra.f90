@@ -18,11 +18,12 @@ PROGRAM refine_tmesh
        suf_klist,  suf_fklist,  suf_tet,    suf_ftet,  suf_contr,  suf_voe, &
        suf_struct, suf_map,     suf_inwop,  suf_kadd,  suf_outref,          &
        fn_klist,   fn_fklist,   fn_tet,     fn_ftet,   fn_contr,   fn_voe,  &
-       fn_struct,  fn_map,      fn_inwop,   fn_kadd,   fn_outref
+       fn_struct,  fn_map,      fn_inwop,   fn_kadd,   fn_outref,           &
+       suf_rfd
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-30-gf31ce8c$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-45-gf5b26c6$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
@@ -51,7 +52,6 @@ PROGRAM refine_tmesh
   integer        :: init_steps
   type(struct_t) :: stru
 
-  character(*), parameter :: suf_new='_refined'
   character(*), parameter :: usage = '(                                      &
 &"refine_tetra: adaptive refinement of tetrahedral k-mesh"                 /&
 &/"USAGE",                                                                   &
@@ -69,7 +69,7 @@ PROGRAM refine_tmesh
 &" * '//suf_voe   //'",T20,"list of k-points on tetrahedral edges"         /&
 &" * '//suf_map   //'",T20,"internal mapping of klist_full to klist"       /&
 &/"Files marked ‘*’ are read and updated (except with --init).  The"       /&
-&"updated file ‘F’ is written to ‘F'//suf_new//'’.  The list of added"     /&
+&"updated file ‘F’ is written to ‘F'//suf_rfd//'’.  The list of added"     /&
 &"k-points is written to ‘CASE'//suf_kadd//'’."                            /&
 &/"OPTIONS",                                                                &
 &T10,"--theta Θ", T21,"(0≤Θ≤1) defines the ‘harshness’ of refinement"      /&
@@ -319,12 +319,12 @@ PROGRAM refine_tmesh
   endif
 
 !!!------------- Open files for writing         -----------------------------
-  open(unit_klist , FILE=trim(fn_klist )//suf_new, STATUS='replace')
-  open(unit_fklist, FILE=trim(fn_fklist)//suf_new, STATUS='replace')
-  open(unit_tet   , FILE=trim(fn_tet   )//suf_new, STATUS='replace')
-  open(unit_ftet  , FILE=trim(fn_ftet  )//suf_new, STATUS='replace')
-  open(unit_voe   , FILE=trim(fn_voe   )//suf_new, STATUS='replace')
-  open(unit_map   , FILE=trim(fn_map   )//suf_new, STATUS='replace')
+  open(unit_klist , FILE=trim(fn_klist )//suf_rfd, STATUS='replace')
+  open(unit_fklist, FILE=trim(fn_fklist)//suf_rfd, STATUS='replace')
+  open(unit_tet   , FILE=trim(fn_tet   )//suf_rfd, STATUS='replace')
+  open(unit_ftet  , FILE=trim(fn_ftet  )//suf_rfd, STATUS='replace')
+  open(unit_voe   , FILE=trim(fn_voe   )//suf_rfd, STATUS='replace')
+  open(unit_map   , FILE=trim(fn_map   )//suf_rfd, STATUS='replace')
   open(unit_kadd  , FILE=trim(fn_kadd  ),          STATUS='replace')
 
 !!!------------- Write updated files            -----------------------------
@@ -1288,4 +1288,4 @@ SUBROUTINE compute_shapeparameters(nk,nt,k,tetra,ndim)
 END SUBROUTINE compute_shapeparameters
 
 
-!! Time-stamp: <2015-11-09 16:59:26 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-15 18:35:46 assman@faepop36.tu-graz.ac.at>

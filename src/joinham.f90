@@ -16,18 +16,19 @@ program combine_hamfiles
   use clio,      only: fetcharg, croak
   use util,      only: lowercase
   use woptic_io, only: fn_ham,    unit_hamcur => unit_ham,                 &
-       &               fn_mommat, unit_momcur => unit_mommat, set_casename
+       &               fn_mommat, unit_momcur => unit_mommat, set_casename,&
+       &               jnd => suf_jnd, old => suf_old
   use woptic,    only: fmt_vk_head
   use maybebin,  only: maybin_open, maybin_read, maybin_write, formatted
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-41-gc1ce1a0$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-45-gf5b26c6$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer,          parameter :: unit_hamold=121, unit_momold=13
   integer,          parameter :: unit_hamnew=123, unit_momnew=16
-  character(len=*), parameter :: old='_old', cur='', jnd='_joined'
+  character(len=*), parameter :: cur=''
 
   integer          :: Nkb1(2), Nkb2(2), i,j
   logical          :: info, mation, mommat=.false.
@@ -209,4 +210,4 @@ contains
 end program combine_hamfiles
 
 
-!! Time-stamp: <2016-02-10 09:30:38 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-15 20:16:55 assman@faepop36.tu-graz.ac.at>
