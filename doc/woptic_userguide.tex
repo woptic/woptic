@@ -629,6 +629,21 @@ The main input file for \woptic is
 \end{lines}
 
 
+\section{Environment variable \code{\$SCRATCH}}
+\label{sec:woprog:scratch}
+
+\woprog and the programs it calls support \wien-style \code{\$SCRATCH}
+for temporary files.  This means that \lapwi and \optic will place
+\file{\case.vector} and \file{\case.mommat2} in the directory
+\code{\$SCRATCH}; likewise, \womain and \reftet will place certain
+temporary files in that directory.
+
+However, note that a true local \code{\$SCRATCH} on a cluster is not
+supported.  In this case, the individual
+\file{\case.mommat2\_\textit{i}} would have to be transferred to the
+“master” node.
+
+
 \section{Output files}
 \label{sec:woprog:output}
 
