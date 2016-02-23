@@ -15,6 +15,7 @@ program check_inwop
        fn_outwop, fn_kadd,                                                &
        suf_new, suf_sym, suf_old, suf_rfd, suf_jnd
   use clio,      only: argstr, fetcharg, croak
+  use util,      only: basename
 
   type(inwop_t) :: inw
   type(argstr)  :: fname, arg
@@ -49,7 +50,7 @@ program check_inwop
   prlog(peierls   )
   prlog(need_ham  )
 
-  if (command_argument_count() > 1) then
+  print_filenames: if (command_argument_count() > 1) then
      jarg=2
      arguments_rest: do while (jarg <= command_argument_count())
         call fetcharg(jarg, arg)
@@ -81,7 +82,9 @@ program check_inwop
 #define prvar(name) print '(A, "=", A)',  'fn_'//#name, trim( fn_##name)
 #define prsuf(name) print '(A, "=", A)', 'suf_'//#name, trim(suf_##name)
 #define prvas(name, n) print '(A, "=", ''"'', '//#n//'(A, " "), ''"'')',  \
-     'fn_'//#name, (trim( fn_##name(i)), i=1,##n)
+     'fn_'//#name, ( trim( fn_##name(i)), i=1,##n )
+#define trbas(name) trim(basename(fn_##name))
+#define trbss(name, n) ( trbas(##name(i)), i=1,##n )
 
      prvar(hist    ); prvar(contr   )
      prvar(klist   ); prvar(doscontr)
@@ -102,7 +105,13 @@ program check_inwop
      if (convert_vr)  prvar(vr      )
      if (mixed_vr  )  prvas(vvk, 6  )
      if (mixed_vr  )  prvar(vvr     )
-  end if
+
+     print '(A, ''="'', 100(A, '' ''))', 'scratchfiles', &
+          trbas(mommat),   trbas(ftet),  trbas(tet),     &
+          trbas(doscontr), trbas(map),   trbas(voe),     &
+          trbss(vvk, 6),   trbas(contr), trbas(K1),      &
+          '"'
+  end if print_filenames
 
   print '("# Emax ΔE δ β = ", F7.3, 2F6.3, F8.3)', &
        inw%Emax, inw%dE, inw%delterl, inw%beta
@@ -115,4 +124,4 @@ program check_inwop
        inw%optcond, inw%dos, inw%joint
 end program check_inwop
 
-!! Time-stamp: <2016-02-15 20:16:06 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-23 17:20:40 assman@faepop36.tu-graz.ac.at>
