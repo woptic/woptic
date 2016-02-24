@@ -68,7 +68,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-52-g304b76a$' |
+    r=$(echo '$version: v0.1.0-54-g87621da$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -104,7 +104,7 @@ archive () {
             ln $v -fs $SCRATCH$f $scratch/$f.$1
             tozip+=" $scratch/$f.$1"
         done
-        zip -qg0 $v $fn_hist $tozip # -0: store only
+        zip -qg $v $fn_hist $tozip
         rm $v $tozip
         rmdir $v $scratch/ || [[ $q ]] || echo continuing anyway …
     fi
@@ -447,4 +447,4 @@ if [[ ! $q ]]; then
 fi
 
 
-## Time-stamp: <2016-02-24 09:20:04 assman@faepop36.tu-graz.ac.at>
+## Time-stamp: <2016-02-24 15:44:55 assman@faepop36.tu-graz.ac.at>
