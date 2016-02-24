@@ -435,7 +435,7 @@ contains
 !!!  end function spectral
 end module woptic
 
-!---------------- Read/write files that may be binary or plain text -----------
+!---------------- Read/write files that may be binary or plain text ----------
 module maybebin
   use const, only: DPk
   implicit none
@@ -501,7 +501,8 @@ contains
     end if
 
     if (detect) then
-       b = .false.
+       b = .true.               ! this is the default if file does not
+                                ! exist
 
        !! We consider the file plain text if the first N bytes are
        !! printable ASCII characters.
@@ -983,4 +984,4 @@ contains
 end module woptic_io
 
 
-!! Time-stamp: <2016-02-23 12:05:55 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-24 14:57:52 assman@faepop36.tu-graz.ac.at>
