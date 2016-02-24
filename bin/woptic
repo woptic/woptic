@@ -21,8 +21,6 @@ file=$(basename $PWD)
 home=$(dirname $0)
 name=$(basename $0)
 log=:log
-reftet=_refined
-wopmain=_new
 
 # copied from x_lapw
 [[ -e $file.struct ]] && \
@@ -68,7 +66,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-45-gf5b26c6$' |
+    r=$(echo '$version: v0.1.0-50-gc3d3755$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -89,7 +87,7 @@ archive () {
     echo Archiving iteration $1 in ‘$fn_hist’ …
 
     for f in $archfiles; do
-        ln -fs $f $f.$1 # create symlinks for names
+        ln $v -fs $f $f.$1      # create symlinks for names
         tozip+=" $f.$1"
     done
 
@@ -98,17 +96,17 @@ archive () {
 }
 
 unarchive () {
-    local tounzip q
+    local tounzip qq
 
-    [[ $v ]] || q=-q
+    [[ $v ]] || qq=-q
 
-    echo Restoring iteration $1 from ‘$fn_hist’ …
+    [[ $q ]] || echo Restoring iteration $1 from ‘$fn_hist’ …
 
-    for suf in $archfiles; do
+    for f in $archfiles; do
         tounzip+=" $f.$1"
     done
 
-    unzip $q $fn_hist $tounzip
+    [[ $tounzip ]] && unzip $qq $fn_hist $tounzip
 
     for f in $archfiles; do
         mv $v $f.$1 $f
@@ -232,7 +230,7 @@ done
 
 
 ## Header ##
-echo -n " MATELMODE     $matelmode"
+echo -n " MATELMODE: $matelmode"
 echo
 echo     " OPTIONS:"
 echo     "          case  = $file"
@@ -388,7 +386,7 @@ do
     fi
 
     # replace added k-points with full symmetrized list
-    [[ ! $band && $iter != 1 ]] && cp $v $fn_klist$reftet $fn_klist
+    [[ ! $band && $iter != 1 ]] && cp $v $fn_klist$suf_rfd $fn_klist
 
     [[ $nosym ]] && ln -sf $v $fn_ksym $fn_struct
 
