@@ -16,11 +16,13 @@ start=1
 init=
 theta=0.5
 maxiterations=5
+fullarch=yes
 
 file=$(basename $PWD)
 home=$(dirname $0)
 name=$(basename $0)
 log=:log
+scratch=.scratch # “scratch” placeholder dir in archive
 
 # copied from x_lapw
 [[ -e $file.struct ]] && \
@@ -66,7 +68,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-51-g9dcb066$' |
+    r=$(echo '$version: v0.1.0-52-g304b76a$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -90,9 +92,22 @@ archive () {
         ln $v -fs $f $f.$1      # create symlinks for names
         tozip+=" $f.$1"
     done
+    zip -qg $v $fn_hist $tozip  # -g: grow archive in-place
+    rm $v $tozip                # remove symlinks again
 
-    zip -qg $v $fn_hist $tozip    # -g: grow archive in-place
-    rm $tozip                   # remove symlinks again
+    if [[ $fullarch ]]; then
+        tozip=
+        [[ $1 -ne 0 ]] && zip -qd $v $fn_hist $scratch/\*
+
+        [[ -d $scratch ]] || mkdir $v $scratch
+        for f in $scratchfiles; do
+            ln $v -fs $SCRATCH$f $scratch/$f.$1
+            tozip+=" $scratch/$f.$1"
+        done
+        zip -qg0 $v $fn_hist $tozip # -0: store only
+        rm $v $tozip
+        rmdir $v $scratch/ || [[ $q ]] || echo continuing anyway …
+    fi
 }
 
 unarchive () {
@@ -101,6 +116,9 @@ unarchive () {
     [[ $v ]] || qq=-q
 
     [[ $q ]] || echo Restoring iteration $1 from ‘$fn_hist’ …
+
+    unzip -l $fn_hist $scratch || croak ‘$fn_hist’ does not contain \
+                                        SCRATCH files -- cannot restore
 
     for f in $archfiles; do
         tounzip+=" $f.$1"
@@ -111,6 +129,19 @@ unarchive () {
     for f in $archfiles; do
         mv $v $f.$1 $f
     done
+
+    tounzip=
+    for f in $scratchfiles; do
+        tounzip+=" $scratch/$f.$1"
+    done
+
+    [[ $tounzip ]] && unzip $qq $fn_hist $tounzip
+
+    for f in $scratchfiles; do
+        mv $v $scratch/$f.$1 $SCRATCH$f
+    done
+
+    rmdir $v $scratch/ || [[ $q ]] || echo continuing anyway …
 }
 
 w () {
@@ -144,6 +175,7 @@ while [[ $# -gt 0 ]]; do
         ?(-)-init)              init=$2; shift ;;
         ?(-)-nosym)            nosym=yes       ;;
         ?(-)-band)              band=-band     ;; 
+        -L|?(-)-leanarch)   fullarch=          ;;
         -p|?(-)-parallel?(-lapw1)) p=-p        ;;
         -c|?(-)-complex?(-lapw1))  c=-c        ;;
         ?(-)-so)                  so=-so       ;;
@@ -200,8 +232,8 @@ wopmainfiles="$fn_contr $fn_doscontr $fn_K1"
 [[ $need_ham   ]] && oldnewfiles+=" $fn_ham"
 [[ $convert_vr ]] && oldnewfiles+=" $fn_vk"
 [[ $mixed_vr   ]] && oldnewfiles+=" $fn_vvk"
-archfiles="$reftetfiles $wopmainfiles $oldnewfiles $fn_klist$suf_new
-           $fn_optcond $fn_wdos $fn_outref $fn_outwop"
+archfiles="$fn_klist $fn_fklist $fn_klist$suf_new $fn_optcond $fn_wdos
+           $fn_outref $fn_outwop"
 
 
 ## Special -restore mode ##
@@ -242,7 +274,7 @@ echo -ne "        -inter? : $inter\t\t"
 echo -e  "          band? : $band"
 echo -ne "         theta  = $theta\t\t"
 echo -e  "            so? : $so"
-echo -ne "         nosym? : $nosym\t\t"
+echo -ne "    full arch.? : $fullarch\t\t"
 echo -e  "            sp  : $sp"
 echo -ne "          init  = $init\t\t"
 echo -e  "       SCRATCH  = $SCRATCH"
