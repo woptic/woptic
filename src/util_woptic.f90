@@ -507,7 +507,7 @@ contains
        !! printable ASCII characters.
        !!
        !! FIXME: do something less hacky.
-       open (unit=unit, file=file, status='old', access='stream')
+       open (unit=unit, file=file, action='read', access='stream')
        read (unit, END=1001) buf
 
        b = .not. printable(buf)
@@ -939,7 +939,7 @@ contains
     fn_ftet     = trim(scratch%s)//trim(file)//suf_ftet
     fn_map      = trim(scratch%s)//trim(file)//suf_map
     fn_voe      = trim(scratch%s)//trim(file)//suf_voe
-    fn_doscontr = trim(scratch%s)//trim(file)//suf_doscontr//ud
+    fn_doscontr = trim(scratch%s)//trim(file)//suf_doscontr          //ud
     fn_contr    = trim(scratch%s)//trim(file)//suf_contr   //trim(ud)//band_
     fn_K1       = trim(scratch%s)//trim(file)//suf_K1      //trim(ud)//band_
     do i=1,size(fn_optorb)
@@ -983,4 +983,4 @@ contains
 end module woptic_io
 
 
-!! Time-stamp: <2016-02-15 18:51:51 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-23 12:05:55 assman@faepop36.tu-graz.ac.at>

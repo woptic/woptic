@@ -8,11 +8,11 @@
 
 program check_inwop
   use woptic,    only: inwop_t, inwop_read
-  use woptic_io, only: set_casename, fn_hist, fn_klist, fn_tet, fn_ftet,  &
+  use woptic_io, only: set_casename, scratch,                             &
        fn_klist, fn_fklist, fn_voe, fn_map, fn_contr, fn_doscontr, fn_K1, &
        fn_energy, fn_mommat, fn_ham, fn_vk, fn_vvk, fn_optcond, fn_wdos,  &
        fn_outref, fn_hr, fn_vr, fn_vvr, fn_ksym, fn_inop, fn_fermi,       &
-       fn_outwop, fn_kadd,                                                &
+       fn_outwop, fn_kadd, fn_hist, fn_klist, fn_tet, fn_ftet,            &
        suf_new, suf_sym, suf_old, suf_rfd, suf_jnd
   use clio,      only: argstr, fetcharg, croak
   use util,      only: basename
@@ -79,38 +79,44 @@ program check_inwop
 
      call set_casename(fname, UPDN=updn, HAVE_SO=have_so, HAVE_BAND=have_band)
 
-#define prvar(name) print '(A, "=", A)',  'fn_'//#name, trim( fn_##name)
-#define prsuf(name) print '(A, "=", A)', 'suf_'//#name, trim(suf_##name)
+#define prvar(name)    print '(A, "=", A)',  'fn_'//#name, trim( fn_##name)
+#define prsuf(name)    print '(A, "=", A)', 'suf_'//#name, trim(suf_##name)
 #define prvas(name, n) print '(A, "=", ''"'', '//#n//'(A, " "), ''"'')',  \
      'fn_'//#name, ( trim( fn_##name(i)), i=1,##n )
-#define trbas(name) trim(basename(fn_##name))
-#define trbss(name, n) ( trbas(##name(i)), i=1,##n )
+#define prbas(name)    print '(A)',   trim(basename(fn_##name))
+#define prbss(name, n) print '(A)', ( trim(basename(fn_##name(i))), i=1,##n )
 
-     prvar(hist    ); prvar(contr   )
-     prvar(klist   ); prvar(doscontr)
-     prvar(tet     ); prvar(K1      )
-     prvar(ftet    ); prvar(optcond )
-     prvar(klist   ); prvar(wdos    )
-     prvar(kadd    ); prvar(outref  )
-     prvar(fklist  ); prvar(fermi   )
-     prvar(voe     ); prvar(ksym    )
-     prvar(map     ); prvar(outwop  )
+     prvar(hist  );   prvar(contr   )
+     prvar(klist );   prvar(doscontr)
+     prvar(tet   );   prvar(K1      )
+     prvar(ftet  );   prvar(optcond )
+     prvar(klist );   prvar(wdos    )
+     prvar(kadd  );   prvar(outref  )
+     prvar(fklist);   prvar(fermi   )
+     prvar(voe   );   prvar(ksym    )
+     prvar(map   );   prvar(outwop  )
 
-     if (runlapw1  )  prvar(energy  ); prsuf(new     )
-     if (runoptic  )  prvar(mommat  ); prsuf(sym     )
-     if (runoptic  )  prvar(inop    ); prsuf(old     )
-     if (need_ham  )  prvar(ham     ); prsuf(jnd     )
-     if (need_ham  )  prvar(hr      ); prsuf(rfd     )
+     if (runlapw1  )  prvar(energy  ); prsuf(new)
+     if (runoptic  )  prvar(mommat  ); prsuf(sym)
+     if (runoptic  )  prvar(inop    ); prsuf(old)
+     if (need_ham  )  prvar(ham     ); prsuf(jnd)
+     if (need_ham  )  prvar(hr      ); prsuf(rfd)
      if (convert_vr)  prvas(vk,  3  )
      if (convert_vr)  prvar(vr      )
      if (mixed_vr  )  prvas(vvk, 6  )
      if (mixed_vr  )  prvar(vvr     )
 
-     print '(A, ''="'', 100(A, '' ''))', 'scratchfiles', &
-          trbas(mommat),   trbas(ftet),  trbas(tet),     &
-          trbas(doscontr), trbas(map),   trbas(voe),     &
-          trbss(vvk, 6),   trbas(contr), trbas(K1),      &
-          '"'
+     print '("SCRATCH=", A)', trim(scratch%s)
+
+     print '(A, ''="'')', 'scratchfiles'
+     prbas(ftet)
+     prbas(tet)
+     prbas(map)
+     prbas(voe)
+     prbas(doscontr)
+     prbas(contr)
+     prbas(K1)
+     print '(''"'')'
   end if print_filenames
 
   print '("# Emax ΔE δ β = ", F7.3, 2F6.3, F8.3)', &
@@ -124,4 +130,4 @@ program check_inwop
        inw%optcond, inw%dos, inw%joint
 end program check_inwop
 
-!! Time-stamp: <2016-02-23 17:20:40 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-23 19:15:51 assman@faepop36.tu-graz.ac.at>
