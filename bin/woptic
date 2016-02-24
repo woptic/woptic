@@ -13,7 +13,7 @@ set -e
 
 # default parameters
 start=1
-init=3
+init=
 theta=0.5
 maxiterations=5
 
@@ -66,7 +66,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-50-gc3d3755$' |
+    r=$(echo '$version: v0.1.0-51-g9dcb066$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -248,12 +248,7 @@ echo -ne "          init  = $init\t\t"
 echo -e  "       SCRATCH  = $SCRATCH"
 echo
 
-if [[ $restart ]]; then
-    start=$restart
-    restart=$(( $restart - 1 ))
-    echo Restart from iteration $start …
-    unarchive $restart
-else
+if [[ $init ]]; then
    ## Initialize history
    ##
    ## Some files have to contain “dummy zeros”, some just have to
@@ -271,6 +266,14 @@ else
         [[ $mixed_vr   ]] && echo "0 0 0"   > $f
     done
     archive 0
+elif [[ $restart ]]; then
+    start=$restart
+    restart=$(( $restart - 1 ))
+    echo Restart from iteration $start …
+    unarchive $restart
+else                            # resume
+    last=$(unzip -qq -l $fn_hist '*.outputwop.*' | tail -1 | sed 's/.*\.//')
+    start=$(( $last + 1 ))
 fi
 
 for iter in $(seq $start $maxiterations)
@@ -412,4 +415,4 @@ if [[ ! $q ]]; then
 fi
 
 
-## Time-stamp: <2015-11-13 11:40:58 assman@faepop36.tu-graz.ac.at>
+## Time-stamp: <2016-02-24 09:20:04 assman@faepop36.tu-graz.ac.at>
