@@ -447,7 +447,7 @@ module maybebin
   logical, target :: binary
 
   interface maybin_read
-     module procedure myread_, myread_i, myread_r, myread_c, myread_a
+     module procedure myread_,  myread_i,  myread_r,  myread_c,  myread_a
   end interface maybin_read
 
   interface maybin_write
@@ -807,7 +807,7 @@ module woptic_io
   character(*),     parameter   ::  suf_voe='.voe'
   character(BUFSZ)              ::   fn_voe
   integer,          parameter   :: unit_optcond=51
-  character(*),     parameter   ::  suf_optcond='.optcondw'
+  character(*),     parameter   ::  suf_optcond='.optcond'
   character(BUFSZ)              ::   fn_optcond
   integer,          parameter   :: unit_optorb(6)=(/511,512,513,514,515,516/)
   character(*),     parameter   ::  suf_optorb(6)= &
@@ -815,16 +815,16 @@ module woptic_io
        &  suf_optcond//'_orbyy',suf_optcond//'_orbyz',suf_optcond//'_orbzz'/)
   character(BUFSZ)              ::   fn_optorb(6)
   integer,          parameter   :: unit_contr=52
-  character(*),     parameter   ::  suf_contr='.kcontribw'
+  character(*),     parameter   ::  suf_contr='.kcontrib'
   character(BUFSZ)              ::   fn_contr
   integer,          parameter   :: unit_wdos=53
   character(*),     parameter   ::  suf_wdos='.wdos'
   character(BUFSZ)              ::   fn_wdos
   integer,          parameter   :: unit_doscontr=54
-  character(*),     parameter   ::  suf_doscontr='.wdoskcontribw'
+  character(*),     parameter   ::  suf_doscontr='.kcontrdos'
   character(BUFSZ)              ::   fn_doscontr
   integer,          parameter   :: unit_K1=55
-  character(*),     parameter   ::  suf_K1='.K1w'
+  character(*),     parameter   ::  suf_K1='.kcontrK1'
   character(BUFSZ)              ::   fn_K1
   integer,          parameter   :: unit_selfE=56
   character(*),     parameter   ::  suf_selfE='.selfE'
@@ -983,4 +983,4 @@ contains
 end module woptic_io
 
 
-!! Time-stamp: <2016-02-23 12:05:55 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-26 10:41:55 assman@faepop36.tu-graz.ac.at>
