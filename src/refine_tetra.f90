@@ -12,6 +12,7 @@ PROGRAM refine_tmesh
   use structmod, only: struct_t, struct_read
   use kpoints,   only: count_kmesh_klist
   use clio,      only: fetcharg, argstr, croak
+  use maybebin,  only: maybin_open, maybin_read, maybin_write
   use woptic_io, only: set_casename, &
        unit_klist, unit_fklist, unit_tet,   unit_ftet, unit_contr, unit_voe,&
        unit_struct,unit_map,    unit_inwop, unit_kadd, unit_outref,         &
@@ -23,11 +24,11 @@ PROGRAM refine_tmesh
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-45-gf5b26c6$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-56-gf8181b3$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
-  integer   :: iarg, iv, iE, ik, jk, ir, it, jd1, tcount, kdiv, jsig
+  integer   :: iarg, iv, iE, ik, jk, it, jd1, tcount, kdiv, jsig
   integer   :: ndim(3), kdim(3)
   real(DPk) :: dE, dwei, emin, emax, rvec(3)
   
@@ -133,12 +134,12 @@ PROGRAM refine_tmesh
 
 !!!------------- Open files for reading         -----------------------------
   if (.not. init) then
-  open(unit_klist , FILE=fn_klist , STATUS='old')
-  open(unit_fklist, FILE=fn_fklist, STATUS='old')
-  open(unit_ftet  , FILE=fn_ftet  , STATUS='old')
-  open(unit_voe   , FILE=fn_voe   , STATUS='old')
-  open(unit_contr , FILE=fn_contr , STATUS='old')
-  open(unit_map   , FILE=fn_map   , STATUS='old')
+                 open(unit_klist , FILE=fn_klist , STATUS='old')
+     call maybin_open(unit_contr , FILE=fn_contr , STATUS='old')
+     call maybin_open(unit_fklist, FILE=fn_fklist, STATUS='old')
+     call maybin_open(unit_ftet  , FILE=fn_ftet  , STATUS='old')
+     call maybin_open(unit_voe   , FILE=fn_voe   , STATUS='old')
+     call maybin_open(unit_map   , FILE=fn_map   , STATUS='old')
   end if
   open(unit_struct, FILE=fn_struct, STATUS='old')
   open(unit_inwop , FILE=fn_inwop , STATUS='old')
@@ -189,11 +190,13 @@ PROGRAM refine_tmesh
      nk = 0
   else
      !standard run: load k-mesh
-     read(unit_ftet,*)nt,ndim
-     allocate(tetra(nt,10),wtetra(nt),newk(48*nt,3),newtetra(8*nt,10),newwtetra(8*nt),trefine(nt))
-     allocate(tvariance(nt),tclass(nt),newtclass(8*nt))
+     call maybin_read(unit_ftet, nt, ndim)
+     allocate( tetra(  nt, 10),    wtetra(  nt), newk(48*nt,3), &
+          & newtetra(8*nt, 10), newwtetra(8*nt), trefine(nt)    )
+     allocate(tvariance(nt), tclass(nt), newtclass(8*nt))
      do it=1,nt
-        read(unit_ftet,*)tetra(it,:),wtetra(it),tclass(it)
+        call maybin_read(unit_ftet, &
+             tetra(it,:), tclass(it), wtetra(it))
      enddo
      close(unit_ftet)
 
@@ -237,12 +240,12 @@ PROGRAM refine_tmesh
      enddo
 
      !load mesh information
-     read(unit_voe,*)nvoe
+     call maybin_read(unit_voe, nvoe)
      allocate(VOE(48*nt,300,2),VOEidx(nvoe + 48*nt,3))
      VOE = 0
      VOEidx = 0
      do iv=1,nvoe
-        read(unit_voe,*)VOEidx(iv,:)
+        call maybin_read(unit_voe, VOEidx(iv,:))
         nev = 1
         do while (VOE(VOEidx(iv,1),nev,1).ne.0)
            nev = nev + 1
@@ -267,26 +270,24 @@ PROGRAM refine_tmesh
      kcontribw = 1d0
   else
      write(unit_outref,*)"standard mode"
-     read(unit_contr,*)idum,NE,nsig
+     call maybin_read(unit_contr, idum, NE, nsig)
      if (idum.ne.nk) call croak("number of k-points inconsistent, &
           &check .kcontribw and .klist")
 
      allocate(kcontribw(nk,0:NE,nsig),tmp(nsig))
      do jk=1,nk
-        read(unit_contr,3000)idum, tmp
+        call maybin_read(unit_contr, '(I8,6E20.12)', (/ idum /), tmp)
         do jsig=1,nsig
            kcontribw(jk,0,jsig) = tmp(jsig)  
         enddo
         do iE=1,NE
-           read(unit_contr,3001)tmp(1:nsig)
+           call maybin_read(unit_contr, '(6E20.12)', tmp(1:nsig))
            do jsig=1,nsig
               kcontribw(jk,iE,jsig) = tmp(jsig)  
            enddo
         enddo
      enddo
      close(unit_contr)
-3000 FORMAT(I8,6E20.12)
-3001 FORMAT(6E20.12)
   endif
 
   if (.not. init) then
@@ -302,7 +303,7 @@ PROGRAM refine_tmesh
      kfulltmp = kfull
 
      do jk=1,nkfull
-        read(unit_map,*)map(jk,:)
+        call maybin_read(unit_map, map(jk,:))
      enddo
      close(unit_map)
 
@@ -319,23 +320,23 @@ PROGRAM refine_tmesh
   endif
 
 !!!------------- Open files for writing         -----------------------------
-  open(unit_klist , FILE=trim(fn_klist )//suf_rfd, STATUS='replace')
-  open(unit_fklist, FILE=trim(fn_fklist)//suf_rfd, STATUS='replace')
-  open(unit_tet   , FILE=trim(fn_tet   )//suf_rfd, STATUS='replace')
-  open(unit_ftet  , FILE=trim(fn_ftet  )//suf_rfd, STATUS='replace')
-  open(unit_voe   , FILE=trim(fn_voe   )//suf_rfd, STATUS='replace')
-  open(unit_map   , FILE=trim(fn_map   )//suf_rfd, STATUS='replace')
-  open(unit_kadd  , FILE=trim(fn_kadd  ),          STATUS='replace')
+  open(unit_klist ,           FILE=trim(fn_klist )//suf_rfd,STATUS='replace')
+  open(unit_fklist,           FILE=trim(fn_fklist)//suf_rfd,STATUS='replace')
+  call maybin_open(unit_tet , FILE=trim(fn_tet )  //suf_rfd,STATUS='replace')
+  call maybin_open(unit_ftet, FILE=trim(fn_ftet)  //suf_rfd,STATUS='replace')
+  call maybin_open(unit_voe , FILE=trim(fn_voe )  //suf_rfd,STATUS='replace')
+  call maybin_open(unit_map , FILE=trim(fn_map )  //suf_rfd,STATUS='replace')
+  open(unit_kadd  ,           FILE=trim(fn_kadd ),          STATUS='replace')
 
 !!!------------- Write updated files            -----------------------------
-  write(unit_voe,*) nvoe
+  call maybin_write(unit_voe, nvoe)
   do iv=1,nvoe
-     write(unit_voe,*)VOEidx(iv,:)
+     call maybin_write(unit_voe, VOEidx(iv,:))
   enddo
   close(unit_voe)
 
   !compute the shapes of the tetrahedra
-  call compute_shapeparameters(nkfull+nnewk, tcount, newk(1:nkfull+nnewk,:), &
+  call compute_shapeparameters(nkfull+nnewk, tcount, newk(1:nkfull+nnewk,:),&
        &                       newtetra(1:tcount,:), ndim)
 
   do jk=1,nkfull+nnewk
@@ -356,9 +357,10 @@ PROGRAM refine_tmesh
   write(unit_fklist,1521)
   close(unit_fklist)
 
-  write(unit_ftet,*) tcount,ndim 
+  call maybin_write(unit_ftet, tcount, ndim)
   do it=1,tcount
-     write(unit_ftet,"(10I10,E20.12,1I10)")(newtetra(it,ir),ir=1,10),newwtetra(it),newtclass(it)
+     call maybin_write(unit_ftet, "(10I10,E20.12,1I10)", &
+          newtetra(it,:), newwtetra(it), newtclass(it))
   enddo
   close(unit_ftet)
 
@@ -413,7 +415,7 @@ PROGRAM refine_tmesh
 
   !write-out map
   do jk=1,nkfull+nnewk
-     write(unit_map,*)newmap(jk,:)
+     call maybin_write(unit_map, newmap(jk,:))
   enddo
   close(unit_map)
 
@@ -435,9 +437,10 @@ PROGRAM refine_tmesh
   write(unit_kadd,1521)
   close(unit_kadd)
 
-  write(unit_tet,*) nnewt,ndim
+  call maybin_write(unit_tet, nnewt, ndim)
   do it=1,nnewt
-     write(unit_tet,"(10I10,E20.12)")(newtetra(it,ir),ir=1,10),newwtetra(it) 
+     call maybin_write(unit_tet, "(10I10,E20.12)", &
+          newtetra(it,:),newwtetra(it))
   enddo
   close(unit_tet)
 
@@ -1288,4 +1291,4 @@ SUBROUTINE compute_shapeparameters(nk,nt,k,tetra,ndim)
 END SUBROUTINE compute_shapeparameters
 
 
-!! Time-stamp: <2016-02-15 18:35:46 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-26 18:15:46 assman@faepop36.tu-graz.ac.at>

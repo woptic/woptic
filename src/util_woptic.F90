@@ -584,62 +584,6 @@ contains
     end if
   end subroutine myread_
 
-  subroutine myread_i(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    integer,      intent(out)           :: data(:)
-
-    if (.not. formatted(unit)) then
-       read(unit) data
-    else if (present(fmt)) then
-       read(unit, fmt) data(:)
-    else
-       read(unit, *)   data(:)
-    end if
-  end subroutine myread_i
-
-  subroutine myread_r(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    real(DPk),    intent(out)           :: data(:)
-
-    if (.not. formatted(unit)) then
-       read(unit) data
-    else if (present(fmt)) then
-       read(unit, fmt) data(:)
-    else
-       read(unit, *)   data(:)
-    end if
-  end subroutine myread_r
-
-  subroutine myread_c(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    complex(DPk), intent(out)           :: data(:)
-
-    if (.not. formatted(unit)) then
-       read(unit) data
-    else if (present(fmt)) then
-       read(unit, fmt) data(:)
-    else
-       read(unit, *)   data(:)
-    end if
-  end subroutine myread_c
-
-  subroutine myread_a(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    character(*), intent(out)           :: data
-
-    if (.not. formatted(unit)) then
-       read(unit) data
-    else if (present(fmt)) then
-       read(unit, fmt) data
-    else
-       read(unit, *)   data
-    end if
-  end subroutine myread_a
-
   subroutine mywrite_(unit)
     integer,      intent(in)            :: unit
 
@@ -650,60 +594,101 @@ contains
     end if
   end subroutine mywrite_
 
-  subroutine mywrite_i(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    integer,      intent(in)            :: data(:)
-
-    if (.not. formatted(unit)) then
-       write(unit) data
-    else if (present(fmt)) then
-       write(unit, fmt) data(:)
-    else
-       write(unit, *)   data(:)
+#define MYREAD1(T, D) (unit, data, fmt)            ;\
+    integer,      intent(in)            :: unit    ;\
+    character(*), intent(in),  optional :: fmt     ;\
+    T,            intent(out)           :: data D  ;\
+                                                    \
+    if (.not. formatted(unit)) then                ;\
+       read(unit) data                             ;\
+    else if (present(fmt)) then                    ;\
+       read(unit, fmt) data                        ;\
+    else                                           ;\
+       read(unit, *)   data                        ;\
     end if
+
+#define MYWRITE1(T, D) (unit, data, fmt)           ;\
+    integer,      intent(in)            :: unit    ;\
+    character(*), intent(in),  optional :: fmt     ;\
+    T,            intent(in)            :: data D  ;\
+                                                    \
+    if (.not. formatted(unit)) then                ;\
+       write(unit) data                            ;\
+    else if (present(fmt)) then                    ;\
+       write(unit, fmt) data                       ;\
+    else                                           ;\
+       write(unit, *)   data                       ;\
+    end if
+
+#define MYREAD2(T1, D1, T2, D2) (unit, d1, d2, fmt);\
+    integer,      intent(in)            :: unit    ;\
+    character(*), intent(in),  optional :: fmt     ;\
+    T1,           intent(out)           :: a D1    ;\
+    T2,           intent(out)           :: b D2    ;\
+                                                    \
+    if (.not. formatted(unit)) then                ;\
+       read(unit) data                             ;\
+    else if (present(fmt)) then                    ;\
+       read(unit, fmt) a, b                        ;\
+    else                                           ;\
+       read(unit, *)   a, b                        ;\
+    end if
+
+#define MYWRITE1(T, D) (unit, data, fmt)           ;\
+    integer,      intent(in)            :: unit    ;\
+    character(*), intent(in),  optional :: fmt     ;\
+    T,            intent(in)            :: data D  ;\
+                                                    \
+    if (.not. formatted(unit)) then                ;\
+       write(unit) data                            ;\
+    else if (present(fmt)) then                    ;\
+       write(unit, fmt) data                       ;\
+    else                                           ;\
+       write(unit, *)   data                       ;\
+    end if
+
+#define MYWRITE2(T1, D1, T2, D2) (unit, d1, d2, fmt);\
+    integer,      intent(in)            :: unit     ;\
+    character(*), intent(in),  optional :: fmt      ;\
+    T1,           intent(in)            :: a D1     ;\
+    T2,           intent(in)            :: b D2     ;\
+                                                     \
+    if (.not. formatted(unit)) then                 ;\
+       write(unit) data                             ;\
+    else if (present(fmt)) then                     ;\
+       write(unit, fmt) a, b                        ;\
+    else                                            ;\
+       write(unit, *)   a, b                        ;\
+    end if
+
+  subroutine myread_i  MYREAD1 (integer, (:))
+  end subroutine myread_i
+  subroutine mywrite_i MYWRITE1(integer, (:))
   end subroutine mywrite_i
 
-  subroutine mywrite_r(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    real(DPk),    intent(in)            :: data(:)
+  subroutine myread_n  MYREAD1 (integer, )
+  end subroutine myread_n
+  subroutine mywrite_n MYWRITE1(integer, )
+  end subroutine mywrite_n
 
-    if (.not. formatted(unit)) then
-       write(unit) data
-    else if (present(fmt)) then
-       write(unit, fmt) data(:)
-    else
-       write(unit, *)   data(:)
-    end if
+  subroutine myread_nn  MYREAD2 (integer, , integer, )
+  end subroutine myread_nn
+  subroutine mywrite_nn MYWRITE2(integer, , integer, )
+  end subroutine mywrite_nn
+
+  subroutine myread_r  MYREAD1 (real(DPk), (:))
+  end subroutine myread_r
+  subroutine mywrite_r MYWRITE1(real(DPk), (:))
   end subroutine mywrite_r
 
-  subroutine mywrite_c(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    complex(DPk), intent(in)            :: data(:)
-
-    if (.not. formatted(unit)) then
-       write(unit) data
-    else if (present(fmt)) then
-       write(unit, fmt) data(:)
-    else
-       write(unit, *)   data(:)
-    end if
+  subroutine myread_c  MYREAD1 (complex(DPk), (:))
+  end subroutine myread_c
+  subroutine mywrite_c MYWRITE1(complex(DPk), (:))
   end subroutine mywrite_c
 
-  subroutine mywrite_a(unit, data, fmt)
-    integer,      intent(in)            :: unit
-    character(*), intent(in),  optional :: fmt
-    character(*), intent(in)            :: data
-
-    if (.not. formatted(unit)) then
-       write(unit) data
-    else if (present(fmt)) then
-       write(unit, fmt) data
-    else
-       write(unit, *)   data
-    end if
+  subroutine myread_a  MYREAD1 (character(*), )
+  end subroutine myread_a
+  subroutine mywrite_a MYWRITE1(character(*), )
   end subroutine mywrite_a
 
 end module maybebin
@@ -984,4 +969,4 @@ contains
 end module woptic_io
 
 
-!! Time-stamp: <2016-02-26 16:48:48 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-26 18:39:12 assman@faepop36.tu-graz.ac.at>

@@ -38,7 +38,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-45-gf5b26c6$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-56-gf8181b3$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -227,25 +227,25 @@ program woptic_main
 
 !!!------------- Open files for reading         -----------------------------
   call inwop_read(fn_inwop, inw)
-                        open(unit_struct,   FILE=fn_struct,   STATUS='old')
-                        open(unit_tet,      FILE=fn_tet,      STATUS='old')
-                        open(unit_contr,    FILE=fn_contr,    STATUS='old')
-                        open(unit_K1,       FILE=fn_K1,       STATUS='old')
-                        open(unit_klist,    FILE=fn_klist,    STATUS='old')
-  if (inw%DOS)          open(unit_doscontr, FILE=fn_doscontr, STATUS='old')
-  if (inw%read_energy)  open(unit_energy,   FILE=fn_energy,   STATUS='old')
-  if (inw%read_energy)  open(unit_fermi,    FILE=fn_fermi,    STATUS='old')
-  if (inw%read_mommat)  open(unit_mommat,   FILE=fn_mommat,   STATUS='old')
-  if (inw%read_ham)     open(unit_ham,      FILE=fn_ham,      STATUS='old')
-  if (inw%selfE)        open(unit_selfE,    FILE=fn_selfE,    STATUS='old')
-  if (inw%wfrot)        open(unit_wfrot,    FILE=fn_wfrot,    STATUS='old')
-  if (inw%orig_umatrix) open(unit_chk,      FILE=fn_chk,      STATUS='old', &
-       &                                    FORM='unformatted')
-  if (inw%intrahop)     open(unit_intrahop, FILE=fn_intrahop, STATUS='old')
+                          open(unit_struct,   FILE=fn_struct,   STATUS='old')
+              call maybin_open(unit_tet,      FILE=fn_tet,      STATUS='old')
+              call maybin_open(unit_contr,    FILE=fn_contr,    STATUS='old')
+              call maybin_open(unit_K1,       FILE=fn_K1,       STATUS='old')
+                          open(unit_klist,    FILE=fn_klist,    STATUS='old')
+  if (inw%DOS)call maybin_open(unit_doscontr, FILE=fn_doscontr, STATUS='old')
+  if (inw%read_energy)    open(unit_energy,   FILE=fn_energy,   STATUS='old')
+  if (inw%read_energy)    open(unit_fermi,    FILE=fn_fermi,    STATUS='old')
+  if (inw%read_mommat)    open(unit_mommat,   FILE=fn_mommat,   STATUS='old')
+  if (inw%read_ham)       open(unit_ham,      FILE=fn_ham,      STATUS='old')
+  if (inw%selfE)          open(unit_selfE,    FILE=fn_selfE,    STATUS='old')
+  if (inw%wfrot)          open(unit_wfrot,    FILE=fn_wfrot,    STATUS='old')
+  if (inw%orig_umatrix)   open(unit_chk,      FILE=fn_chk,    STATUS='old', &
+       &                                      FORM='unformatted')
+  if (inw%intrahop)       open(unit_intrahop, FILE=fn_intrahop, STATUS='old')
   if (inw%Peierls) then
-                        open(unit_fklist,   FILE=fn_fklist,   STATUS='old')
-                        open(unit_ftet,     FILE=fn_ftet,     STATUS='old')
-                        open(unit_map,      FILE=fn_map,      STATUS='old')
+                          open(unit_fklist,   FILE=fn_fklist,   STATUS='old')
+              call maybin_open(unit_ftet,     FILE=fn_ftet,     STATUS='old')
+              call maybin_open(unit_map,      FILE=fn_map,      STATUS='old')
   end if
   if (inw%read_vk) then
      do i=1,size(unit_vk)
@@ -616,22 +616,22 @@ program woptic_main
 !!!------------- Read old k-resolved contributions --------------------------
   Nkold = 0; DCcond = 0; K1 = 0
   if (.not. have_band) then
-     read(unit_contr,*) Nkold
+     call maybin_read(unit_contr, Nkold)
   end if
   do jk=1,Nkold
-     read(unit_contr,fmt_K1DC) &
-          i, ( DCcond(ij(jj,1), ij(jj,2), jk), jj=1,size(ij,1) )
+     call maybin_read(unit_contr, fmt_K1DC, &
+          i, (/( DCcond(ij(jj,1), ij(jj,2), jk), jj=1,size(ij,1) )/))
 
-     read(unit_K1,fmt_K1DC) &
-          i, ( K1(ij(jj,1),ij(jj,2), jk), jj=1,size(ij,1) )
+     call maybin_read(unit_K1,fmt_K1DC, &
+          i, (/( K1(ij(jj,1),ij(jj,2), jk), jj=1,size(ij,1) )/))
 
      do jE=1,NE
-        read(unit_contr,fmt_contr) &
-             ( optcond(ij(jj,1),ij(jj,2), jE, jk), jj=1,size(ij,1) )
+        call maybin_read(unit_contr,fmt_contr, &
+             (/( optcond(ij(jj,1),ij(jj,2), jE, jk), jj=1,size(ij,1) )/))
      end do
      if (inw%DOS) then
         do jw=wmin,wmax
-           read(unit_doscontr,fmt_doscontr) DOS_orb(:, jw, jk)
+           call maybin_read(unit_doscontr,fmt_doscontr, DOS_orb(:, jw, jk))
         end do
      end if
   end do
@@ -663,8 +663,8 @@ program woptic_main
         j = ij(jj,2)
 
         compute_VA_wk: do jw = wmin,wmax
-           VA1(:,:,jw) = matmul(Hkd(WFmin:WFmax,WFmin:WFmax,i,jk), Awk(:,:,jw))
-           VA2(:,:,jw) = matmul(Hkd(WFmin:WFmax,WFmin:WFmax,j,jk), Awk(:,:,jw))
+           VA1(:,:,jw)=matmul(Hkd(WFmin:WFmax,WFmin:WFmax,i,jk), Awk(:,:,jw))
+           VA2(:,:,jw)=matmul(Hkd(WFmin:WFmax,WFmin:WFmax,j,jk), Awk(:,:,jw))
         end do compute_VA_wk
 
         get_VAV_wk: if (inw%read_vvk) then
@@ -808,34 +808,35 @@ program woptic_main
 
 
 !!!------------- Open files for writing         -----------------------------
-  open(unit_optcond,   FILE=fn_optcond,                  STATUS='replace')
-  open(unit_contr,     FILE=trim(fn_contr    )//suf_new, STATUS='replace')
-  open(unit_K1,        FILE=trim(fn_K1       )//suf_new, STATUS='replace')
+  open(unit_optcond,           FILE=fn_optcond,             STATUS='replace')
+  call maybin_open(unit_contr, FILE=trim(fn_contr)//suf_new,STATUS='replace')
+  call maybin_open(unit_K1,    FILE=trim(fn_K1   )//suf_new,STATUS='replace')
   if (inw%DOS) then
-  open(unit_wdos,      FILE=fn_wdos,                     STATUS='replace')
-  open(unit_doscontr,  FILE=trim(fn_doscontr )//suf_new, STATUS='replace')
+     open(unit_wdos,           FILE=fn_wdos,                STATUS='replace')
+     call maybin_open(unit_doscontr, &
+                           FILE=trim(fn_doscontr )//suf_new,STATUS='replace')
   end if
   if (inw%orbresolv) then; do i=1,size(unit_optorb)
-  open(unit_optorb(i), FILE=fn_optorb(i),                STATUS='replace')
+     open(unit_optorb(i),      FILE=fn_optorb(i),           STATUS='replace')
   end do; end if
 
-  write(unit_contr,*) Nk, NE, size(ij,1), convfac
+  call maybin_write(unit_contr, Nk, NE, size(ij,1), convfac)
 
   do jk=1,Nk
-     write(unit_contr, fmt_K1DC) &
-          jk, ( DCcond(ij(jj,1), ij(jj,2), jk), jj=1,size(ij,1) )
+     call maybin_write(unit_contr, fmt_K1DC, &
+          jk, (/( DCcond(ij(jj,1), ij(jj,2), jk), jj=1,size(ij,1) )/))
 
-     write(unit_K1, fmt_K1DC) &
-          jk, ( K1(ij(jj,1),ij(jj,2), jk), jj=1,size(ij,1) )
+     call maybin_write(unit_K1, fmt_K1DC, &
+          jk, (/( K1(ij(jj,1),ij(jj,2), jk), jj=1,size(ij,1) )/))
 
      do jE=1,NE
-        write(unit_contr, fmt_contr) &
-             ( optcond(ij(jj,1),ij(jj,2), jE, jk), jj=1,size(ij,1))
+        call maybin_write(unit_contr, fmt_contr, &
+             (/( optcond(ij(jj,1),ij(jj,2), jE, jk), jj=1,size(ij,1) )/))
      end do
 
      if (inw%DOS) then
         do jw=wmin,wmax
-           write(unit_doscontr, fmt_doscontr) DOS_orb(:, jw, jk)
+           call maybin_write(unit_doscontr, fmt_doscontr, DOS_orb(:, jw, jk))
         end do
      end if
   end do
@@ -1058,7 +1059,7 @@ program woptic_main
      write(unit_wdos,*)"# spectral function in eV^-1"
      write(unit_wdos,*)"# ω total orbital1 orbital2 …"
      do jw=wmin,wmax
-        write(unit_wdos,'(200F13.8)') inw%w(jw), DOS_tot(jw), DOS_tot_orb(:,jw)
+        write(unit_wdos,'(200F13.8)')inw%w(jw), DOS_tot(jw), DOS_tot_orb(:,jw)
      end do
   end if
   close(unit_wdos)
@@ -1106,15 +1107,15 @@ subroutine get_hkderiv()
 
   Hkdfull = 0; mapcount = 0
 
-  read(unit_ftet,*) Ntfull
+  call maybin_read(unit_ftet, Ntfull)
   allocate(tetrafull(Ntfull,10))
   do jt=1,Ntfull
-     read(unit_ftet,*) tetrafull(jt,:),mxr
+     call maybin_read(unit_ftet, tetrafull(jt,:), mxr)
   end do
   close(unit_ftet)
 
   do jk=1,Nkfull
-     read(unit_map,*) map(:,jk)
+     call maybin_read(unit_map, map(:,jk))
   end do
   close(unit_map)
 
@@ -1381,7 +1382,7 @@ subroutine read_tetra(lun, tet, weigh)
 
   allocate(tet(10,Nt), weigh(Nt))
   do jt=1,Nt
-     read(lun,*) tet(:,jt), weigh(jt)
+     call maybin_read(lun, tet(:,jt), weigh(jt))
   end do
 end subroutine read_tetra
 
@@ -1674,4 +1675,4 @@ end subroutine init_random_seed
 !! End:
 !!\---
 !!
-!! Time-stamp: <2016-02-15 18:34:47 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-02-25 16:29:16 assman@faepop36.tu-graz.ac.at>
