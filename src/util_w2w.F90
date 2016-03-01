@@ -1059,6 +1059,7 @@ contains
           else
              call croak("FETCHENV: failed to get environment variable `" // &
                   &     name // "'s length: " // trim(string(s)))
+          end if
        end if
     end if
 
