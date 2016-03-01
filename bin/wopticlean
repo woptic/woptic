@@ -69,15 +69,16 @@ my @extensions = (@sic, @ext_only, @andfull, @andnew, @andold, @andrefined);
 
 sub help    { pod2usage(0) }
 sub man     { pod2usage(-verbose=>2, exitval=>0, -noperldoc=>1) }
-sub version { '$version: v0.1.0-33-g51bf2a1$/;
-              print "wopticlean $1\n"' }
+sub version { q($version: v0.1.0-33-g51bf2a1$) =~ /version: *([\w\d.-]+)/;
+              print "wopticlean $1\n";
+              exit; }
 
 my ($verbose, $recursive, $mrproper, $recon, %dirs);
 
 GetOptions('help|h'      => \&help,
            'man|H'       => \&man,
-           'verbose|V'   => \$verbose,
-           'version|v'   => \&version,#
+           'verbose|v'   => \$verbose,
+           'version|V'   => \&version,
            'recursive|r' => \$recursive,
            'mrproper|A'  => \$mrproper,
            'recon|n'     => \$recon,
@@ -137,6 +138,7 @@ wopticlean [OPTIONS] [DIRECTORY ...]
 
    -h, --help        brief help
    -H, --man         full documentation
+   -V, --version     print version information
    -v, --verbose     print file names as they are deleted
    -r, --recursive   recursively operate on all (!) subdirectories
    -A, --mrproper    clean more thoroughly
@@ -157,4 +159,4 @@ You are  advised to do a  dry run (`-n') first,  especially when using
 =cut
 
 
-## Time-stamp: <2016-01-29 16:56:31 assman@faepop36.tu-graz.ac.at>
+## Time-stamp: <2016-03-01 10:12:31 assman@faepop36.tu-graz.ac.at>

@@ -21,7 +21,7 @@ LDFLAGS ?= -L$(MKLROOT)/lib/intel64
 LDLIBS 	?= -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -openmp -lpthread
 
 ifneq "$(findstring gfortran,$(FC))" ""
-    FFLAGS += -Wall -ffree-form -g -pedantic
+    FFLAGS += -Wall -ffree-form -g -pedantic -ffree-line-length-0
     FFLAGS += -Wcharacter-truncation -Wextra #-Wconversion
 else ifneq "$(findstring ifort,$(FC))" ""
     FFLAGS += -warn all -traceback -g -ipo
@@ -37,4 +37,4 @@ endif
 ## End:
 ##\---
 ##
-## Time-stamp: <2015-09-23 15:48:54 assman@faepop06.tu-graz.ac.at>
+## Time-stamp: <2016-02-26 17:31:19 assman@faepop36.tu-graz.ac.at>
