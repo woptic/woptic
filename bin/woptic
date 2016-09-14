@@ -101,7 +101,7 @@ archive () {
 
         [[ -d $scratch ]] || mkdir $v $scratch
         for f in $scratchfiles; do
-            ln $v -fs $SCRATCH$f $scratch/$f.$1
+            ln $v -rfs $SCRATCH$f $scratch/$f.$1
             tozip+=" $scratch/$f.$1"
         done
         zip -qg0 $v $fn_hist $tozip # -0: store only
@@ -297,6 +297,7 @@ if [[ $init ]]; then
     for f in $fn_vvk; do
         [[ $mixed_vr   ]] && echo "0 0 0"   > $f
     done
+
     archive 0
 elif [[ $restart ]]; then
     start=$restart
@@ -332,7 +333,7 @@ do
         w refine_tetra -th $theta $inter $file
         nk=$(perl -ne '/^END/ and print($.-1), exit' $fn_kadd)
 
-        fgrep "estimator =" $fn_outref
+        fgrep --text "estimator =" $fn_outref
     fi
 
     # if there was no error, move updated files over old ones …
@@ -396,7 +397,7 @@ do
         fi
 
         if [[ $iter -ne 1 && $runlapw1 ]]; then
-            natoms=$(grep "elements:" $fn_outwop | cut -d: -f2)
+            natoms=$(fgrep --text "elements:" $fn_outwop | cut -d: -f2)
 
             tail -n +$(( 2*$natoms+1 )) $fn_energy >>$fn_energy$suf_old
             mv $v $fn_energy$suf_old $fn_energy
@@ -435,7 +436,7 @@ do
 
     [[ $nosym ]] && ln -sf $v $fn_struct$suf_sym $fn_struct
 
-    fgrep $fn_outwop -e "sumrules" -e "dc cond" -e "thermopower"
+    fgrep --text $fn_outwop -e "sumrules" -e "dc cond" -e "thermopower"
 
     # store history
     archive $iter
@@ -447,4 +448,4 @@ if [[ ! $q ]]; then
 fi
 
 
-## Time-stamp: <2016-02-24 09:20:04 assman@faepop36.tu-graz.ac.at>
+## Time-stamp: <2016-09-14 15:39:36 assman@faepop71.tu-graz.ac.at>
