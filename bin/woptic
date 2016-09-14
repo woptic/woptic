@@ -14,6 +14,7 @@ set -e
 # default parameters
 start=1
 init=
+definit=3
 theta=0.5
 maxiterations=5
 fullarch=yes
@@ -52,7 +53,7 @@ OPTIONS:
  --theta Θ      change refinement “harshness”
                 (0 [uniform] … 1 [most adaptive]; default: $theta)
  --inter        focus refinement on higher energies (usually inter-orbital)
- --init         initial refinement steps (default: $init)
+ --init         initial refinement steps (default: $definit)
  --nosym        do not use symmetry operations
  --band         use ‘case.klist_band’
   -p            use parallel lapw1, optic
@@ -280,6 +281,10 @@ echo -ne "          init  = $init\t\t"
 echo -e  "       SCRATCH  = $SCRATCH"
 echo
 
+if [[ ! $restart && ! -s $fn_hist ]]; then
+    init=$definit
+fi
+
 if [[ $init ]]; then
    ## Initialize history
    ##
@@ -448,4 +453,4 @@ if [[ ! $q ]]; then
 fi
 
 
-## Time-stamp: <2016-09-14 15:39:36 assman@faepop71.tu-graz.ac.at>
+## Time-stamp: <2016-09-14 16:58:43 assman@faepop71.tu-graz.ac.at>
