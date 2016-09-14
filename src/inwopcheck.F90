@@ -85,9 +85,9 @@ program check_inwop
      if (runoptic  ) print fmt_var, 'fn_inop'  ,   trim(fn_inop    )
      if (need_ham  ) print fmt_var, 'fn_ham'   ,   trim(fn_ham     )
      if (need_ham  ) print fmt_var, 'fn_hr'    ,   trim(fn_hr      )
-     if (convert_vr) print fmt_var, 'fn_vk'    , ( trim(fn_vk (i)  ), i=1,3 )
+     if (convert_vr) print fmt_mul(3), 'fn_vk' , ( trim(fn_vk (i)  ), i=1,3 )
      if (convert_vr) print fmt_var, 'fn_vr'    ,   trim(fn_vr      )
-     if (mixed_vr  ) print fmt_var, 'fn_vvk'   , ( trim(fn_vvk(i)  ), i=1,6 )
+     if (mixed_vr  ) print fmt_mul(6), 'fn_vvk', ( trim(fn_vvk(i)  ), i=1,6 )
      if (mixed_vr  ) print fmt_var, 'fn_vvr'   ,   trim(fn_vvr     )
 
      print                 fmt_var, 'fn_hist'    , trim(fn_hist    )
@@ -117,15 +117,10 @@ program check_inwop
 
      print                 fmt_var, 'SCRATCH'    , trim(scratch%s  )
 
-     print '(A, ''="'')', 'scratchfiles'
-     print '(A)', trim(basename(fn_ftet    ))
-     print '(A)', trim(basename(fn_tet     ))
-     print '(A)', trim(basename(fn_map     ))
-     print '(A)', trim(basename(fn_voe     ))
-     print '(A)', trim(basename(fn_doscontr))
-     print '(A)', trim(basename(fn_contr   ))
-     print '(A)', trim(basename(fn_K1      ))
-     print '(''"'')'
+     print fmt_mul(7), 'scratchfiles', trim(basename(fn_K1 )), &
+          trim(basename(fn_ftet    )), trim(basename(fn_tet)), &
+          trim(basename(fn_contr   )), trim(basename(fn_voe)), &
+          trim(basename(fn_doscontr)), trim(basename(fn_map))
   end if print_filenames
 
   print '("# Emax ΔE δ β = ", F7.3, 2F6.3, F8.3)', &
@@ -137,6 +132,16 @@ program check_inwop
        inw%wfrot, inw%orig_umatrix
   print '("# compute opt. cond.?, DOS?, joint DOS?", 3L2)', &
        inw%optcond, inw%dos, inw%joint
+
+contains
+  pure character(len=30) function fmt_mul(N)
+    use util, only: string
+    implicit none
+
+    integer, intent(in) :: N
+
+    fmt_mul = '(A, "=''", '//trim(string(N))//'(/A), /"''")'
+  end function fmt_mul
 end program check_inwop
 
-!! Time-stamp: <2016-02-26 16:39:32 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-09-14 14:33:19 assman@faepop71.tu-graz.ac.at>
