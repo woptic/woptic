@@ -143,5 +143,3 @@ contains
     fmt_mul = '(A, "=''", '//trim(string(N))//'(/A), /"''")'
   end function fmt_mul
 end program check_inwop
-
-!! Time-stamp: <2016-09-14 14:33:19 assman@faepop71.tu-graz.ac.at>

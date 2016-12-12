@@ -23,7 +23,7 @@ program combine_hamfiles
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-45-gf5b26c6$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-67-gc8703e0$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer,          parameter :: unit_hamold=121, unit_momold=13
@@ -208,6 +208,3 @@ contains
     enddo
   end subroutine cpk_mom
 end program combine_hamfiles
-
-
-!! Time-stamp: <2016-02-15 20:16:55 assman@faepop36.tu-graz.ac.at>

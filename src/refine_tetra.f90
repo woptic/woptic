@@ -23,7 +23,7 @@ PROGRAM refine_tmesh
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-45-gf5b26c6$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-67-gc8703e0$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
@@ -1286,6 +1286,3 @@ SUBROUTINE compute_shapeparameters(nk,nt,k,tetra,ndim)
   write(unit_outref,*)"  there are ",counter," different shapes"
   write(unit_outref,*)"  qualities ",quals(1:counter)
 END SUBROUTINE compute_shapeparameters
-
-
-!! Time-stamp: <2016-02-15 18:35:46 assman@faepop36.tu-graz.ac.at>

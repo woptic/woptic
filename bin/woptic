@@ -69,7 +69,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-52-g304b76a$' |
+    r=$(echo '$version: v0.1.0-67-gc8703e0$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -451,6 +451,3 @@ if [[ ! $q ]]; then
     echo
     echo "+++ woptic done +++"
 fi
-
-
-## Time-stamp: <2016-09-14 16:58:43 assman@faepop71.tu-graz.ac.at>

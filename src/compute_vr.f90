@@ -35,7 +35,7 @@ program compute_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-33-g51bf2a1$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-67-gc8703e0$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
 !!! Formats for log file
@@ -557,5 +557,3 @@ contains
     call zhemm('L','U', M,N, one, he,M, ge,M, zero, hemul,M)
   end function hemul
 end program compute_vr
-
-!! Time-stamp: <2016-01-29 17:02:57 assman@faepop36.tu-graz.ac.at>
