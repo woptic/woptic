@@ -8,14 +8,16 @@
 
 program check_inwop
   use woptic,    only: inwop_t, inwop_read
-  use woptic_io, only: set_casename, fn_hist, fn_klist, fn_tet, fn_ftet,  &
+  use woptic_io, only: set_casename, scratch,                             &
        fn_klist, fn_fklist, fn_voe, fn_map, fn_contr, fn_doscontr, fn_K1, &
        fn_energy, fn_mommat, fn_ham, fn_vk, fn_vvk, fn_optcond, fn_wdos,  &
        fn_outref, fn_hr, fn_vr, fn_vvr, fn_ksym, fn_inop, fn_fermi,       &
-       fn_outwop, fn_kadd,                                                &
+       fn_outwop, fn_kadd, fn_hist, fn_klist, fn_tet, fn_ftet,            &
        suf_new, suf_sym, suf_old, suf_rfd, suf_jnd
   use clio,      only: argstr, fetcharg, croak
   use util,      only: basename
+
+  character(*), parameter :: fmt_var = '(A, "=", A)'
 
   type(inwop_t) :: inw
   type(argstr)  :: fname, arg
@@ -42,13 +44,12 @@ program check_inwop
      runoptic = .false.
   end if
 
-#define prlog(name) print '(A, "=", A)', #name, merge("yes", "   ", ##name)
-  prlog(runlapw1  )
-  prlog(runoptic  )
-  prlog(convert_vr)
-  prlog(mixed_vr  )
-  prlog(peierls   )
-  prlog(need_ham  )
+  print '(A, "=", A)', 'runlapw1'  , merge("yes", "   ", runlapw1  )
+  print '(A, "=", A)', 'runoptic'  , merge("yes", "   ", runoptic  )
+  print '(A, "=", A)', 'convert_vr', merge("yes", "   ", convert_vr)
+  print '(A, "=", A)', 'mixed_vr'  , merge("yes", "   ", mixed_vr  )
+  print '(A, "=", A)', 'peierls'   , merge("yes", "   ", peierls   )
+  print '(A, "=", A)', 'need_ham'  , merge("yes", "   ", need_ham  )
 
   print_filenames: if (command_argument_count() > 1) then
      jarg=2
@@ -79,38 +80,47 @@ program check_inwop
 
      call set_casename(fname, UPDN=updn, HAVE_SO=have_so, HAVE_BAND=have_band)
 
-#define prvar(name) print '(A, "=", A)',  'fn_'//#name, trim( fn_##name)
-#define prsuf(name) print '(A, "=", A)', 'suf_'//#name, trim(suf_##name)
-#define prvas(name, n) print '(A, "=", ''"'', '//#n//'(A, " "), ''"'')',  \
-     'fn_'//#name, ( trim( fn_##name(i)), i=1,##n )
-#define trbas(name) trim(basename(fn_##name))
-#define trbss(name, n) ( trbas(##name(i)), i=1,##n )
+     if (runlapw1  ) print fmt_var, 'fn_energy',   trim(fn_energy  )
+     if (runoptic  ) print fmt_var, 'fn_mommat',   trim(fn_mommat  )
+     if (runoptic  ) print fmt_var, 'fn_inop'  ,   trim(fn_inop    )
+     if (need_ham  ) print fmt_var, 'fn_ham'   ,   trim(fn_ham     )
+     if (need_ham  ) print fmt_var, 'fn_hr'    ,   trim(fn_hr      )
+     if (convert_vr) print fmt_mul(3), 'fn_vk' , ( trim(fn_vk (i)  ), i=1,3 )
+     if (convert_vr) print fmt_var, 'fn_vr'    ,   trim(fn_vr      )
+     if (mixed_vr  ) print fmt_mul(6), 'fn_vvk', ( trim(fn_vvk(i)  ), i=1,6 )
+     if (mixed_vr  ) print fmt_var, 'fn_vvr'   ,   trim(fn_vvr     )
 
-     prvar(hist    ); prvar(contr   )
-     prvar(klist   ); prvar(doscontr)
-     prvar(tet     ); prvar(K1      )
-     prvar(ftet    ); prvar(optcond )
-     prvar(klist   ); prvar(wdos    )
-     prvar(kadd    ); prvar(outref  )
-     prvar(fklist  ); prvar(fermi   )
-     prvar(voe     ); prvar(ksym    )
-     prvar(map     ); prvar(outwop  )
+     print                 fmt_var, 'fn_hist'    , trim(fn_hist    )
+     print                 fmt_var, 'fn_klist'   , trim(fn_klist   )
+     print                 fmt_var, 'fn_tet'     , trim(fn_tet     )
+     print                 fmt_var, 'fn_ftet'    , trim(fn_ftet    )
+     print                 fmt_var, 'fn_klist'   , trim(fn_klist   )
+     print                 fmt_var, 'fn_kadd'    , trim(fn_kadd    )
+     print                 fmt_var, 'fn_fklist'  , trim(fn_fklist  )
+     print                 fmt_var, 'fn_voe'     , trim(fn_voe     )
+     print                 fmt_var, 'fn_map'     , trim(fn_map     )
+     print                 fmt_var, 'fn_contr'   , trim(fn_contr   )
+     print                 fmt_var, 'fn_doscontr', trim(fn_doscontr)
+     print                 fmt_var, 'fn_K1'      , trim(fn_K1      )
+     print                 fmt_var, 'fn_optcond' , trim(fn_optcond )
+     print                 fmt_var, 'fn_wdos'    , trim(fn_wdos    )
+     print                 fmt_var, 'fn_outref'  , trim(fn_outref  )
+     print                 fmt_var, 'fn_fermi'   , trim(fn_fermi   )
+     print                 fmt_var, 'fn_ksym'    , trim(fn_ksym    )
+     print                 fmt_var, 'fn_outwop'  , trim(fn_outwop  )
 
-     if (runlapw1  )  prvar(energy  ); prsuf(new     )
-     if (runoptic  )  prvar(mommat  ); prsuf(sym     )
-     if (runoptic  )  prvar(inop    ); prsuf(old     )
-     if (need_ham  )  prvar(ham     ); prsuf(jnd     )
-     if (need_ham  )  prvar(hr      ); prsuf(rfd     )
-     if (convert_vr)  prvas(vk,  3  )
-     if (convert_vr)  prvar(vr      )
-     if (mixed_vr  )  prvas(vvk, 6  )
-     if (mixed_vr  )  prvar(vvr     )
+     print                 fmt_var, 'suf_new'    , trim(suf_new    )
+     print                 fmt_var, 'suf_sym'    , trim(suf_sym    )
+     print                 fmt_var, 'suf_old'    , trim(suf_old    )
+     print                 fmt_var, 'suf_jnd'    , trim(suf_jnd    )
+     print                 fmt_var, 'suf_rfd'    , trim(suf_rfd    )
 
-     print '(A, ''="'', 100(A, '' ''))', 'scratchfiles', &
-          trbas(mommat),   trbas(ftet),  trbas(tet),     &
-          trbas(doscontr), trbas(map),   trbas(voe),     &
-          trbss(vvk, 6),   trbas(contr), trbas(K1),      &
-          '"'
+     print                 fmt_var, 'SCRATCH'    , trim(scratch%s  )
+
+     print fmt_mul(7), 'scratchfiles', trim(basename(fn_K1 )), &
+          trim(basename(fn_ftet    )), trim(basename(fn_tet)), &
+          trim(basename(fn_contr   )), trim(basename(fn_voe)), &
+          trim(basename(fn_doscontr)), trim(basename(fn_map))
   end if print_filenames
 
   print '("# Emax ΔE δ β = ", F7.3, 2F6.3, F8.3)', &
@@ -122,6 +132,16 @@ program check_inwop
        inw%wfrot, inw%orig_umatrix
   print '("# compute opt. cond.?, DOS?, joint DOS?", 3L2)', &
        inw%optcond, inw%dos, inw%joint
+
+contains
+  pure character(len=30) function fmt_mul(N)
+    use util, only: string
+    implicit none
+
+    integer, intent(in) :: N
+
+    fmt_mul = '(A, "=''", '//trim(string(N))//'(/A), /"''")'
+  end function fmt_mul
 end program check_inwop
 
-!! Time-stamp: <2016-02-23 17:20:40 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-09-14 14:33:19 assman@faepop71.tu-graz.ac.at>

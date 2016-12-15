@@ -234,6 +234,13 @@ contains
 
        if (all(inw%matelmode /= MATELMODES)) &
             call croak("unknown matelmode: "//trim(string(inw%matelmode)))
+
+       getname: do i = 1, size(MATELMODES)
+          if (inw%matelmode == MATELMODES(i)) then
+             inw%matelname = MATELNAMES(i)
+             exit
+          end if
+       end do getname
     else                        ! matelmode given as string?
        read(buf, *) inw%mode, inw%matelname, inw%intrahop
 
@@ -249,18 +256,9 @@ contains
 1001   continue
     end if
 
-    unsupported: if (any(inw%matelmode == UNSUPPORTED_MATELMODES)) then
-       inw%matelname = "???"
-
-       do i = 1, size(MATELMODES)
-          if (inw%matelmode == MATELMODES(i)) then
-             inw%matelname = MATELNAMES(i)
-          end if
-       end do
-
-       call croak("FIXME: matelmode "//trim(string(inw%matelmode))// &
-            &     " ("//trim(inw%matelname)//") is currently unsupported")
-    end if unsupported
+    if (any(inw%matelmode == UNSUPPORTED_MATELMODES)) &
+         call croak("FIXME: matelmode "//trim(string(inw%matelmode))// &
+         &          " ("//trim(inw%matelname)//") is currently unsupported")
 
     read(lun,*) inw%Emax, inw%dE, inw%delterl, inw%wint_dens, inw%wint_cutoff
 
@@ -447,7 +445,7 @@ module maybebin
   logical, target :: binary
 
   interface maybin_read
-     module procedure myread_, myread_i, myread_r, myread_c, myread_a
+     module procedure myread_,  myread_i,  myread_r,  myread_c,  myread_a
   end interface maybin_read
 
   interface maybin_write
@@ -507,7 +505,7 @@ contains
        !! printable ASCII characters.
        !!
        !! FIXME: do something less hacky.
-       open (unit=unit, file=file, status='old', access='stream')
+       open (unit=unit, file=file, action='read', access='stream')
        read (unit, END=1001) buf
 
        b = .not. printable(buf)
@@ -807,7 +805,7 @@ module woptic_io
   character(*),     parameter   ::  suf_voe='.voe'
   character(BUFSZ)              ::   fn_voe
   integer,          parameter   :: unit_optcond=51
-  character(*),     parameter   ::  suf_optcond='.optcondw'
+  character(*),     parameter   ::  suf_optcond='.optcond'
   character(BUFSZ)              ::   fn_optcond
   integer,          parameter   :: unit_optorb(6)=(/511,512,513,514,515,516/)
   character(*),     parameter   ::  suf_optorb(6)= &
@@ -815,16 +813,16 @@ module woptic_io
        &  suf_optcond//'_orbyy',suf_optcond//'_orbyz',suf_optcond//'_orbzz'/)
   character(BUFSZ)              ::   fn_optorb(6)
   integer,          parameter   :: unit_contr=52
-  character(*),     parameter   ::  suf_contr='.kcontribw'
+  character(*),     parameter   ::  suf_contr='.kcontrib'
   character(BUFSZ)              ::   fn_contr
   integer,          parameter   :: unit_wdos=53
   character(*),     parameter   ::  suf_wdos='.wdos'
   character(BUFSZ)              ::   fn_wdos
   integer,          parameter   :: unit_doscontr=54
-  character(*),     parameter   ::  suf_doscontr='.wdoskcontribw'
+  character(*),     parameter   ::  suf_doscontr='.kcontrdos'
   character(BUFSZ)              ::   fn_doscontr
   integer,          parameter   :: unit_K1=55
-  character(*),     parameter   ::  suf_K1='.K1w'
+  character(*),     parameter   ::  suf_K1='.kcontrK1'
   character(BUFSZ)              ::   fn_K1
   integer,          parameter   :: unit_selfE=56
   character(*),     parameter   ::  suf_selfE='.selfE'
@@ -939,7 +937,7 @@ contains
     fn_ftet     = trim(scratch%s)//trim(file)//suf_ftet
     fn_map      = trim(scratch%s)//trim(file)//suf_map
     fn_voe      = trim(scratch%s)//trim(file)//suf_voe
-    fn_doscontr = trim(scratch%s)//trim(file)//suf_doscontr//ud
+    fn_doscontr = trim(scratch%s)//trim(file)//suf_doscontr          //ud
     fn_contr    = trim(scratch%s)//trim(file)//suf_contr   //trim(ud)//band_
     fn_K1       = trim(scratch%s)//trim(file)//suf_K1      //trim(ud)//band_
     do i=1,size(fn_optorb)
@@ -983,4 +981,4 @@ contains
 end module woptic_io
 
 
-!! Time-stamp: <2016-02-15 18:51:51 assman@faepop36.tu-graz.ac.at>
+!! Time-stamp: <2016-09-14 16:41:36 assman@faepop71.tu-graz.ac.at>

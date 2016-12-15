@@ -1,4 +1,4 @@
-### woptic/make.sys
+### woptic/make.sys.example
 #
 #   Options for Makefiles in subdirectories
 #
@@ -6,29 +6,41 @@
 # environment (i.e., the placeholders in Makefile.orig have not been
 # replaced to create Makefile)
 #
-# Copyright 2014-2015 Elias Assmann
+# Copyright 2014-2016 Elias Assmann
 #
 
-## overwrite make's outdated default FC (f77, WTF?)
+### Select Fortan compiler
 ifeq "$(origin FC)" "default"
-#	FC = gfortran
-	FC = ifort
+#FC      = ifort
+FC      = gfortran
 endif
 
-## ‘src/Makefile’ uses ‘-llapack -lblas’ by default, override here to
-## use e.g. MKL
+
+### ‘src/Makefile’ uses ‘-llapack -lblas’ by default, override here to
+### use e.g. MKL
 LDFLAGS ?= -L$(MKLROOT)/lib/intel64
 LDLIBS 	?= -lmkl_lapack95_lp64 -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -openmp -lpthread
 
-ifneq "$(findstring gfortran,$(FC))" ""
-    FFLAGS += -Wall -ffree-form -g -pedantic
-    FFLAGS += -Wcharacter-truncation -Wextra #-Wconversion
-else ifneq "$(findstring ifort,$(FC))" ""
-    FFLAGS += -warn all -traceback -g -ipo
-#else
-#   unknown compiler, please specify variables manually
-endif
 
+### These options enable some code that uses semi-recent Fortran
+### features.  Remove if you use an old compiler that does not support
+### them.
+FFLAGS += -DHAVE_PTR_ALLOC_GENERICS -DHAVE_VARLEN_STR
+
+
+### Compiler-specific suggestions.
+ifneq "$(findstring gfortran,$(FC))" ""
+FFLAGS += -ffree-form -g -pedantic -Wcharacter-truncation -Wall #-fcheck=all
+# suppress gfortran's stupid warnings about uninitialized array bounds
+FFLAGS += -Wno-maybe-uninitialized -ffree-line-length-0
+FFLAGS += -Wcharacter-truncation -Wextra #-Wconversion
+
+else ifneq "$(findstring ifort,$(FC))" ""
+FFLAGS += -free -gen-interface nosource -traceback -g -warn all -assume buffered_io
+#-debug all -check format,uninit,output_conversion -warn all
+#FFLAGS   += -ipo
+
+endif
 
 
 ##/---
@@ -37,4 +49,4 @@ endif
 ## End:
 ##\---
 ##
-## Time-stamp: <2015-09-23 15:48:54 assman@faepop06.tu-graz.ac.at>
+## Time-stamp: <2016-03-01 17:55:53 assman@faepop36.tu-graz.ac.at>

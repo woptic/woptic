@@ -13,16 +13,17 @@ set -e
 
 # default parameters
 start=1
-init=3
+init=
+definit=3
 theta=0.5
 maxiterations=5
+fullarch=yes
 
 file=$(basename $PWD)
 home=$(dirname $0)
 name=$(basename $0)
 log=:log
-reftet=_refined
-wopmain=_new
+scratch=.scratch # “scratch” placeholder dir in archive
 
 # copied from x_lapw
 [[ -e $file.struct ]] && \
@@ -52,7 +53,7 @@ OPTIONS:
  --theta Θ      change refinement “harshness”
                 (0 [uniform] … 1 [most adaptive]; default: $theta)
  --inter        focus refinement on higher energies (usually inter-orbital)
- --init         initial refinement steps (default: $init)
+ --init         initial refinement steps (default: $definit)
  --nosym        do not use symmetry operations
  --band         use ‘case.klist_band’
   -p            use parallel lapw1, optic
@@ -68,7 +69,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-45-gf5b26c6$' |
+    r=$(echo '$version: v0.1.0-52-g304b76a$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -89,30 +90,59 @@ archive () {
     echo Archiving iteration $1 in ‘$fn_hist’ …
 
     for f in $archfiles; do
-        ln -fs $f $f.$1 # create symlinks for names
+        ln $v -fs $f $f.$1      # create symlinks for names
         tozip+=" $f.$1"
     done
+    zip -qg $v $fn_hist $tozip  # -g: grow archive in-place
+    rm $v $tozip                # remove symlinks again
 
-    zip -qg $v $fn_hist $tozip    # -g: grow archive in-place
-    rm $tozip                   # remove symlinks again
+    if [[ $fullarch ]]; then
+        tozip=
+        [[ $1 -ne 0 ]] && zip -qd $v $fn_hist $scratch/\*
+
+        [[ -d $scratch ]] || mkdir $v $scratch
+        for f in $scratchfiles; do
+            ln $v -rfs $SCRATCH$f $scratch/$f.$1
+            tozip+=" $scratch/$f.$1"
+        done
+        zip -qg0 $v $fn_hist $tozip # -0: store only
+        rm $v $tozip
+        rmdir $v $scratch/ || [[ $q ]] || echo continuing anyway …
+    fi
 }
 
 unarchive () {
-    local tounzip q
+    local tounzip qq
 
-    [[ $v ]] || q=-q
+    [[ $v ]] || qq=-q
 
-    echo Restoring iteration $1 from ‘$fn_hist’ …
+    [[ $q ]] || echo Restoring iteration $1 from ‘$fn_hist’ …
 
-    for suf in $archfiles; do
+    unzip -l $fn_hist $scratch || croak ‘$fn_hist’ does not contain \
+                                        SCRATCH files -- cannot restore
+
+    for f in $archfiles; do
         tounzip+=" $f.$1"
     done
 
-    unzip $q $fn_hist $tounzip
+    [[ $tounzip ]] && unzip $qq $fn_hist $tounzip
 
     for f in $archfiles; do
         mv $v $f.$1 $f
     done
+
+    tounzip=
+    for f in $scratchfiles; do
+        tounzip+=" $scratch/$f.$1"
+    done
+
+    [[ $tounzip ]] && unzip $qq $fn_hist $tounzip
+
+    for f in $scratchfiles; do
+        mv $v $scratch/$f.$1 $SCRATCH$f
+    done
+
+    rmdir $v $scratch/ || [[ $q ]] || echo continuing anyway …
 }
 
 w () {
@@ -146,6 +176,7 @@ while [[ $# -gt 0 ]]; do
         ?(-)-init)              init=$2; shift ;;
         ?(-)-nosym)            nosym=yes       ;;
         ?(-)-band)              band=-band     ;; 
+        -L|?(-)-leanarch)   fullarch=          ;;
         -p|?(-)-parallel?(-lapw1)) p=-p        ;;
         -c|?(-)-complex?(-lapw1))  c=-c        ;;
         ?(-)-so)                  so=-so       ;;
@@ -202,8 +233,8 @@ wopmainfiles="$fn_contr $fn_doscontr $fn_K1"
 [[ $need_ham   ]] && oldnewfiles+=" $fn_ham"
 [[ $convert_vr ]] && oldnewfiles+=" $fn_vk"
 [[ $mixed_vr   ]] && oldnewfiles+=" $fn_vvk"
-archfiles="$reftetfiles $wopmainfiles $oldnewfiles $fn_klist$suf_new
-           $fn_optcond $fn_wdos $fn_outref $fn_outwop"
+archfiles="$fn_klist $fn_fklist $fn_klist$suf_new $fn_optcond $fn_wdos
+           $fn_outref $fn_outwop"
 
 
 ## Special -restore mode ##
@@ -232,7 +263,7 @@ done
 
 
 ## Header ##
-echo -n " MATELMODE     $matelmode"
+echo -n " MATELMODE: $matelmode"
 echo
 echo     " OPTIONS:"
 echo     "          case  = $file"
@@ -244,18 +275,17 @@ echo -ne "        -inter? : $inter\t\t"
 echo -e  "          band? : $band"
 echo -ne "         theta  = $theta\t\t"
 echo -e  "            so? : $so"
-echo -ne "         nosym? : $nosym\t\t"
+echo -ne "    full arch.? : $fullarch\t\t"
 echo -e  "            sp  : $sp"
 echo -ne "          init  = $init\t\t"
 echo -e  "       SCRATCH  = $SCRATCH"
 echo
 
-if [[ $restart ]]; then
-    start=$restart
-    restart=$(( $restart - 1 ))
-    echo Restart from iteration $start …
-    unarchive $restart
-else
+if [[ ! $restart && ! -s $fn_hist ]]; then
+    init=$definit
+fi
+
+if [[ $init ]]; then
    ## Initialize history
    ##
    ## Some files have to contain “dummy zeros”, some just have to
@@ -272,7 +302,16 @@ else
     for f in $fn_vvk; do
         [[ $mixed_vr   ]] && echo "0 0 0"   > $f
     done
+
     archive 0
+elif [[ $restart ]]; then
+    start=$restart
+    restart=$(( $restart - 1 ))
+    echo Restart from iteration $start …
+    unarchive $restart
+else                            # resume
+    last=$(unzip -qq -l $fn_hist '*.outputwop.*' | tail -1 | sed 's/.*\.//')
+    start=$(( $last + 1 ))
 fi
 
 for iter in $(seq $start $maxiterations)
@@ -299,7 +338,7 @@ do
         w refine_tetra -th $theta $inter $file
         nk=$(perl -ne '/^END/ and print($.-1), exit' $fn_kadd)
 
-        fgrep "estimator =" $fn_outref
+        fgrep --text "estimator =" $fn_outref
     fi
 
     # if there was no error, move updated files over old ones …
@@ -363,7 +402,7 @@ do
         fi
 
         if [[ $iter -ne 1 && $runlapw1 ]]; then
-            natoms=$(grep "elements:" $fn_outwop | cut -d: -f2)
+            natoms=$(fgrep --text "elements:" $fn_outwop | cut -d: -f2)
 
             tail -n +$(( 2*$natoms+1 )) $fn_energy >>$fn_energy$suf_old
             mv $v $fn_energy$suf_old $fn_energy
@@ -388,7 +427,7 @@ do
     fi
 
     # replace added k-points with full symmetrized list
-    [[ ! $band && $iter != 1 ]] && cp $v $fn_klist$reftet $fn_klist
+    [[ ! $band && $iter != 1 ]] && cp $v $fn_klist$suf_rfd $fn_klist
 
     [[ $nosym ]] && ln -sf $v $fn_ksym $fn_struct
 
@@ -402,7 +441,7 @@ do
 
     [[ $nosym ]] && ln -sf $v $fn_struct$suf_sym $fn_struct
 
-    fgrep $fn_outwop -e "sumrules" -e "dc cond" -e "thermopower"
+    fgrep --text $fn_outwop -e "sumrules" -e "dc cond" -e "thermopower"
 
     # store history
     archive $iter
@@ -414,4 +453,4 @@ if [[ ! $q ]]; then
 fi
 
 
-## Time-stamp: <2015-11-13 11:40:58 assman@faepop36.tu-graz.ac.at>
+## Time-stamp: <2016-09-14 16:58:43 assman@faepop71.tu-graz.ac.at>
