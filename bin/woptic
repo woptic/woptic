@@ -60,11 +60,11 @@ OPTIONS:
   -c            use complex  lapw1, optic
  --so           use lapwso to compute energies
  --up|--dn      use lapw1 -up/-dn to compute energies
-  -f            override  ‘case’
+ --case, -f     override  ‘case’
+  -h, --help    print this message and exit
+  -v, --version print version information and exit
   -V, --verbose increase verbiage level to maximum
-  -v, --version
   -q, --quiet
-  -h, --help    this message
 EOF
 }
 
@@ -167,13 +167,20 @@ wq () {
 shopt -s extglob
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -i|?(-)-max-iterations)
-                       maxiterations=$2; shift ;;
-        ?(-)-restart)        restart=$2; shift ;;
-        ?(-)-restore)        restore=$2; shift ;;
-        ?(-)-th|?(-)-theta)    theta=$2; shift ;;
+        -i|?(-)-max-iterations) maxiterations=$2; shift
+        [[ $# -gt 0 ]] || croak --max-iterations requires an argument ;;
+        ?(-)-restart)                 restart=$2; shift
+        [[ $# -gt 0 ]] || croak --restart requires an argument        ;;
+        ?(-)-restore)                 restore=$2; shift
+        [[ $# -gt 0 ]] || croak --restore requires an argument        ;;
+        ?(-)-th|?(-)-theta)             theta=$2; shift
+        [[ $# -gt 0 ]] || croak --theta requires an argument          ;;
+        ?(-)-init)                       init=$2; shift
+        [[ $# -gt 0 ]] || croak --init requires an argument           ;;
+        -f|?(-)-case)                    file=$2; shift
+                                        ffile="-f $file"
+        [[ $# -gt 0 ]] || croak --case requires an argument           ;;
         ?(-)-inter)            inter=-inter    ;;
-        ?(-)-init)              init=$2; shift ;;
         ?(-)-nosym)            nosym=yes       ;;
         ?(-)-band)              band=-band     ;; 
         -L|?(-)-leanarch)   fullarch=          ;;
@@ -182,8 +189,6 @@ while [[ $# -gt 0 ]]; do
         ?(-)-so)                  so=-so       ;;
         ?(-)-up)                updn=up        ;;
         ?(-)-dn)                updn=dn        ;;
-        -f|?(-)-case)           file=$2; shift
-                               ffile="-f $file";;
         -V|?(-)-verbose)           v="-v"      ;;
         -q|?(-)-quiet)             q="-q"      ;;
 
@@ -285,7 +290,7 @@ echo -ne "          init  = $init\t\t"
 echo -e  "       SCRATCH  = $SCRATCH"
 echo
 
-if [[ ! $restart && ! -s $fn_hist ]]; then
+if [[ -z $init && ! $restart && ! -s $fn_hist ]]; then
     init=$definit
 fi
 
