@@ -398,7 +398,7 @@ do
             done
 
             if [[ $mixed_vr ]]; then
-                for f in xx xy xz yy yz zz; do
+                for f in $fn_vvk; do
                     wq joinham $f$suf_old $f $f$suf_jnd
                     mv $v $f$suf_jnd $f
                 done
