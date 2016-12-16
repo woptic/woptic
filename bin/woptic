@@ -102,7 +102,7 @@ archive () {
 
         [[ -d $scratch ]] || mkdir $v $scratch
         for f in $scratchfiles; do
-            ln $v -rfs $SCRATCH$f $scratch/$f.$1
+            ln $v -fs $SCRATCH$f $scratch/$f.$1
             tozip+=" $scratch/$f.$1"
         done
         zip -qg0 $v $fn_hist $tozip # -0: store only
@@ -260,6 +260,10 @@ must="$fn_fermi"
 for f in $must; do
     [[ -s $f ]] || croak "required file ‘$f’ not found"
 done
+
+# canonicalize $SCRATCH
+[[ -z $SCRATCH ]] && $SCRATCH=.
+export SCRATCH=$(readlink -f $SCRATCH)/
 
 
 ## Header ##
