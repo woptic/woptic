@@ -460,6 +460,3 @@ if [[ ! $q ]]; then
     echo
     echo "+++ woptic done +++"
 fi
-
-
-## Time-stamp: <2016-09-14 16:58:43 assman@faepop71.tu-graz.ac.at>

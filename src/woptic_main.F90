@@ -1673,5 +1673,3 @@ end subroutine init_random_seed
 !! mode: f90
 !! End:
 !!\---
-!!
-!! Time-stamp: <2016-02-15 18:34:47 assman@faepop36.tu-graz.ac.at>

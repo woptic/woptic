@@ -46,6 +46,3 @@
       indx(i)=indxt
       goto 10
       end
-
-
-!! Time-stamp: <2015-06-01 12:36:52 assman@faepop23.tu-graz.ac.at>

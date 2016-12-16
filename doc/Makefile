@@ -4274,6 +4274,3 @@ endef
 -include $(HOME)/.latex-makefile/Targets.ini
 #
 # vim: noet sts=0 sw=8 ts=8
-
-
-## Time-stamp: <2015-06-08 16:12:53 assman@faepop23.tu-graz.ac.at>

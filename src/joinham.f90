@@ -208,6 +208,3 @@ contains
     enddo
   end subroutine cpk_mom
 end program combine_hamfiles
-
-
-!! Time-stamp: <2016-02-15 20:16:55 assman@faepop36.tu-graz.ac.at>

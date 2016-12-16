@@ -557,5 +557,3 @@ contains
     call zhemm('L','U', M,N, one, he,M, ge,M, zero, hemul,M)
   end function hemul
 end program compute_vr
-
-!! Time-stamp: <2016-01-29 17:02:57 assman@faepop36.tu-graz.ac.at>

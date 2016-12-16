@@ -1286,6 +1286,3 @@ SUBROUTINE compute_shapeparameters(nk,nt,k,tetra,ndim)
   write(unit_outref,*)"  there are ",counter," different shapes"
   write(unit_outref,*)"  qualities ",quals(1:counter)
 END SUBROUTINE compute_shapeparameters
-
-
-!! Time-stamp: <2016-02-15 18:35:46 assman@faepop36.tu-graz.ac.at>

@@ -274,6 +274,3 @@ PROGRAM convert_vr
 
   call ptime('writing V(k)')
 end program convert_vr
-
-
-!! Time-stamp: <2016-01-29 17:02:44 assman@faepop36.tu-graz.ac.at>

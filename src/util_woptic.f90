@@ -979,6 +979,3 @@ contains
     call set_case_buf(file%s, band, so, ud)
   end subroutine set_case_argstr
 end module woptic_io
-
-
-!! Time-stamp: <2016-09-14 16:41:36 assman@faepop71.tu-graz.ac.at>
