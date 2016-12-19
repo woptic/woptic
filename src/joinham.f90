@@ -23,7 +23,7 @@ program combine_hamfiles
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-84-g80816cc$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-85-g2e508b1$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer,          parameter :: unit_hamold=121, unit_momold=13
