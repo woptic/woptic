@@ -23,14 +23,14 @@ PROGRAM refine_tmesh
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-68-gf16a3fe$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-69-g3333305$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
   integer   :: iarg, iv, iE, ik, jk, ir, it, jd1, tcount, kdiv, jsig
   integer   :: ndim(3), kdim(3)
   real(DPk) :: dE, dwei, emin, emax, rvec(3)
-  
+
   real(DPk) :: rdum
   integer   :: idum
 
@@ -174,7 +174,7 @@ PROGRAM refine_tmesh
 
   init_: if (init) then
      !get initial mesh
-     nt = 48*8**(init_steps-1) 
+     nt = 48*8**(init_steps-1)
      allocate(tvariance(nt),tclass(nt),newtclass(8*nt))
      nkfull = (3*2**init_steps)**3
      allocate(tetra(nt,10),wtetra(nt),newk(nkfull,3),newtetra(48*8**(init_steps-1),10),&
@@ -200,7 +200,7 @@ PROGRAM refine_tmesh
      nk = count_kmesh_klist(unit_klist)
      allocate(k(nk,3),nabk(nk))
      do jk=1,nk
-        if(jk.eq.1) then 
+        if(jk.eq.1) then
            read(unit_klist,1523) idum,(k(jk,ik),ik=1,3),kdiv, &
                 dwei,emin,emax,nkp,kdim
         else
@@ -212,7 +212,7 @@ PROGRAM refine_tmesh
      nkfull = count_kmesh_klist(unit_fklist)
      allocate(kfull(nkfull,3),kfulltmp(nkfull,3),map(nkfull,2),kfull_int(nkfull,3))
      do jk=1,nkfull
-        if(jk.eq.1) then 
+        if(jk.eq.1) then
            read(unit_fklist,1523) idum,(kfull(jk,ik),ik=1,3),kdiv, &
                 dwei,emin,emax,nkp,kdim
         else
@@ -220,8 +220,8 @@ PROGRAM refine_tmesh
         endif
      enddo
      close(unit_fklist)
-1523 FORMAT(I10,4I10,3f5.1,4x,i6,10x,3i3,1x) 
-1520 FORMAT(I10,4I10,f5.1)     
+1523 FORMAT(I10,4I10,3f5.1,4x,i6,10x,3i3,1x)
+1520 FORMAT(I10,4I10,f5.1)
 
      !map first to internal coordinates(real numerators) and than
      !back to integer values
@@ -275,12 +275,12 @@ PROGRAM refine_tmesh
      do jk=1,nk
         read(unit_contr,3000)idum, tmp
         do jsig=1,nsig
-           kcontribw(jk,0,jsig) = tmp(jsig)  
+           kcontribw(jk,0,jsig) = tmp(jsig)
         enddo
         do iE=1,NE
            read(unit_contr,3001)tmp(1:nsig)
            do jsig=1,nsig
-              kcontribw(jk,iE,jsig) = tmp(jsig)  
+              kcontribw(jk,iE,jsig) = tmp(jsig)
            enddo
         enddo
      enddo
@@ -298,7 +298,7 @@ PROGRAM refine_tmesh
      write(unit_outref,*)"  sum of tetrahedron weights before refinement:", &
           sum(wtetra)
 
-     !get symmetry mesh information  
+     !get symmetry mesh information
      kfulltmp = kfull
 
      do jk=1,nkfull
@@ -314,7 +314,7 @@ PROGRAM refine_tmesh
      !refine marked elements
      call refine_tetra(nt,tetra,tclass,wtetra,nkfull,48*nt,newk,&
           &            nvoe,VOE,VOEidx,trefine,8*nt,&
-          &            newtetra,newwtetra,newtclass,nnewk,tcount) 
+          &            newtetra,newwtetra,newtclass,nnewk,tcount)
      ndim = ndim*2 !doubled divisor for new mesh
   endif
 
@@ -356,7 +356,7 @@ PROGRAM refine_tmesh
   write(unit_fklist,1521)
   close(unit_fklist)
 
-  write(unit_ftet,*) tcount,ndim 
+  write(unit_ftet,*) tcount,ndim
   do it=1,tcount
      write(unit_ftet,"(10I10,E20.12,1I10)")(newtetra(it,ir),ir=1,10),newwtetra(it),newtclass(it)
   enddo
@@ -437,13 +437,13 @@ PROGRAM refine_tmesh
 
   write(unit_tet,*) nnewt,ndim
   do it=1,nnewt
-     write(unit_tet,"(10I10,E20.12)")(newtetra(it,ir),ir=1,10),newwtetra(it) 
+     write(unit_tet,"(10I10,E20.12)")(newtetra(it,ir),ir=1,10),newwtetra(it)
   enddo
   close(unit_tet)
 
-1530 FORMAT(I10,4I10,f5.1)                                              
+1530 FORMAT(I10,4I10,f5.1)
 1521 format('END',/)
-1533 FORMAT(I10,4I10,3f5.1,4x,i6,' k, div: (',3i3,')')    
+1533 FORMAT(I10,4I10,3f5.1,4x,i6,' k, div: (',3i3,')')
 
 CONTAINS
   FUNCTION kmean(kp1,kp2,ndim) result(outm)
