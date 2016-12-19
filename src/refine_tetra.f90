@@ -23,7 +23,7 @@ PROGRAM refine_tmesh
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-69-g3333305$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-70-g3e3f99f$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp

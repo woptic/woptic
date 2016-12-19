@@ -60,16 +60,16 @@ OPTIONS:
   -c            use complex  lapw1, optic
  --so           use lapwso to compute energies
  --up|--dn      use lapw1 -up/-dn to compute energies
-  -f            override  ‘case’
+ --case, -f     override  ‘case’
+  -h, --help    print this message and exit
+  -v, --version print version information and exit
   -V, --verbose increase verbiage level to maximum
-  -v, --version
   -q, --quiet
-  -h, --help    this message
 EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-68-gf16a3fe$' |
+    r=$(echo '$version: v0.1.0-70-g3e3f99f$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -102,7 +102,7 @@ archive () {
 
         [[ -d $scratch ]] || mkdir $v $scratch
         for f in $scratchfiles; do
-            ln $v -rfs $SCRATCH$f $scratch/$f.$1
+            ln $v -fs $SCRATCH$f $scratch/$f.$1
             tozip+=" $scratch/$f.$1"
         done
         zip -qg0 $v $fn_hist $tozip # -0: store only
@@ -167,13 +167,20 @@ wq () {
 shopt -s extglob
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -i|?(-)-max-iterations)
-                       maxiterations=$2; shift ;;
-        ?(-)-restart)        restart=$2; shift ;;
-        ?(-)-restore)        restore=$2; shift ;;
-        ?(-)-th|?(-)-theta)    theta=$2; shift ;;
+        -i|?(-)-max-iterations) maxiterations=$2; shift
+        [[ $# -gt 0 ]] || croak --max-iterations requires an argument ;;
+        ?(-)-restart)                 restart=$2; shift
+        [[ $# -gt 0 ]] || croak --restart requires an argument        ;;
+        ?(-)-restore)                 restore=$2; shift
+        [[ $# -gt 0 ]] || croak --restore requires an argument        ;;
+        ?(-)-th|?(-)-theta)             theta=$2; shift
+        [[ $# -gt 0 ]] || croak --theta requires an argument          ;;
+        ?(-)-init)                       init=$2; shift
+        [[ $# -gt 0 ]] || croak --init requires an argument           ;;
+        -f|?(-)-case)                    file=$2; shift
+                                        ffile="-f $file"
+        [[ $# -gt 0 ]] || croak --case requires an argument           ;;
         ?(-)-inter)            inter=-inter    ;;
-        ?(-)-init)              init=$2; shift ;;
         ?(-)-nosym)            nosym=yes       ;;
         ?(-)-band)              band=-band     ;; 
         -L|?(-)-leanarch)   fullarch=          ;;
@@ -182,8 +189,6 @@ while [[ $# -gt 0 ]]; do
         ?(-)-so)                  so=-so       ;;
         ?(-)-up)                updn=up        ;;
         ?(-)-dn)                updn=dn        ;;
-        -f|?(-)-case)           file=$2; shift
-                               ffile="-f $file";;
         -V|?(-)-verbose)           v="-v"      ;;
         -q|?(-)-quiet)             q="-q"      ;;
 
@@ -261,6 +266,10 @@ for f in $must; do
     [[ -s $f ]] || croak "required file ‘$f’ not found"
 done
 
+# canonicalize $SCRATCH
+[[ -z $SCRATCH ]] && $SCRATCH=.
+export SCRATCH=$(readlink -f $SCRATCH)/
+
 
 ## Header ##
 echo -n " MATELMODE: $matelmode"
@@ -281,7 +290,7 @@ echo -ne "          init  = $init\t\t"
 echo -e  "       SCRATCH  = $SCRATCH"
 echo
 
-if [[ ! $restart && ! -s $fn_hist ]]; then
+if [[ -z $init && ! $restart && ! -s $fn_hist ]]; then
     init=$definit
 fi
 
@@ -394,7 +403,7 @@ do
             done
 
             if [[ $mixed_vr ]]; then
-                for f in xx xy xz yy yz zz; do
+                for f in $fn_vvk; do
                     wq joinham $f$suf_old $f $f$suf_jnd
                     mv $v $f$suf_jnd $f
                 done
