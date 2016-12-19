@@ -24,7 +24,7 @@ PROGRAM refine_tmesh
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-63-gd13290c$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-84-g80816cc$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
@@ -276,12 +276,12 @@ PROGRAM refine_tmesh
 
      allocate(kcontribw(nk,0:NE,nsig),tmp(nsig))
      do jk=1,nk
-        call maybin_read(unit_contr, '(I8,6E20.12)', (/ idum /), tmp)
+        call maybin_read(unit_contr, idum, tmp, FMT='(I8,6E20.12)')
         do jsig=1,nsig
            kcontribw(jk,0,jsig) = tmp(jsig)
         enddo
         do iE=1,NE
-           call maybin_read(unit_contr, '(6E20.12)', tmp(1:nsig))
+           call maybin_read(unit_contr, tmp(1:nsig), FMT='(6E20.12)')
            do jsig=1,nsig
               kcontribw(jk,iE,jsig) = tmp(jsig)
            enddo
@@ -359,8 +359,10 @@ PROGRAM refine_tmesh
 
   call maybin_write(unit_ftet, tcount, ndim)
   do it=1,tcount
-     call maybin_write(unit_ftet, "(10I10,E20.12,1I10)", &
-          newtetra(it,:), newwtetra(it), newtclass(it))
+     call maybin_write(                                 &
+          unit_ftet,                                    &
+          newtetra(it,:), newwtetra(it), newtclass(it), &
+          FMT="(10I10,E20.12,1I10)")
   enddo
   close(unit_ftet)
 
@@ -439,8 +441,8 @@ PROGRAM refine_tmesh
 
   call maybin_write(unit_tet, nnewt, ndim)
   do it=1,nnewt
-     call maybin_write(unit_tet, "(10I10,E20.12)", &
-          newtetra(it,:),newwtetra(it))
+     call maybin_write(unit_tet, newtetra(it,:), newwtetra(it), &
+          FMT="(10I10,E20.12)")
   enddo
   close(unit_tet)
 

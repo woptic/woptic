@@ -14,7 +14,7 @@ program woptic_main
   use util,       only: string, ptime, ptimer, ptick, ptock, ptot, inverse3x3
 #define str(x) trim(string(x))
   use clio,       only: argstr, fetcharg, croak, carp
-  use maybebin,   only: maybin_open, maybin_read
+  use maybebin,   only: maybin_open, maybin_read, maybin_write
   use Wannier90,  only: chk_t, chk_read
   use woptic,     only: inwop_t, inwop_read, get_mommat, &
        MODE_Peierls, MODE_interp, MODE_optic, MODE_Bloch, MODE_LDA
@@ -38,7 +38,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-63-gd13290c$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-84-g80816cc$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -65,7 +65,7 @@ program woptic_main
 !!!
 !!!    Indices are odered as: i, j, bands, E, k.
 
-  real   (DPk), allocatable, dimension(:)         :: fw, DOS_tot
+  real   (DPk), allocatable, dimension(:)         :: fw, DOS_tot, tmpr
   real   (DPk), allocatable, dimension(:,:)       :: DOS_tot_orb
   real   (DPk), allocatable, dimension(:,:,:)     :: &
        DCCond, K1, DCcond_tot_orb, K1_tot_orb,       &
@@ -618,20 +618,29 @@ program woptic_main
   if (.not. have_band) then
      call maybin_read(unit_contr, Nkold)
   end if
-  do jk=1,Nkold
-     call maybin_read(unit_contr, fmt_K1DC, &
-          i, (/( DCcond(ij(jj,1), ij(jj,2), jk), jj=1,size(ij,1) )/))
 
-     call maybin_read(unit_K1,fmt_K1DC, &
-          i, (/( K1(ij(jj,1),ij(jj,2), jk), jj=1,size(ij,1) )/))
+  allocate( tmpr(size(ij, 1)) )
+  do jk = 1,Nkold
+     call maybin_read(unit_contr, i, tmpr, FMT=fmt_K1DC)
+     call maybin_read(unit_K1,    i, tmpr, FMT=fmt_K1DC)
+
+     do jj = 1, size(ij,1)
+        K1    (ij(jj,1), ij(jj,2), jk) = tmpr(jj)
+        DCcond(ij(jj,1), ij(jj,2), jk) = tmpr(jj)
+     end do
 
      do jE=1,NE
-        call maybin_read(unit_contr,fmt_contr, &
-             (/( optcond(ij(jj,1),ij(jj,2), jE, jk), jj=1,size(ij,1) )/))
+        call maybin_read(unit_contr, tmpr, FMT=fmt_contr)
+
+        do jj = 1, size(ij,1)
+           optcond(ij(jj,1), ij(jj,2), jE, jk) = tmpr(jj)
+        end do
      end do
+
      if (inw%DOS) then
         do jw=wmin,wmax
-           call maybin_read(unit_doscontr,fmt_doscontr, DOS_orb(:, jw, jk))
+           call maybin_read(unit_doscontr, DOS_orb(:, jw, jk), &
+                &           FMT=fmt_doscontr)
         end do
      end if
   end do
@@ -820,23 +829,26 @@ program woptic_main
      open(unit_optorb(i),      FILE=fn_optorb(i),           STATUS='replace')
   end do; end if
 
-  call maybin_write(unit_contr, Nk, NE, size(ij,1), convfac)
+  call maybin_write(unit_contr, (/ Nk, NE, size(ij,1) /), convfac)
 
   do jk=1,Nk
-     call maybin_write(unit_contr, fmt_K1DC, &
-          jk, (/( DCcond(ij(jj,1), ij(jj,2), jk), jj=1,size(ij,1) )/))
+     call maybin_write(unit_contr, &
+          jk, (/( DCcond(ij(jj,1), ij(jj,2), jk), jj=1,size(ij,1) )/),    &
+          FMT=fmt_K1DC)
 
-     call maybin_write(unit_K1, fmt_K1DC, &
-          jk, (/( K1(ij(jj,1),ij(jj,2), jk), jj=1,size(ij,1) )/))
+     call maybin_write(unit_K1, &
+          jk, (/( K1(ij(jj,1),ij(jj,2), jk), jj=1,size(ij,1) )/),         &
+          FMT=fmt_K1DC)
 
      do jE=1,NE
-        call maybin_write(unit_contr, fmt_contr, &
-             (/( optcond(ij(jj,1),ij(jj,2), jE, jk), jj=1,size(ij,1) )/))
+        call maybin_write(unit_contr, &
+             (/( optcond(ij(jj,1),ij(jj,2), jE, jk), jj=1,size(ij,1) )/), &
+             FMT=fmt_contr)
      end do
 
      if (inw%DOS) then
         do jw=wmin,wmax
-           call maybin_write(unit_doscontr, fmt_doscontr, DOS_orb(:, jw, jk))
+           call maybin_write(unit_doscontr, DOS_orb(:, jw, jk), fmt_doscontr)
         end do
      end if
   end do

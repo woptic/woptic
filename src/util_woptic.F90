@@ -445,11 +445,19 @@ module maybebin
   logical, target :: binary
 
   interface maybin_read
-     module procedure myread_,  myread_i,  myread_r,  myread_c,  myread_a
+     module procedure &
+          myread_, myread_i, myread_n, myread_r, myread_x, myread_c,        &
+          myread_a, &
+          myread_ix, myread_ni, myread_nx, myread_nr, &
+          myread_nnn, myread_inx, myread_ixn
   end interface maybin_read
 
   interface maybin_write
-     module procedure mywrite_, mywrite_i, mywrite_r, mywrite_c, mywrite_a
+     module procedure &
+          mywrite_, mywrite_i, mywrite_n, mywrite_r, mywrite_x, mywrite_c,  &
+          mywrite_a, &
+          mywrite_ix, mywrite_ni, mywrite_nx, mywrite_nr, &
+          mywrite_nnn, mywrite_inx, mywrite_ixn
   end interface maybin_write
 
 contains
@@ -618,77 +626,136 @@ contains
        write(unit, *)   data                       ;\
     end if
 
-#define MYREAD2(T1, D1, T2, D2) (unit, d1, d2, fmt);\
+#define MYREAD2(T1, D1, T2, D2) (unit, a, b, fmt)  ;\
     integer,      intent(in)            :: unit    ;\
     character(*), intent(in),  optional :: fmt     ;\
     T1,           intent(out)           :: a D1    ;\
     T2,           intent(out)           :: b D2    ;\
                                                     \
     if (.not. formatted(unit)) then                ;\
-       read(unit) data                             ;\
+       read(unit) a, b                             ;\
     else if (present(fmt)) then                    ;\
        read(unit, fmt) a, b                        ;\
     else                                           ;\
        read(unit, *)   a, b                        ;\
     end if
 
-#define MYWRITE1(T, D) (unit, data, fmt)           ;\
-    integer,      intent(in)            :: unit    ;\
-    character(*), intent(in),  optional :: fmt     ;\
-    T,            intent(in)            :: data D  ;\
-                                                    \
-    if (.not. formatted(unit)) then                ;\
-       write(unit) data                            ;\
-    else if (present(fmt)) then                    ;\
-       write(unit, fmt) data                       ;\
-    else                                           ;\
-       write(unit, *)   data                       ;\
-    end if
-
-#define MYWRITE2(T1, D1, T2, D2) (unit, d1, d2, fmt);\
+#define MYWRITE2(T1, D1, T2, D2) (unit, a, b, fmt)  ;\
     integer,      intent(in)            :: unit     ;\
     character(*), intent(in),  optional :: fmt      ;\
     T1,           intent(in)            :: a D1     ;\
     T2,           intent(in)            :: b D2     ;\
                                                      \
     if (.not. formatted(unit)) then                 ;\
-       write(unit) data                             ;\
+       write(unit) a, b                             ;\
     else if (present(fmt)) then                     ;\
        write(unit, fmt) a, b                        ;\
     else                                            ;\
        write(unit, *)   a, b                        ;\
     end if
 
-  subroutine myread_i  MYREAD1 (integer, (:))
+#define MYREAD3(T1, D1, T2, D2, T3, D3) \
+    (unit, a, b, c, fmt)                           ;\
+    integer,      intent(in)            :: unit    ;\
+    character(*), intent(in),  optional :: fmt     ;\
+    T1,           intent(out)           :: a D1    ;\
+    T2,           intent(out)           :: b D2    ;\
+    T3,           intent(out)           :: c D3    ;\
+                                                    \
+    if (.not. formatted(unit)) then                ;\
+       read(unit) a, b                             ;\
+    else if (present(fmt)) then                    ;\
+       read(unit, fmt) a, b, c                     ;\
+    else                                           ;\
+       read(unit, *)   a, b, c                     ;\
+    end if
+
+#define MYWRITE3(T1, D1, T2, D2, T3, D3) \
+    (unit, a, b, c, fmt)                           ;\
+    integer,      intent(in)            :: unit     ;\
+    character(*), intent(in),  optional :: fmt      ;\
+    T1,           intent(in)            :: a D1     ;\
+    T2,           intent(in)            :: b D2     ;\
+    T3,           intent(in)            :: c D3     ;\
+                                                     \
+    if (.not. formatted(unit)) then                 ;\
+       write(unit) a, b                             ;\
+    else if (present(fmt)) then                     ;\
+       write(unit, fmt) a, b, c                     ;\
+    else                                            ;\
+       write(unit, *)   a, b, c                     ;\
+    end if
+
+!!! The following abbreviations are used to mark the signature of the
+!!! following subroutines:
+!!!  i → integer(:)   r → real(:)   c → complex(:)
+!!!  n → integer      x → real      z → complex
+!!!  a → character(*)
+
+  subroutine     myread_i  MYREAD1 (integer, (:))
   end subroutine myread_i
-  subroutine mywrite_i MYWRITE1(integer, (:))
+  subroutine     mywrite_i MYWRITE1(integer, (:))
   end subroutine mywrite_i
 
-  subroutine myread_n  MYREAD1 (integer, )
+  subroutine     myread_n  MYREAD1 (integer, )
   end subroutine myread_n
-  subroutine mywrite_n MYWRITE1(integer, )
+  subroutine     mywrite_n MYWRITE1(integer, )
   end subroutine mywrite_n
 
-  subroutine myread_nn  MYREAD2 (integer, , integer, )
-  end subroutine myread_nn
-  subroutine mywrite_nn MYWRITE2(integer, , integer, )
-  end subroutine mywrite_nn
-
-  subroutine myread_r  MYREAD1 (real(DPk), (:))
+  subroutine     myread_r  MYREAD1 (real(DPk), (:))
   end subroutine myread_r
-  subroutine mywrite_r MYWRITE1(real(DPk), (:))
+  subroutine     mywrite_r MYWRITE1(real(DPk), (:))
   end subroutine mywrite_r
 
-  subroutine myread_c  MYREAD1 (complex(DPk), (:))
+  subroutine     myread_x  MYREAD1 (real(DPk), )
+  end subroutine myread_x
+  subroutine     mywrite_x MYWRITE1(real(DPk), )
+  end subroutine mywrite_x
+
+  subroutine     myread_c  MYREAD1 (complex(DPk), (:))
   end subroutine myread_c
-  subroutine mywrite_c MYWRITE1(complex(DPk), (:))
+  subroutine     mywrite_c MYWRITE1(complex(DPk), (:))
   end subroutine mywrite_c
 
-  subroutine myread_a  MYREAD1 (character(*), )
+  subroutine     myread_a  MYREAD1 (character(*), )
   end subroutine myread_a
-  subroutine mywrite_a MYWRITE1(character(*), )
+  subroutine     mywrite_a MYWRITE1(character(*), )
   end subroutine mywrite_a
 
+  subroutine     myread_nx  MYREAD2 (integer, , real(DPk), )
+  end subroutine myread_nx
+  subroutine     mywrite_nx MYWRITE2(integer, , real(DPk), )
+  end subroutine mywrite_nx
+
+  subroutine     myread_ix  MYREAD2 (integer, (:), real(DPk), )
+  end subroutine myread_ix
+  subroutine     mywrite_ix MYWRITE2(integer, (:), real(DPk), )
+  end subroutine mywrite_ix
+
+  subroutine     myread_ni  MYREAD2 (integer, , integer, (:))
+  end subroutine myread_ni
+  subroutine     mywrite_ni MYWRITE2(integer, , integer, (:))
+  end subroutine mywrite_ni
+
+  subroutine     myread_nr  MYREAD2 (integer, , real(DPk), (:))
+  end subroutine myread_nr
+  subroutine     mywrite_nr MYWRITE2(integer, , real(DPk), (:))
+  end subroutine mywrite_nr
+
+  subroutine     myread_inx  MYREAD3 (integer, (:), integer, , real(DPk), )
+  end subroutine myread_inx
+  subroutine     mywrite_inx MYWRITE3(integer, (:), integer, , real(DPk), )
+  end subroutine mywrite_inx
+
+  subroutine     myread_nnn  MYREAD3 (integer, , integer, , integer, )
+  end subroutine myread_nnn
+  subroutine     mywrite_nnn MYWRITE3(integer, , integer, , integer, )
+  end subroutine mywrite_nnn
+
+  subroutine     myread_ixn  MYREAD3 (integer, (:), real(DPk), , integer, )
+  end subroutine myread_ixn
+  subroutine     mywrite_ixn MYWRITE3(integer, (:), real(DPk), , integer, )
+  end subroutine mywrite_ixn
 end module maybebin
 
 !--------------- Files and units for woptic          ------------------------
