@@ -98,6 +98,3 @@ program kanalysis
 !   stop
    close(unit1)
  end program kanalysis
-
-
-!! Time-stamp: <2015-06-01 12:37:05 assman@faepop23.tu-graz.ac.at>

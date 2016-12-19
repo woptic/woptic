@@ -29,7 +29,7 @@ PROGRAM convert_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-33-g51bf2a1$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-63-gd13290c$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer        :: v, w, k, r, o, i, id, omin, omax
@@ -274,6 +274,3 @@ PROGRAM convert_vr
 
   call ptime('writing V(k)')
 end program convert_vr
-
-
-!! Time-stamp: <2016-01-29 17:02:44 assman@faepop36.tu-graz.ac.at>

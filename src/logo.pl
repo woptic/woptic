@@ -3,7 +3,10 @@
 use strict;
 use warnings;
 
+use File::Basename;
+
 my $version = qx(git describe);
+my $d       = dirname $0;
 
 chomp $version;
 $version =~ s/([\d.]+-\d+).*/$1/;
@@ -24,9 +27,9 @@ my @ansire = map { my ($a, $b) = ($markup[$_], $ansi[$_]);
                    sub { $_[0] =~ s/$a/$b/g } }
   0..$#markup;
 
-open TEX,  q[>], q[../doc/logo.tex]         or die $!;
-open TXT,  q[>], q[../src/logo.txt]  or die $!;
-open ANSI, q[>], q[../src/logo.ansi] or die $!;
+open TEX,  q[>], qq[$d/../doc/logo.tex]  or die $!;
+open TXT,  q[>], qq[$d/../src/logo.txt]  or die $!;
+open ANSI, q[>], qq[$d/../src/logo.ansi] or die $!;
 
 for (<DATA>) {
   my ($ansi, $tex, $txt) = ($_, $_, $_);

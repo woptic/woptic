@@ -76,5 +76,3 @@ $(UTIL_USERS): $(UTILOBJ)
 ### Rules for logo variants
 logo.txt logo.ansi ../doc/logo.tex: logo.pl
 	./logo.pl
-
-## Time-stamp: <2015-11-09 14:24:50 assman@faepop36.tu-graz.ac.at>

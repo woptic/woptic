@@ -14,6 +14,7 @@ set -e
 # default parameters
 start=1
 init=
+definit=3
 theta=0.5
 maxiterations=5
 fullarch=yes
@@ -52,23 +53,23 @@ OPTIONS:
  --theta Θ      change refinement “harshness”
                 (0 [uniform] … 1 [most adaptive]; default: $theta)
  --inter        focus refinement on higher energies (usually inter-orbital)
- --init         initial refinement steps (default: $init)
+ --init         initial refinement steps (default: $definit)
  --nosym        do not use symmetry operations
  --band         use ‘case.klist_band’
   -p            use parallel lapw1, optic
   -c            use complex  lapw1, optic
  --so           use lapwso to compute energies
  --up|--dn      use lapw1 -up/-dn to compute energies
-  -f            override  ‘case’
+ --case, -f     override  ‘case’
+  -h, --help    print this message and exit
+  -v, --version print version information and exit
   -V, --verbose increase verbiage level to maximum
-  -v, --version
   -q, --quiet
-  -h, --help    this message
 EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-54-g87621da$' |
+    r=$(echo '$version: v0.1.0-63-gd13290c$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -166,13 +167,20 @@ wq () {
 shopt -s extglob
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -i|?(-)-max-iterations)
-                       maxiterations=$2; shift ;;
-        ?(-)-restart)        restart=$2; shift ;;
-        ?(-)-restore)        restore=$2; shift ;;
-        ?(-)-th|?(-)-theta)    theta=$2; shift ;;
+        -i|?(-)-max-iterations) maxiterations=$2; shift
+        [[ $# -gt 0 ]] || croak --max-iterations requires an argument ;;
+        ?(-)-restart)                 restart=$2; shift
+        [[ $# -gt 0 ]] || croak --restart requires an argument        ;;
+        ?(-)-restore)                 restore=$2; shift
+        [[ $# -gt 0 ]] || croak --restore requires an argument        ;;
+        ?(-)-th|?(-)-theta)             theta=$2; shift
+        [[ $# -gt 0 ]] || croak --theta requires an argument          ;;
+        ?(-)-init)                       init=$2; shift
+        [[ $# -gt 0 ]] || croak --init requires an argument           ;;
+        -f|?(-)-case)                    file=$2; shift
+                                        ffile="-f $file"
+        [[ $# -gt 0 ]] || croak --case requires an argument           ;;
         ?(-)-inter)            inter=-inter    ;;
-        ?(-)-init)              init=$2; shift ;;
         ?(-)-nosym)            nosym=yes       ;;
         ?(-)-band)              band=-band     ;; 
         -L|?(-)-leanarch)   fullarch=          ;;
@@ -181,8 +189,6 @@ while [[ $# -gt 0 ]]; do
         ?(-)-so)                  so=-so       ;;
         ?(-)-up)                updn=up        ;;
         ?(-)-dn)                updn=dn        ;;
-        -f|?(-)-case)           file=$2; shift
-                               ffile="-f $file";;
         -V|?(-)-verbose)           v="-v"      ;;
         -q|?(-)-quiet)             q="-q"      ;;
 
@@ -260,6 +266,10 @@ for f in $must; do
     [[ -s $f ]] || croak "required file ‘$f’ not found"
 done
 
+# canonicalize $SCRATCH
+[[ -z $SCRATCH ]] && $SCRATCH=.
+export SCRATCH=$(readlink -f $SCRATCH)/
+
 
 ## Header ##
 echo -n " MATELMODE: $matelmode"
@@ -280,6 +290,10 @@ echo -ne "          init  = $init\t\t"
 echo -e  "       SCRATCH  = $SCRATCH"
 echo
 
+if [[ -z $init && ! $restart && ! -s $fn_hist ]]; then
+    init=$definit
+fi
+
 if [[ $init ]]; then
    ## Initialize history
    ##
@@ -297,6 +311,7 @@ if [[ $init ]]; then
     for f in $fn_vvk; do
         [[ $mixed_vr   ]] && echo "0 0 0"   > $f
     done
+
     archive 0
 elif [[ $restart ]]; then
     start=$restart
@@ -332,7 +347,7 @@ do
         w refine_tetra -th $theta $inter $file
         nk=$(perl -ne '/^END/ and print($.-1), exit' $fn_kadd)
 
-        fgrep "estimator =" $fn_outref
+        fgrep --text "estimator =" $fn_outref
     fi
 
     # if there was no error, move updated files over old ones …
@@ -388,7 +403,7 @@ do
             done
 
             if [[ $mixed_vr ]]; then
-                for f in xx xy xz yy yz zz; do
+                for f in $fn_vvk; do
                     wq joinham $f$suf_old $f $f$suf_jnd
                     mv $v $f$suf_jnd $f
                 done
@@ -396,7 +411,7 @@ do
         fi
 
         if [[ $iter -ne 1 && $runlapw1 ]]; then
-            natoms=$(grep "elements:" $fn_outwop | cut -d: -f2)
+            natoms=$(fgrep --text "elements:" $fn_outwop | cut -d: -f2)
 
             tail -n +$(( 2*$natoms+1 )) $fn_energy >>$fn_energy$suf_old
             mv $v $fn_energy$suf_old $fn_energy
@@ -435,7 +450,7 @@ do
 
     [[ $nosym ]] && ln -sf $v $fn_struct$suf_sym $fn_struct
 
-    fgrep $fn_outwop -e "sumrules" -e "dc cond" -e "thermopower"
+    fgrep --text $fn_outwop -e "sumrules" -e "dc cond" -e "thermopower"
 
     # store history
     archive $iter
@@ -445,6 +460,3 @@ if [[ ! $q ]]; then
     echo
     echo "+++ woptic done +++"
 fi
-
-
-## Time-stamp: <2016-02-24 15:44:55 assman@faepop36.tu-graz.ac.at>

@@ -234,6 +234,13 @@ contains
 
        if (all(inw%matelmode /= MATELMODES)) &
             call croak("unknown matelmode: "//trim(string(inw%matelmode)))
+
+       getname: do i = 1, size(MATELMODES)
+          if (inw%matelmode == MATELMODES(i)) then
+             inw%matelname = MATELNAMES(i)
+             exit
+          end if
+       end do getname
     else                        ! matelmode given as string?
        read(buf, *) inw%mode, inw%matelname, inw%intrahop
 
@@ -249,18 +256,9 @@ contains
 1001   continue
     end if
 
-    unsupported: if (any(inw%matelmode == UNSUPPORTED_MATELMODES)) then
-       inw%matelname = "???"
-
-       do i = 1, size(MATELMODES)
-          if (inw%matelmode == MATELMODES(i)) then
-             inw%matelname = MATELNAMES(i)
-          end if
-       end do
-
-       call croak("FIXME: matelmode "//trim(string(inw%matelmode))// &
-            &     " ("//trim(inw%matelname)//") is currently unsupported")
-    end if unsupported
+    if (any(inw%matelmode == UNSUPPORTED_MATELMODES)) &
+         call croak("FIXME: matelmode "//trim(string(inw%matelmode))// &
+         &          " ("//trim(inw%matelname)//") is currently unsupported")
 
     read(lun,*) inw%Emax, inw%dE, inw%delterl, inw%wint_dens, inw%wint_cutoff
 
@@ -967,6 +965,3 @@ contains
     call set_case_buf(file%s, band, so, ud)
   end subroutine set_case_argstr
 end module woptic_io
-
-
-!! Time-stamp: <2016-02-26 18:39:12 assman@faepop36.tu-graz.ac.at>

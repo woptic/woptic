@@ -4,7 +4,7 @@
 Version 1.0.0
 =============
 
-This release corresponds to the publication of the paper describing
+This release coincides with the publication of the paper describing
 woptic, CPC ….
 
  * corrected the prefactor of the optical conductivity in the user's
@@ -19,8 +19,10 @@ woptic, CPC ….
  * joinham: fixed a bug where the second argument in the two-argument
    case (‘joinham HK MOMMAT’) was ignored
 
- * woptic: fixed a bug that caused ‘-restore N’ to fail (thanks to
-   U. Wedig)
+ * woptic: fixed a bug that caused ‘-restore N’ to fail
+
+Thanks to Hyeon-Jong Park and Ulrich Wedig for their valuable comments
+on previous versions.
 
 
 Version 0.1.0

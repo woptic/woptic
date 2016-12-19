@@ -49,6 +49,3 @@ real*8,allocatable :: centres(:,:),distmatx(:,:),distmaty(:,:),distmatz(:,:)
   enddo
   close(unit2)
 end program obtain_dist
-
-
-!! Time-stamp: <2015-06-05 13:48:35 assman@faepop23.tu-graz.ac.at>

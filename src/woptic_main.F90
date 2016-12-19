@@ -38,7 +38,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-56-gf8181b3$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-63-gd13290c$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -1674,5 +1674,3 @@ end subroutine init_random_seed
 !! mode: f90
 !! End:
 !!\---
-!!
-!! Time-stamp: <2016-02-25 16:29:16 assman@faepop36.tu-graz.ac.at>
