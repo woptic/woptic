@@ -1,5 +1,5 @@
           *    *-----------------------------*
-         / \    \ WOPTIC \ v0.1.0-70 \ GPLv2+ \
+         / \    \ WOPTIC \ v0.1.0-77 \ GPLv2+ \
        _/_  \ \  \ transport with  Wien2k+DMFT \
       //|| /|\/   *-----------------------------*
       \ ||/||/\    \[Assmann,  Wissgott,  Kuneš, \

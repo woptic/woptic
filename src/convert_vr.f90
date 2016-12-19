@@ -29,7 +29,7 @@ PROGRAM convert_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-70-g3e3f99f$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-77-g865bcbd$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer        :: v, w, k, r, o, i, id, omin, omax

@@ -69,7 +69,7 @@ my @extensions = (@sic, @ext_only, @andfull, @andnew, @andold, @andrefined);
 
 sub help    { pod2usage(0) }
 sub man     { pod2usage(-verbose=>2, exitval=>0, -noperldoc=>1) }
-sub version { q($version: v0.1.0-70-g3e3f99f$) =~ /version: *([\w\d.-]+)/;
+sub version { q($version: v0.1.0-77-g865bcbd$) =~ /version: *([\w\d.-]+)/;
               print "wopticlean $1\n";
               exit; }
 

@@ -63,8 +63,6 @@ $(EXE_SIMPLE): %: %.f90
 W2WU_USERS := $(addsuffix .o,$(EXE_W2WU))
 UTIL_USERS := $(addsuffix .o,$(EXE_UTIL))
 
-refine_tetra: indexx.o
-
 ### Rules for objects
 $(W2WU_USERS): $(W2W_UTILOBJ)
 
