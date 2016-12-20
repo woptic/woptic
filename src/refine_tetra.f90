@@ -311,7 +311,7 @@ contains
     integer,   intent(in)  :: Nt, Nk, Nkfull, NE, Nsig
     integer,   intent(in)  :: tclass(Nt), map(Nkfull), tetra(Nt,10)
     real(DPk), intent(in)  :: dE, wtetra(Nt), theta
-    real(DPk), intent(out) :: kcontribw(Nk, 0:NE, Nsig)
+    real(DPk), intent(in)  :: kcontribw(Nk, 0:NE, Nsig)
     logical,   intent(in)  :: inter
     logical,   intent(out) :: trefine(nt)
 
@@ -868,7 +868,7 @@ program refine_tmesh
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-77-g865bcbd$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-78-gbde82cf$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   integer   :: Nk, Nkfull, Nt, Nev, Nvoe, Nnewt, NE, Nsig, Nnewk, Nnewsk, Nkp
@@ -897,9 +897,9 @@ program refine_tmesh
   integer        :: init_steps
   type(struct_t) :: stru
 
-  character(:), parameter :: usage = '(                                      &
+  character(*), parameter :: usage = '(                                     &
 &"refine_tetra: adaptive refinement of tetrahedral k-mesh"                 /&
-&/"USAGE",                                                                   &
+&/"USAGE",                                                                  &
 &T10,"refine_tetra [OPTIONS] CASE",                                        /&
 &/"FILES",                                                                  &
 &T10,"(prefixed by CASE)",                                                 /&
@@ -928,7 +928,7 @@ program refine_tmesh
 &T10,"--help, --version"                                                    &
 &)'
 
-  character(:), parameter ::                                     &
+  character(*), parameter ::                                     &
        fmt_head = "(I10,4I10,3f5.1,4x,i6,' k, div: (',3i3,')')", &
        fmt_line = "(I10,4I10,f5.1)",                             &
        fmt_end  = "('END',/)"
