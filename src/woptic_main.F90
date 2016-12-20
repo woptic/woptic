@@ -38,7 +38,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-78-gbde82cf$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-80-gc5c67d4$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -645,9 +645,9 @@ program woptic_main
 !!!------------- Compute new k-resolved contributions -----------------------
   write(unit_outwop,"(/, '+------------------------------+')")
   Nk_echo = min(100, (Nk-Nkold)/10+1)
-  !$OMP parallel do
   k_points: do jk=Nkold+1,Nk
      call ptick(specfct_timer)
+     !$OMP parallel do
      compute_A_wk: do jw = wmin,wmax
         Awk(:,:, jw) = specmat(jw, jk)
         do jb=WFmin,WFmax
@@ -662,6 +662,7 @@ program woptic_main
         i = ij(jj,1)
         j = ij(jj,2)
 
+        !$OMP parallel do
         compute_VA_wk: do jw = wmin,wmax
            VA1(:,:,jw) = matmul(Hkd(WFmin:WFmax,WFmin:WFmax,i,jk), Awk(:,:,jw))
            VA2(:,:,jw) = matmul(Hkd(WFmin:WFmax,WFmin:WFmax,j,jk), Awk(:,:,jw))
@@ -676,6 +677,7 @@ program woptic_main
            end forall
 #endif
         elseif         (inw%mixed) then
+           !$OMP parallel do
            compute_VAV_wk: do jw = wmin,wmax
               VAV(:,:,jw) = 0
               do jb1=WFmin,WFmax
@@ -721,6 +723,7 @@ program woptic_main
            DCcond(i,j, jk) = DCcond(i,j, jk) - xd
            K1    (i,j, jk) = K1    (i,j, jk) + xk
            
+           !$OMP parallel do
            ext_freq: do jE = 1, NE
               jwE = inw%wint_dens*jE
               int_freq: do jw = -jwE-inw%Nwx, +inw%Nwx
@@ -789,12 +792,11 @@ program woptic_main
 
      if (mod(jk, Nk_echo)==0) then 
         write(unit_outwop, &
-             '("| k-point",I5," of ",I0," | ",F3.0,"%",T32,"|")') &
+             '("| k-point",I5," of ",I0," | ",F4.0,"%",T32,"|")') &
              jk, Nk, 100._DPk*jk/Nk
         flush(unit_outwop)
      end if
   end do k_points
-  !$OMP end do
   write(unit_outwop,"('+------------------------------+', /)")
 
   deallocate(VA1, VA2, fw)

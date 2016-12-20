@@ -32,11 +32,11 @@ FFLAGS += -DHAVE_PTR_ALLOC_GENERICS -DHAVE_VARLEN_STR
 ifneq "$(findstring gfortran,$(FC))" ""
 FFLAGS += -ffree-form -g -pedantic -Wcharacter-truncation -Wall #-fcheck=all
 # suppress gfortran's stupid warnings about uninitialized array bounds
-FFLAGS += -Wno-maybe-uninitialized -ffree-line-length-0
+FFLAGS += -Wno-maybe-uninitialized -ffree-line-length-0 -fopenmp
 FFLAGS += -Wcharacter-truncation -Wextra #-Wconversion
 
 else ifneq "$(findstring ifort,$(FC))" ""
-FFLAGS += -free -gen-interface nosource -traceback -g -warn all -assume buffered_io
+FFLAGS += -free -gen-interface nosource -traceback -warn all -assume buffered_io -qopenmp
 #-debug all -check format,uninit,output_conversion -warn all
 #FFLAGS   += -ipo
 

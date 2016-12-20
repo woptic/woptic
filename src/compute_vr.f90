@@ -35,7 +35,7 @@ program compute_vr
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-78-gbde82cf$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-80-gc5c67d4$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
 !!! Formats for log file
