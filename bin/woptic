@@ -69,7 +69,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-81-g16b0f39$' |
+    r=$(echo '$version: v0.1.0-81-gf9b9ecb$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
