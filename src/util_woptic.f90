@@ -339,7 +339,7 @@ contains
          &            (inw%matelmode == MODE_interp  .and. inw%mixed)
     inw%read_vk      = inw%matelmode == MODE_interp
     inw%read_vvk     = inw%matelmode == MODE_interp  .and. inw%mixed
-    inw%read_ham     = inw%matelmode >  MODE_Peierls .and. &
+    inw%read_ham     = inw%matelmode >= MODE_Peierls .and. &
          &             inw%matelmode <  MODE_LDA
     inw%need_umatrix = inw%matelmode >  MODE_interp  .and. &
          &             inw%matelmode <  MODE_LDA
@@ -371,6 +371,11 @@ contains
          call croak("shift indices must be inside outer window")
     if (any(inw%iself  < inw%bmin     .or. inw%iself  > inw%bmax)) &
          call croak("interacting indices must be contained in inner window")
+
+    if (inw%matelmode == MODE_LDA) then
+       inw%bmin = 0
+       inw%bmax = 0
+    end if
   end subroutine inwop_read_unit
 
   pure integer function find_nw_extra(cutoff, beta, dw)

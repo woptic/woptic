@@ -69,7 +69,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-80-g457d16f$' |
+    r=$(echo '$version: v0.1.0-81-g16b0f39$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -90,11 +90,12 @@ archive () {
     echo Archiving iteration $1 in ‘$fn_hist’ …
 
     for f in $archfiles; do
+        [[ -s $f ]] || continue
         ln $v -fs $f $f.$1      # create symlinks for names
         tozip+=" $f.$1"
     done
-    zip -qg $v $fn_hist $tozip  # -g: grow archive in-place
-    rm $v $tozip                # remove symlinks again
+    [[ $tozip ]] && zip -qg $v $fn_hist $tozip
+    rm -f $v $tozip                # remove symlinks again
 
     if [[ $fullarch ]]; then
         tozip=
@@ -107,7 +108,7 @@ archive () {
         done
         zip -qg0 $v $fn_hist $tozip # -0: store only
         rm $v $tozip
-        rmdir $v $scratch/ || [[ $q ]] || echo continuing anyway …
+        rm -rf $v $scratch/
     fi
 }
 
@@ -145,18 +146,14 @@ unarchive () {
     rmdir $v $scratch/ || [[ $q ]] || echo continuing anyway …
 }
 
-w () {
-    echo "`date`> (w) $@" >> $log
-    [[ $v ]] && echo
-    [[ $v ]] && echo $1 | perl -ple tr/a-z/A-Z/
-    $@
+function joinmom () {
+    head -n  1 $file.mommat2     >  $file.mommat2_joined
+    tail -n +2 $file.mommat2_old >> $file.mommat2_joined
+    tail -n +2 $file.mommat2     >> $file.mommat2_joined
 }
 
-wq () {
-    local t
-
+w () {
     echo "`date`> (w) $@" >> $log
-
     [[ $v ]] && echo
     [[ $v ]] && echo $1 | perl -ple tr/a-z/A-Z/
     $@
@@ -312,6 +309,7 @@ if [[ $init ]]; then
         [[ $mixed_vr   ]] && echo "0 0 0"   > $f
     done
 
+    rm -f $v $fn_hist
     archive 0
 elif [[ $restart ]]; then
     start=$restart
@@ -385,26 +383,36 @@ do
             mv $v $fn_klist $ktmp
             ln -fs $v $fn_fklist $fn_klist
         fi
-        x convham $ffile
+        [[ $need_ham ]] && x convham $ffile
         if [[ $peierls ]]; then
             rm $v $fn_klist
             mv $v $ktmp $fn_klist
         fi
 
-        [[ $runoptic || $need_ham ]] && wq joinham $file
-        [[ $runoptic ]]&& mv $v $fn_mommat$suf_jnd $fn_mommat
-        [[ $need_ham ]]&& mv $v $fn_ham$suf_jnd    $fn_ham
+        # FIXME: ‘joinham’ still joins case.hk, and case.mommat2 if it
+        # exists; it crashes if case.hk does not exist, and expects
+        # the number of k-points to match between hk and mommat2.
+        # Thus, we only use it when we have a Hamiltonian, and use
+        # joinmom() for mommat2 otherwise.  This should probably be
+        # done more elegantly.
+        if   [[ $need_ham ]]; then
+            w joinham $file
+        elif [[ $runoptic ]]; then
+            w joinmom $file
+        fi
+        [[ $runoptic ]] && mv $v $fn_mommat$suf_jnd $fn_mommat
+        [[ $need_ham ]] && mv $v $fn_ham$suf_jnd    $fn_ham
 
         if [[ $convert_vr ]]; then
-            wq convert_vr $file
+            w convert_vr $file
             for f in $fn_vk; do
-                wq joinham $f$suf_old $f $f$suf_jnd
+                w joinham $f$suf_old $f $f$suf_jnd
                 mv $v $f$suf_jnd $f
             done
 
             if [[ $mixed_vr ]]; then
                 for f in $fn_vvk; do
-                    wq joinham $f$suf_old $f $f$suf_jnd
+                    w joinham $f$suf_old $f $f$suf_jnd
                     mv $v $f$suf_jnd $f
                 done
             fi
