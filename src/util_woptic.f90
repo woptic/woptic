@@ -65,8 +65,8 @@ module woptic
   character(LEN_MATEL), public, parameter :: MATELNAMES(6) = & 
        (/ "Peierls", "interp ", "optic  ", "OrigU  ", "Bloch  ", "LDA    " /)
 
-  integer, parameter :: UNSUPPORTED_MATELMODES(3) = &
-       (/ MODE_Peierls, MODE_Bloch, MODE_LDA /)
+  integer, parameter :: UNSUPPORTED_MATELMODES(2) = &
+       (/ MODE_Peierls, MODE_Bloch /)
 
 !!! Type representing ‘inwop’ files
   type inwop_t
@@ -263,6 +263,7 @@ contains
     read(lun,*) inw%Emax, inw%dE, inw%delterl, inw%wint_dens, inw%wint_cutoff
 
     read(lun, '(A)') buf
+    inw%bmin_w2k=0; inw%bmin=0; inw%bmax=0; inw%bmax_w2k=0
     read(buf, *, IOSTAT=ios) inw%bmin,inw%bmax, inw%bmin_w2k,inw%bmax_w2k
     if (ios /= 0) then
        read(buf, *) inw%bmin, inw%bmax
@@ -324,8 +325,8 @@ contains
     inw%dos     = .true.
     inw%joint   = .false.
     select case (uppercase(inw%mode))
-    case('OPT') ;
-    case('DOS') ;  inw%optcond = .false.
+    case('OPT')  ;
+    case('DOS')  ; inw%optcond = .false.
     case('JOINT'); inw%joint   = .true.
     case default; call croak("unknown MODE: "//inw%mode)
     end select
@@ -358,13 +359,13 @@ contains
     if (inw%beta < 0) &
          call croak("beta should be ≥0, not " // trim(string(inw%beta)))
     if (inw%delterl <= 0) &
-         call croak("delterl should be >0, not" // trim(string(inw%delterl)))
-    if ( inw%bmin_w2k<=0           .or. &
-         inw%bmin<inw%bmin_w2k     .or. inw%bmax<inw%bmin .or. &
-         inw%bmax_w2k<inw%bmin_w2k .or. inw%bmax>inw%bmax_w2k) &
+         call croak("delterl should be >0, not " //trim(string(inw%delterl)))
+    if ( 0        >=  inw%bmin_w2k .or. inw%bmin_w2k > inw%bmin .or. &
+         inw%bmin >   inw%bmax     .or. inw%bmax     > inw%bmax_w2k ) &
          call croak("1 ≤ bmin_w2k ≤ bmin ≤ bmax ≤ bmax_w2k must hold")
     if (inw%drudesep < 0) &
-         call croak("drudesep should be ≥0, not "//trim(string(inw%drudesep)))
+         call croak("drudesep should be ≥0, not " &
+         &       // trim(string(inw%drudesep)))
     Nb = inw%bmax_w2k - inw%bmin_w2k + 1
     if (any(inw%ishift < inw%bmin_w2k .or. inw%ishift > inw%bmax_w2k)) &
          call croak("shift indices must be inside outer window")
