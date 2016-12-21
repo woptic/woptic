@@ -38,7 +38,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-85-g03f0ea0$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-86-g85fcd62$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -315,8 +315,13 @@ program woptic_main
   call ptime(UNIT=unit_outwop)
   call ptime(UNIT=unit_outwop, TIMER=specfct_timer)
   call ptime(UNIT=unit_outwop, TIMER=optcond_timer)
-  write(unit_outwop,'(A)') &
-       "----- OPTICAL CONDUCTIVITY WITH WANNIER FUNCTIONS -----"
+  if (inw%read_ham) then
+     write(unit_outwop,'(A)') &
+          "----- OPTICAL CONDUCTIVITY WITH WANNIER FUNCTIONS -----"
+  else
+     write(unit_outwop,'(A)') &
+          "----- OPTICAL CONDUCTIVITY WITHOUT WANNIER FUNCTIONS -----"
+  end if
   write(unit_outwop, '(A)') &
        "      This is woptic_main " // woptic_version
   write(unit_outwop,*)
@@ -331,8 +336,14 @@ program woptic_main
        '(I0," internal frequencies from ",SP,F7.3," to ",F7.3)') &
        Nw, inw%w(wmin), inw%w(wmax)
   write(unit_outwop, '("number of elements: ", I0)') stru%nneq
-  write(unit_outwop, '("band windows: [",&
-       &I0, "..", I0, "] ⊆ [", I0, "..", I0, "]")') WFmin,WFmax, KSmin,KSmax
+  if (inw%read_ham) then
+     write(unit_outwop,                                                    &
+          '("band windows: [", I0, "..", I0, "] ⊆ [", I0, "..", I0, "]")') &
+          WFmin,WFmax, KSmin,KSmax
+  else
+     write(unit_outwop, '("band window: [", I0, "..", I0, "]")') &
+          KSmin,KSmax
+  end if
   write(unit_outwop, "('unit cell volume: ',G12.6E1,' bohr³')") stru%vol
 
   call read_tetra(unit_tet, tetra, wtetra); close(unit_tet)
