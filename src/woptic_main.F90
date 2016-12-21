@@ -38,7 +38,7 @@ program woptic_main
 
   implicit none
 
-  character(*), parameter :: rev_str = "$version: v0.1.0-81-gf9b9ecb$"
+  character(*), parameter :: rev_str = "$version: v0.1.0-85-g03f0ea0$"
   character(*), parameter :: woptic_version = rev_str(11 : len (rev_str)-1)
 
   real(DPk), parameter :: KPT_TOL = 1e-10_DPk
@@ -528,9 +528,6 @@ program woptic_main
      write(unit_outwop,'(A)') '>>> use original Wien2k matrix elements'
      write(unit_outwop,'(A)') '    with diagonal Hamiltonian from Wien2k'
      write(unit_outwop,*)
-     do jb=WFmin,WFmax
-        Hk(jb,jb,:) = bands(jb,:)
-     end do
 
   case default
      call croak("unknown matrix element mode: "// &
@@ -650,6 +647,7 @@ program woptic_main
      !$OMP parallel do
      compute_A_wk: do jw = wmin,wmax
         Awk(:,:, jw) = specmat(jw, jk)
+
         do jb=WFmin,WFmax
            DOS_orb(jb,jw,jk) = DOS_orb(jb,jw,jk) + real(Awk(jb,jb,jw))
         end do
@@ -1463,6 +1461,9 @@ function specmat(jw, jk)
 
   complex(DPk) :: G(WFmin:WFmax, WFmin:WFmax)
   integer      :: jb
+
+  !! in LDA matelmode, bail
+  if (size(G) == 0) return
 
   !! prepare Green function inverse
   G = -Hk(:,:,jk)

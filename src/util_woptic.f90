@@ -331,7 +331,8 @@ contains
     case default; call croak("unknown MODE: "//inw%mode)
     end select
 
-    inw%mixed = inw%bmin/=inw%bmin_w2k .or. inw%bmax/=inw%bmax_w2k
+    inw%mixed = inw%matelmode < MODE_LDA &
+         .and. (inw%bmin/=inw%bmin_w2k .or. inw%bmax/=inw%bmax_w2k)
 
     inw%intrahop     = inw%matelmode == MODE_Peierls .and. inw%intrahop
     inw%read_energy  = inw%matelmode >= MODE_LDA      .or. inw%mixed 
@@ -373,7 +374,7 @@ contains
          call croak("interacting indices must be contained in inner window")
 
     if (inw%matelmode == MODE_LDA) then
-       inw%bmin = 0
+       inw%bmin = 1
        inw%bmax = 0
     end if
   end subroutine inwop_read_unit
