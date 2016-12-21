@@ -46,7 +46,7 @@ WOPTIC:   adaptive algorithm to compute optical conductivity, dc conductivity,
 USAGE:    woptic [OPTIONS]
 
 OPTIONS:
- --max-iterations N, -i N 
+ --max-iterations N, -i N
                 number of total iterations (default: $maxiterations)
  --restart I    continue from iteration I
  --restore I    restore iteration I without continuing
@@ -69,7 +69,7 @@ EOF
 }
 
 version () {
-    r=$(echo '$version: v0.1.0-80-gc5c67d4$' |
+    r=$(echo '$version: v0.1.0-81-gc3a6371$' |
                perl -pe 's/.*: *(\S+) *\$/$1/')
     echo "woptic $r"
 }
@@ -164,6 +164,8 @@ wq () {
 
 
 ## Option handling ##
+echo ">   ($(basename $0)) options: $@" >>:log
+
 shopt -s extglob
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -182,7 +184,7 @@ while [[ $# -gt 0 ]]; do
         [[ $# -gt 0 ]] || croak --case requires an argument           ;;
         ?(-)-inter)            inter=-inter    ;;
         ?(-)-nosym)            nosym=yes       ;;
-        ?(-)-band)              band=-band     ;; 
+        ?(-)-band)              band=-band     ;;
         -L|?(-)-leanarch)   fullarch=          ;;
         -p|?(-)-parallel?(-lapw1)) p=-p        ;;
         -c|?(-)-complex?(-lapw1))  c=-c        ;;
@@ -214,8 +216,6 @@ fi
 banner=$(dirname $0)/../src/logo.$banner
 cat $banner
 echo
-
-echo ">   ($(basename $0)) options: $@" >>:log
 
 [[ $updn ]] && sp=-$updn
 
@@ -249,7 +249,7 @@ if [[ $restore ]]; then
     echo Restoring iteration $start …
     unarchive $restore
     exit
-fi    
+fi
 
 
 ## Test file existence ##
@@ -374,7 +374,7 @@ do
             else
                 x lapw1 $ffile $sp $p $c #work with klist
             fi
-            
+
             [[ $p ]] && x joinvec -enefile $ffile $sp $so
         fi
 
