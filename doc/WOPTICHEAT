@@ -20,7 +20,7 @@
    2.1) cp $WIENROOT/SRC_templates/case.inop $(basename $PWD).inop     MME=ON
    2.2) ‘interp’ mode: run optic for ‘case.mommat2’                   x optic
 
-3) If MATELMODE=2: compute V(R), VAV(R)           compute_vr $(basename $PWD)
+3) If MATELMODE=interp: compute V(R), VAV(R)      compute_vr $(basename $PWD)
 
 5) Run ‘woptic’
    5.1) main output files:

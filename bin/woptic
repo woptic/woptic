@@ -56,6 +56,7 @@ OPTIONS:
  --init         initial refinement steps (default: $definit)
  --nosym        do not use symmetry operations
  --band         use ‘case.klist_band’
+ --orb          call lapw1 with -orb switch (needs case.vorb)
   -p            use parallel lapw1, optic
   -c            use complex  lapw1, optic
  --so           use lapwso to compute energies
@@ -186,6 +187,7 @@ while [[ $# -gt 0 ]]; do
         -p|?(-)-parallel?(-lapw1)) p=-p        ;;
         -c|?(-)-complex?(-lapw1))  c=-c        ;;
         ?(-)-so)                  so=-so       ;;
+        ?(-)-orb)                orb=-orb      ;;
         ?(-)-up)                updn=up        ;;
         ?(-)-dn)                updn=dn        ;;
         -V|?(-)-verbose)           v="-v"      ;;
@@ -363,14 +365,14 @@ do
                 if [[ $sp ]]; then
                     x lapw1  $ffile -up $p $c
                     x lapw1  $ffile -dn $p $c
-                    x lapwso $ffile -up $p $c
+                    x lapwso $ffile -up $p $c $orb
                 else
                     #FIXME: “this is not yet working” (???)
                     x lapw1  $ffile $p $c
                     x lapwso $ffile $p $c
                 fi
             else
-                x lapw1 $ffile $sp $p $c #work with klist
+                x lapw1 $ffile $sp $p $c $orb #work with klist
             fi
 
             [[ $p ]] && x joinvec -enefile $ffile $sp $so
