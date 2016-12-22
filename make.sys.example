@@ -38,8 +38,7 @@ FFLAGS += -Wcharacter-truncation -Wextra #-Wconversion
 else ifneq "$(findstring ifort,$(FC))" ""
 FFLAGS += -free -gen-interface nosource -traceback -warn all -assume buffered_io -qopenmp
 #-debug all -check format,uninit,output_conversion -warn all
-#FFLAGS   += -ipo
-
+FFLAGS += -ip # -ipo
 endif
 
 
